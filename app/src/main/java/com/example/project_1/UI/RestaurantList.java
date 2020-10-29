@@ -1,10 +1,12 @@
-package com.example.project_1;
+package com.example.project_1.UI;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+import com.example.project_1.R;
+
+public class RestaurantList extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
