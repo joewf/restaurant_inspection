@@ -5,13 +5,14 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 public class Inspection {
-    InspectionType type;
-    HazardRating hazardRating;
-    List<Violation> violationLump = new ArrayList<>();
-    String trackingNumber;
-    int numCritical;
-    int numNonCritical;
-    int hazardColor;
-    int hazardIcon;
-    GregorianCalendar date;
+    private List<Violation> violationLump = new ArrayList<>();
+
+    private GregorianCalendar date;
+    private InspectionType type;
+    private HazardRating hazardRating;
+    private String trackingNumber;
+    private int numCritical;
+    private int numNonCritical;
+    private int hazardColor;
+    private int hazardIcon;
 }
