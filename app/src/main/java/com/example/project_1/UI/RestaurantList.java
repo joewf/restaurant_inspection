@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -106,7 +107,7 @@ public class RestaurantList extends AppCompatActivity {
         ListView list = (ListView) findViewById(R.id.restaurantListView);
         list.setAdapter(adapter);
 
-        // Start RestaurantDetails.java\
+        // Start RestaurantDetails.java with restaurant's index
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
@@ -140,6 +141,7 @@ public class RestaurantList extends AppCompatActivity {
             // Fill restaurant name
             TextView restaurantName = itemView.findViewById(R.id.text_restaurant_name);
             restaurantName.setText( currentRestaurant.getName() );
+            restaurantName.setTextColor(Color.BLUE);
 
             // Fill issues
 
