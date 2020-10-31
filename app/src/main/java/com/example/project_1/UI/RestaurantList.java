@@ -26,6 +26,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class RestaurantList extends AppCompatActivity {
@@ -41,20 +45,10 @@ public class RestaurantList extends AppCompatActivity {
         restaurantManager = restaurantManager.getInstance();
 
         setRestaurantData();
-        populateIcon();
         populateListView();
+        sortArrayList();
+        populateIcon();
 
-    }
-
-    private void populateIcon() {
-        restaurantIcon[0] = R.drawable.icon_hamburgers;
-        restaurantIcon[1] = R.drawable.icon_chinese_food;
-        restaurantIcon[2] = R.drawable.icon_beer;
-        restaurantIcon[3] = R.drawable.icon_chinese_food;
-        restaurantIcon[4] = R.drawable.icon_pizza;
-        restaurantIcon[5] = R.drawable.icon_tuna;
-        restaurantIcon[6] = R.drawable.icon_pizza;
-        restaurantIcon[7] = R.drawable.icon_chicken;
     }
 
     private void setRestaurantData() {
@@ -101,6 +95,17 @@ public class RestaurantList extends AppCompatActivity {
             }
 
         }
+
+    private void populateIcon() {
+        restaurantIcon[0] = R.drawable.icon_tuna;
+        restaurantIcon[1] = R.drawable.icon_chinese_food;
+        restaurantIcon[2] = R.drawable.icon_chinese_food;
+        restaurantIcon[3] = R.drawable.icon_hamburgers;
+        restaurantIcon[4] = R.drawable.icon_beer;
+        restaurantIcon[5] = R.drawable.icon_pizza;
+        restaurantIcon[6] = R.drawable.icon_pizza;
+        restaurantIcon[7] = R.drawable.icon_chicken;
+    }
 
     private void populateListView() {
         ArrayAdapter<Restaurant> adapter = new MyListAdapter();
@@ -155,5 +160,15 @@ public class RestaurantList extends AppCompatActivity {
             return itemView;
 
         }
+    }
+
+    private void sortArrayList() {
+        Collections.sort(RestaurantManager.restaurants, new Comparator<Restaurant>() {
+            @Override
+            public int compare(Restaurant R1, Restaurant R2) {
+                // Compare R1 name and R2 name
+                return R1.getName().compareTo(R2.getName());
+            }
+        });
     }
 }
