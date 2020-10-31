@@ -1,5 +1,7 @@
 package com.example.project_1.Model;
 
+import com.example.project_1.R;
+
 /**
  * Restaurant information
  */
@@ -12,8 +14,7 @@ public class Restaurant {
     private String factType;
     private double latitude;
     private double altitude;
-
-    private int restaurantIcon;
+    //private int restaurantIcon;
 
     public Restaurant(String trackingNumber, String name, String physicalAddress, String physicalCity, String factType, double latitude, double altitude) {
         this.trackingNumber = trackingNumber;
@@ -92,13 +93,13 @@ public class Restaurant {
         this.altitude = altitude;
     }
 
-    public int getRestaurantIcon() {
+    /*public int getRestaurantIcon(int icon) {
         return restaurantIcon;
     }
 
     public void setRestaurantIcon(int restaurantIcon) {
         this.restaurantIcon = restaurantIcon;
-    }
+    }*/
 
     @Override
     public String toString() {
@@ -110,7 +111,6 @@ public class Restaurant {
                 ", factType='" + factType + '\'' +
                 ", latitude=" + latitude +
                 ", altitude=" + altitude +
-                ", restaurantIcon=" + restaurantIcon +
                 '}';
     }
 }

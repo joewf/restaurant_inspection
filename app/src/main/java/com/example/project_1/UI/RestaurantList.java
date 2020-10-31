@@ -4,10 +4,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -28,6 +30,7 @@ import java.util.List;
 public class RestaurantList extends AppCompatActivity {
 
     private RestaurantManager restaurantManager;
+    private int[] restaurantIcon = new int[8];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +40,20 @@ public class RestaurantList extends AppCompatActivity {
         restaurantManager = restaurantManager.getInstance();
 
         setRestaurantData();
+        populateIcon();
         populateListView();
+
+    }
+
+    private void populateIcon() {
+        restaurantIcon[0] = R.drawable.icon_hamburgers;
+        restaurantIcon[1] = R.drawable.icon_chinese_food;
+        restaurantIcon[2] = R.drawable.icon_beer;
+        restaurantIcon[3] = R.drawable.icon_chinese_food;
+        restaurantIcon[4] = R.drawable.icon_pizza;
+        restaurantIcon[5] = R.drawable.icon_tuna;
+        restaurantIcon[6] = R.drawable.icon_pizza;
+        restaurantIcon[7] = R.drawable.icon_chicken;
     }
 
     private void setRestaurantData() {
@@ -89,6 +105,15 @@ public class RestaurantList extends AppCompatActivity {
         ArrayAdapter<Restaurant> adapter = new MyListAdapter();
         ListView list = (ListView) findViewById(R.id.restaurantListView);
         list.setAdapter(adapter);
+
+        // Start RestaurantDetails.java\
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Intent intent = RestaurantDetails.makeIntent(RestaurantList.this, position);
+                startActivity(intent);
+            }
+        });
     }
 
     private class MyListAdapter extends ArrayAdapter<Restaurant> {
@@ -108,13 +133,21 @@ public class RestaurantList extends AppCompatActivity {
             // Find the restaurant to work with
             Restaurant currentRestaurant = restaurantManager.get(position);
 
-            // Fill the view
+            // Fill restaurant icon
             ImageView restaurantView = (ImageView) itemView.findViewById(R.id.restaurant_icon);
-            restaurantView.setImageResource( currentRestaurant.getRestaurantIcon() );
+            restaurantView.setImageResource(restaurantIcon[position]);
 
             // Fill restaurant name
             TextView restaurantName = itemView.findViewById(R.id.text_restaurant_name);
             restaurantName.setText( currentRestaurant.getName() );
+
+            // Fill issues
+
+            // Fill hazard icon
+
+            // Fill hazard text
+
+            // Fill inspection date
 
 
             return itemView;
