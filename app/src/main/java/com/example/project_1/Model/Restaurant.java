@@ -25,6 +25,17 @@ public class Restaurant {
         this.altitude = altitude;
     }
 
+    // Default constructor to read cvs file
+    public Restaurant() {
+        this.trackingNumber = null;
+        this.name = null;
+        this.physicalAddress = null;
+        this.physicalCity = null;
+        this.factType = null;
+        this.latitude = 0;
+        this.altitude = 0;
+    }
+
     public String getTrackingNumber() {
         return trackingNumber;
     }
@@ -87,5 +98,19 @@ public class Restaurant {
 
     public void setRestaurantIcon(int restaurantIcon) {
         this.restaurantIcon = restaurantIcon;
+    }
+
+    @Override
+    public String toString() {
+        return "Restaurant{" +
+                "trackingNumber='" + trackingNumber + '\'' +
+                ", name='" + name + '\'' +
+                ", physicalAddress='" + physicalAddress + '\'' +
+                ", physicalCity='" + physicalCity + '\'' +
+                ", factType='" + factType + '\'' +
+                ", latitude=" + latitude +
+                ", altitude=" + altitude +
+                ", restaurantIcon=" + restaurantIcon +
+                '}';
     }
 }
