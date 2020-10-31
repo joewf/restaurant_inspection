@@ -37,14 +37,7 @@ public class RestaurantList extends AppCompatActivity {
         restaurantManager = restaurantManager.getInstance();
 
         setRestaurantData();
-        //populateRestaurantList();
         populateListView();
-    }
-
-
-
-    private void populateRestaurantList() {
-
     }
 
     private void setRestaurantData() {
