@@ -41,8 +41,8 @@ public class RestaurantManager {
         return restaurants.get(index);
     }
 
-    @Override
+    /*@Override
     public Iterator<Restaurant> iterator() {
         return restaurants.iterator();
-    }
+    }*/
 }
