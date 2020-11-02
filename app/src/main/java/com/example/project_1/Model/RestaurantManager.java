@@ -7,7 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class RestaurantManager {
-    private List<Restaurant> restaurants = new ArrayList<>();
+    public static List<Restaurant> restaurants = new ArrayList<>();
     private static RestaurantManager instance;
 
     // Return restaurant for MyListAdapter

@@ -4,10 +4,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -23,11 +26,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class RestaurantList extends AppCompatActivity {
 
     private RestaurantManager restaurantManager;
+    private int[] restaurantIcon = new int[8];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +46,9 @@ public class RestaurantList extends AppCompatActivity {
 
         setRestaurantData();
         populateListView();
+        sortArrayList();
+        populateIcon();
+
     }
 
     private void setRestaurantData() {
@@ -85,10 +96,30 @@ public class RestaurantList extends AppCompatActivity {
 
         }
 
+    private void populateIcon() {
+        restaurantIcon[0] = R.drawable.icon_tuna;
+        restaurantIcon[1] = R.drawable.icon_chinese_food;
+        restaurantIcon[2] = R.drawable.icon_chinese_food;
+        restaurantIcon[3] = R.drawable.icon_hamburgers;
+        restaurantIcon[4] = R.drawable.icon_beer;
+        restaurantIcon[5] = R.drawable.icon_pizza;
+        restaurantIcon[6] = R.drawable.icon_pizza;
+        restaurantIcon[7] = R.drawable.icon_chicken;
+    }
+
     private void populateListView() {
         ArrayAdapter<Restaurant> adapter = new MyListAdapter();
         ListView list = (ListView) findViewById(R.id.restaurantListView);
         list.setAdapter(adapter);
+
+        // Start RestaurantDetails.java with restaurant's index
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Intent intent = RestaurantDetails.makeIntent(RestaurantList.this, position);
+                startActivity(intent);
+            }
+        });
     }
 
     private class MyListAdapter extends ArrayAdapter<Restaurant> {
@@ -108,17 +139,36 @@ public class RestaurantList extends AppCompatActivity {
             // Find the restaurant to work with
             Restaurant currentRestaurant = restaurantManager.get(position);
 
-            // Fill the view
+            // Fill restaurant icon
             ImageView restaurantView = (ImageView) itemView.findViewById(R.id.restaurant_icon);
-            restaurantView.setImageResource( currentRestaurant.getRestaurantIcon() );
+            restaurantView.setImageResource(restaurantIcon[position]);
 
             // Fill restaurant name
             TextView restaurantName = itemView.findViewById(R.id.text_restaurant_name);
             restaurantName.setText( currentRestaurant.getName() );
+            restaurantName.setTextColor(Color.BLUE);
+
+            // Fill issues
+
+            // Fill hazard icon
+
+            // Fill hazard text
+
+            // Fill inspection date
 
 
             return itemView;
 
         }
+    }
+
+    private void sortArrayList() {
+        Collections.sort(RestaurantManager.restaurants, new Comparator<Restaurant>() {
+            @Override
+            public int compare(Restaurant R1, Restaurant R2) {
+                // Compare R1 name and R2 name
+                return R1.getName().compareTo(R2.getName());
+            }
+        });
     }
 }

@@ -67,5 +67,8 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:layout_toEndOf="@+id/restaurant_icon"
-        android:text="Restaurant name" />
+        android:text="Restaurant name"
+        android:textSize="20dp"
+
+        android:textStyle="bold" />
 </RelativeLayout>
