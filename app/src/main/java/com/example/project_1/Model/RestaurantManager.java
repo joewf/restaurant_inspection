@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class RestaurantManager {
+public class RestaurantManager implements Iterable<Restaurant>{
+
     public static List<Restaurant> restaurants = new ArrayList<>();
     private static RestaurantManager instance;
 
@@ -41,8 +42,8 @@ public class RestaurantManager {
         return restaurants.get(index);
     }
 
-    /*@Override
+    @Override
     public Iterator<Restaurant> iterator() {
         return restaurants.iterator();
-    }*/
+    }
 }
