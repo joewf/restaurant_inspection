@@ -11,8 +11,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 public class Inspection {
-    private List<Violation> violationLump = new ArrayList<>();
 
+    private List<Violation> violationLump = new ArrayList<>();
     private GregorianCalendar date;
     private InspectionType type;
     private HazardRating hazardRating;
