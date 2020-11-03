@@ -8,6 +8,7 @@ import java.util.List;
 
 public class RestaurantManager {
     public static List<Restaurant> restaurants = new ArrayList<>();
+    public static List<Inspection> inspections = new ArrayList<>();
     private static RestaurantManager instance;
 
     // Return restaurant for MyListAdapter

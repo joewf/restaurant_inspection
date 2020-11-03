@@ -16,9 +16,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.project_1.Model.HazardRating;
+import com.example.project_1.Model.Inspection;
+import com.example.project_1.Model.InspectionType;
 import com.example.project_1.Model.Restaurant;
 import com.example.project_1.Model.RestaurantManager;
 import com.example.project_1.R;
+
+import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -45,11 +50,13 @@ public class RestaurantList extends AppCompatActivity {
         restaurantManager = restaurantManager.getInstance();
 
         setRestaurantData();
+        //setInspectionData();
         populateListView();
         sortArrayList();
         populateIcon();
 
     }
+
 
     private void setRestaurantData() {
         InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
@@ -68,25 +75,27 @@ public class RestaurantList extends AppCompatActivity {
                     String[] tokens = line.split(",");
 
                     // Read the data
-                    Restaurant sample = new Restaurant();
-                    sample.setTrackingNumber(tokens[0]);
-                    sample.setName(tokens[1]);
-                    sample.setPhysicalAddress(tokens[2]);
-                    sample.setPhysicalCity(tokens[3]);
-                    sample.setFactType(tokens[4]);
+                    Restaurant sampleRestaurant = new Restaurant();
+                    sampleRestaurant.setTrackingNumber(tokens[0]);
+                    sampleRestaurant.setName(tokens[1]);
+                    sampleRestaurant.setPhysicalAddress(tokens[2]);
+                    sampleRestaurant.setPhysicalCity(tokens[3]);
+                    sampleRestaurant.setFactType(tokens[4]);
                     if (tokens[5].length() > 0) {
-                        sample.setLatitude(Double.parseDouble(tokens[5]));
+                        sampleRestaurant.setLatitude(Double.parseDouble(tokens[5]));
                     } else {
-                        sample.setLatitude(0);
+                        sampleRestaurant.setLatitude(0);
                     }
                     if (tokens[6].length() > 0) {
-                        sample.setAltitude(Double.parseDouble(tokens[6]));
+                        sampleRestaurant.setAltitude(Double.parseDouble(tokens[6]));
                     } else {
-                        sample.setAltitude(0);
+                        sampleRestaurant.setAltitude(0);
                     }
-                    restaurantManager.add(sample);
+                    restaurantManager.add(sampleRestaurant);
 
-                    Log.d("RestaurantList", "Just created: " + sample);
+                    Inspection sampleInspection = new Inspection();
+
+                    Log.d("RestaurantList", "Just created: " + sampleRestaurant);
 
                 }
             } catch (IOException e) {
@@ -144,11 +153,15 @@ public class RestaurantList extends AppCompatActivity {
             restaurantView.setImageResource(restaurantIcon[position]);
 
             // Fill restaurant name
-            TextView restaurantName = itemView.findViewById(R.id.text_restaurant_name);
+            TextView restaurantName = (TextView) itemView.findViewById(R.id.text_restaurant_name);
             restaurantName.setText( currentRestaurant.getName() );
             restaurantName.setTextColor(Color.BLUE);
 
             // Fill issues
+            TextView restaurantCriticalIssues = (TextView) itemView.findViewById(R.id.text_issues_found);
+            String trackingNumber = currentRestaurant.getTrackingNumber();
+
+
 
             // Fill hazard icon
 
