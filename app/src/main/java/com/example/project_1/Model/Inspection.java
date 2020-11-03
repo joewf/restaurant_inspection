@@ -70,4 +70,62 @@ public class Inspection {
         return hazardIcon;
     }
 
+    public List<Violation> getViolationLump() {
+        return violationLump;
+    }
+
+    public void setViolationLump(List<Violation> violationLump) {
+        this.violationLump = violationLump;
+    }
+
+    public GregorianCalendar getDate() {
+        return date;
+    }
+
+    public void setDate(GregorianCalendar date) {
+        this.date = date;
+    }
+
+    public void setType(InspectionType type) {
+        this.type = type;
+    }
+
+    public void setHazardRating(HazardRating hazardRating) {
+        this.hazardRating = hazardRating;
+    }
+
+    public void setTrackingNumber(String trackingNumber) {
+        this.trackingNumber = trackingNumber;
+    }
+
+    public void setNumCritical(int numCritical) {
+        this.numCritical = numCritical;
+    }
+
+    public void setNumNonCritical(int numNonCritical) {
+        this.numNonCritical = numNonCritical;
+    }
+
+    public void setHazardColor(int hazardColor) {
+        this.hazardColor = hazardColor;
+    }
+
+    public void setHazardIcon(int hazardIcon) {
+        this.hazardIcon = hazardIcon;
+    }
+
+    @Override
+    public String toString() {
+        return "Inspection{" +
+                "violationLump=" + violationLump +
+                ", date=" + date +
+                ", type=" + type +
+                ", hazardRating=" + hazardRating +
+                ", trackingNumber='" + trackingNumber + '\'' +
+                ", numCritical=" + numCritical +
+                ", numNonCritical=" + numNonCritical +
+                ", hazardColor=" + hazardColor +
+                ", hazardIcon=" + hazardIcon +
+                '}';
+    }
 }
