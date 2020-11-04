@@ -154,7 +154,7 @@ public class RestaurantList extends AppCompatActivity {
 
             // Fill hazard text
 
-            // Fill inspection date
+            // Fill inspection date 
 
 
             return itemView;
