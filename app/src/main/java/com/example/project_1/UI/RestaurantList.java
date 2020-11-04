@@ -171,4 +171,9 @@ public class RestaurantList extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(InspectionReport.makeIntent(this));
+    }
 }

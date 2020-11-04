@@ -2,6 +2,8 @@ package com.example.project_1.UI;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -15,78 +17,99 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 public class InspectionReport extends AppCompatActivity {
-
-
+    public static Intent makeIntent(Context context) {
+        return new Intent(context, InspectionReport.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inspection_report);
 
-        getinspectiondata();
+        readInspectionData();
     }
 
     private List<Inspection> inspectionList = new ArrayList<>();
 
-    private void getinspectiondata() {
+    private void readInspectionData() {
 
         InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
         BufferedReader reader = new BufferedReader(
-                new InputStreamReader(is, Charset.forName("UTF-8")));
+                new InputStreamReader(is, StandardCharsets.UTF_8)
+        );
 
         String line = "";
         try {
             //Step over headers
             reader.readLine();
 
-            while ( ((line = reader.readLine()) != null) ) {
+            InspectionType inspectionType;
+            HazardRating hazardRating;
+            String trackingNumber;
+            int numCritical;
+            int numNonCritical;
+            while (((line = reader.readLine()) != null)) {
+                Log.e("line", "readInspectionData: " + line);
 
-                Log.d("InspectionReport", "line: " + line);
-                //split upon commas
+                // Split by ','
                 String[] tokens = line.split(",");
-                //reading in data
-                Inspection inspectData = new Inspection();
-                inspectData.setTrackingNumber(tokens[0]);
-                inspectData.setDate(tokens[1]);
 
-                // Couldn't get the type and hazard
-                    if (line == "Routine") {
-                        inspectData.setType(tokens[2]) = InspectionType.ROUTINE;
+                // Read the data
+                trackingNumber = tokens[0].substring(1, tokens[0].length() - 1);
 
-                    }
-                    if (line == "Follow-Up"){
-                        inspectData.setType(tokens[2]) = InspectionType.FOLLOW_UP;
-                    }
-                inspectData.setNumCritical(Integer.parseInt(tokens[3]));
-                inspectData.setNumNonCritical(Integer.parseInt(tokens[4]));
-                if(line == "Low") {
-                    inspectData.setHazardRating(tokens[5]) = HazardRating.LOW;
-                }
-                if(line == "Moderate") {
-                    inspectData.setHazardRating(tokens[5]) = HazardRating.MODERATE;
-                }
-                if(line == "High") {
-                    inspectData.setHazardRating(tokens[5]) = HazardRating.HIGH;
+                int[] yearMonthDay = parseDateString(tokens[1]);
+
+                if (tokens[2].equals("\"Routine\"")) {
+                    inspectionType = InspectionType.ROUTINE;
+                } else {
+                    inspectionType = InspectionType.FOLLOW_UP;
                 }
 
+                numCritical = Integer.parseInt(tokens[3]);
 
-                inspectionList.add(inspectData);
+                numNonCritical = Integer.parseInt(tokens[4]);
 
-                Log.d("InspectionReport", "created" + inspectData);
+                if ("\"Low\"".equals(tokens[5])) {
+                    hazardRating = HazardRating.LOW;
+                } else if ("\"Moderate\"".equals(tokens[5])) {
+                    hazardRating = HazardRating.MODERATE;
+                } else {
+                    hazardRating = HazardRating.HIGH;
+                }
+
+                Inspection inspection = new Inspection(trackingNumber, yearMonthDay[0], yearMonthDay[1], yearMonthDay[2]
+                        , inspectionType, numCritical, numNonCritical, hazardRating, null);
+
+                inspectionList.add(inspection);
+
+                Log.e("InspectionReport", "Just created " + inspectionList.size() + ": " + inspection);
             }
         } catch (IOException e) {
-                Log.wtf("InspectionReport", "error reading file on line", e);
-                e.printStackTrace();
-            }
-
+            Log.wtf("InspectionReport", "error reading file on line" + line, e);
+            e.printStackTrace();
         }
 
-
     }
+
+    private int[] parseDateString(String token) {
+        int[] date = new int[3];
+
+        Log.e("parseDateString", "parseDateString: " + token);
+        date[0] = Integer.parseInt(token.substring(0, 4));
+        Log.e("parseDateString", "parseDateString: " + date[0]);
+        date[1] = Integer.parseInt(token.substring(4, 6));
+        Log.e("parseDateString", "parseDateString: " + date[1]);
+        date[2] = Integer.parseInt(token.substring(6));
+        Log.e("parseDateString", "parseDateString: " + date[2]);
+
+        return date;
+    }
+}
 
 
 
