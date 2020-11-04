@@ -106,7 +106,7 @@ public class Inspection {
     @Override
     public String toString() {
         return "Inspection{" +
-                ", date=" + date +
+                "date=" + date +
                 ", type=" + type +
                 ", hazardRating=" + hazardRating +
                 ", trackingNumber='" + trackingNumber + '\'' +
