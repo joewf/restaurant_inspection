@@ -303,7 +303,7 @@ public class RestaurantList extends AppCompatActivity {
                     }
                     // Less than one year
                     else if(diff < 365) {
-                        simpleDateFormat = new SimpleDateFormat("MMM dd");
+                        simpleDateFormat = new SimpleDateFormat("MMMM dd");
                         String strDate = simpleDateFormat.format(inspectionDate);
                         restaurantDate.setText(strDate);
                     }
