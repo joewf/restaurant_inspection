@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Project_1</string>
+    <string name="address">Address: </string>
+    <string name="GPS">GPS Coordinates: </string>
 </resources>
