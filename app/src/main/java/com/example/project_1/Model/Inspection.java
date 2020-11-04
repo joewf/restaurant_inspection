@@ -5,6 +5,8 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import java.time.Month;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalAdjuster;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -19,18 +21,20 @@ public class Inspection {
     private String trackingNumber;
     private int numCritical;
     private int numNonCritical;
-    private int hazardColor;
-    private int hazardIcon;
 
-    public Inspection(int year, int month, int dayOfMonth, InspectionType type, HazardRating hazardRating, String trackingNumber, int numCritical, int numNonCritical, int hazardColor, int hazardIcon) {
+    public Inspection(String trackingNumber, int year, int month, int dayOfMonth, InspectionType type, int numCritical,
+                      int numNonCritical, HazardRating hazardRating, List<Violation> violations) {
+
         setDate(year, month, dayOfMonth);
-        this.type = type;
-        this.hazardRating = hazardRating;
         this.trackingNumber = trackingNumber;
+        this.type = type;
         this.numCritical = numCritical;
         this.numNonCritical = numNonCritical;
-        this.hazardColor = hazardColor;
-        this.hazardIcon = hazardIcon;
+        this.hazardRating = hazardRating;
+    }
+
+    public void addViolation(String violation) {
+
     }
 
     public void setDate(int year, int month, int dayOfMonth) {
@@ -39,7 +43,21 @@ public class Inspection {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public String getDateString() {
-        return Month.of(date.get(Calendar.MONTH)) + " " + date.get(Calendar.DAY_OF_MONTH) + ", " + date.get(Calendar.YEAR);
+        return Month.values()[(date.get(Calendar.MONTH))] + " " + date.get(Calendar.DAY_OF_MONTH) + ", " + date.get(Calendar.YEAR);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public String toString() {
+        return "Inspection{" +
+                "violationLump=" + violationLump +
+                ", date=" + getDateString() +
+                ", type=" + type +
+                ", hazardRating=" + hazardRating +
+                ", trackingNumber='" + trackingNumber + '\'' +
+                ", numCritical=" + numCritical +
+                ", numNonCritical=" + numNonCritical +
+                '}';
     }
 
     public InspectionType getType() {
@@ -62,12 +80,7 @@ public class Inspection {
         return numNonCritical;
     }
 
-    public int getHazardColor() {
-        return hazardColor;
+    enum Month {
+        January, February, March, April, May, June, July, August, September, October, November, December
     }
-
-    public int getHazardIcon() {
-        return hazardIcon;
-    }
-
 }
