@@ -9,12 +9,14 @@ import java.util.List;
 public class RestaurantManager implements Iterable<Restaurant>{
 
     public static List<Restaurant> restaurants = new ArrayList<>();
+    public static List<Inspection> inspections = new ArrayList<>();
     private static RestaurantManager instance;
 
     // Return restaurant for MyListAdapter
     public List<Restaurant> getRestaurants() {
         return restaurants;
     }
+    public List<Inspection> getInspections() { return inspections; }
 
     /*
         Singleton support
@@ -30,11 +32,14 @@ public class RestaurantManager implements Iterable<Restaurant>{
         return instance;
     }
 
-    public void add(Restaurant restaurant) {
+    public void addRestaurant(Restaurant restaurant) {
         restaurants.add(restaurant);
     }
 
-    public void remove(Restaurant restaurant) {
+    public void addInspection(Inspection inspection) {inspections.add(inspection); }
+
+
+    public void removeRestaurant(Restaurant restaurant) {
         restaurants.remove(restaurant);
     }
 
