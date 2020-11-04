@@ -320,9 +320,7 @@ public class RestaurantList extends AppCompatActivity {
                     restaurantDate.setText("No inspections found");
                 }
             }
-
             return itemView;
-
         }
     }
 

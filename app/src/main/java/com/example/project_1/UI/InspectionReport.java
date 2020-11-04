@@ -18,7 +18,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class InspectionReport extends AppCompatActivity {
@@ -62,7 +65,8 @@ public class InspectionReport extends AppCompatActivity {
                 // Read the data
                 trackingNumber = tokens[0].substring(1, tokens[0].length() - 1);
 
-                int[] yearMonthDay = parseDateString(tokens[1]);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                Date date = simpleDateFormat.parse(tokens[1]);
 
                 if (tokens[2].equals("\"Routine\"")) {
                     inspectionType = InspectionType.ROUTINE;
@@ -82,14 +86,14 @@ public class InspectionReport extends AppCompatActivity {
                     hazardRating = HazardRating.HIGH;
                 }
 
-                Inspection inspection = new Inspection(trackingNumber, yearMonthDay[0], yearMonthDay[1], yearMonthDay[2]
-                        , inspectionType, numCritical, numNonCritical, hazardRating, null);
+                Inspection inspection = new Inspection(trackingNumber, date,
+                        inspectionType, numCritical, numNonCritical, hazardRating, null);
 
                 inspectionList.add(inspection);
 
                 Log.e("InspectionReport", "Just created " + inspectionList.size() + ": " + inspection);
             }
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             Log.wtf("InspectionReport", "error reading file on line" + line, e);
             e.printStackTrace();
         }
