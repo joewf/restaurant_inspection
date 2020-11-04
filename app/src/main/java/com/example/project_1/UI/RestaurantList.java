@@ -30,11 +30,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 public class RestaurantList extends AppCompatActivity {
@@ -78,9 +81,13 @@ public class RestaurantList extends AppCompatActivity {
                 // Read data from inspectionreports_itr1.csv
                 Inspection sampleInspection = new Inspection();
                 sampleInspection.setTrackingNumber(tokens[0]);
-                sampleInspection.setDate(tokens[1]);
 
-                // Inspection type
+                // Set date
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                Date date = simpleDateFormat.parse(tokens[1]);
+                sampleInspection.setDate(date);
+
+                // dry inspection type
                 InspectionType inspectionType;
                 if (tokens[2].equals("\"Routine\"")) {
                     inspectionType = InspectionType.ROUTINE;
@@ -122,7 +129,7 @@ public class RestaurantList extends AppCompatActivity {
 
                 Log.d("Inspection List", "Just created: " + sampleInspection);
             }
-        } catch (IOException e) {
+        } catch (IOException | ParseException e) {
             Log.wtf("Inspection List", "Error reading data file on line " + line, e);
             e.printStackTrace();
         }
@@ -284,7 +291,7 @@ public class RestaurantList extends AppCompatActivity {
             TextView restaurantDate = (TextView) itemView.findViewById(R.id.text_inspection_date);
             for (int i = 0; i < listInspections.size(); i++) {
                 if (currentRestaurant.getTrackingNumber().equals(listInspections.get(i).getTrackingNumber())) {
-                    String date = listInspections.get(i).getDate();
+                    Date date = listInspections.get(i).getDate();
                     restaurantDate.setText("" + date);
                     break;
                 }

@@ -4,21 +4,21 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import java.text.SimpleDateFormat;
 import java.time.Month;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 public class Inspection {
     //private List<Violation> violationLump = new ArrayList<>();
 
-
-    //private GregorianCalendar date;
     private InspectionType type;
     private HazardRating hazardRating;
+    private Date date;
     private String trackingNumber;
-    private String date;
     private int numCritical;
     private int numNonCritical;
     private int hazardColor;
@@ -39,10 +39,10 @@ public class Inspection {
         this.violations = null;
     }
 
-    public Inspection(String trackingNumber, String date, InspectionType type, int numCritical,
+    public Inspection(String trackingNumber, Date date, InspectionType type, int numCritical,
                       int numNonCritical, HazardRating hazardRating, List<Violation> violations) {
 
-        //setDate(year, month, dayOfMonth);
+
         this.trackingNumber = trackingNumber;
         this.date = date;
         this.type = type;
@@ -95,7 +95,7 @@ public class Inspection {
         return hazardIcon;
     }
 
-    public String getDate() {
+    public Date getDate() {
         return date;
     }
 
@@ -119,7 +119,7 @@ public class Inspection {
         this.trackingNumber = trackingNumber;
     }
 
-    public void setDate(String date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
