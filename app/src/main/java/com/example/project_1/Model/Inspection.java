@@ -21,7 +21,6 @@ public class Inspection {
     private String trackingNumber;
     private int numCritical;
     private int numNonCritical;
-    private List<Violation> violations;
 
     public Inspection(String trackingNumber, int year, int month, int dayOfMonth, InspectionType type, int numCritical,
                       int numNonCritical, HazardRating hazardRating, List<Violation> violations) {
@@ -32,7 +31,10 @@ public class Inspection {
         this.numCritical = numCritical;
         this.numNonCritical = numNonCritical;
         this.hazardRating = hazardRating;
-        this.violations = violations;
+    }
+
+    public void addViolation(String violation) {
+
     }
 
     public void setDate(int year, int month, int dayOfMonth) {
@@ -55,8 +57,27 @@ public class Inspection {
                 ", trackingNumber='" + trackingNumber + '\'' +
                 ", numCritical=" + numCritical +
                 ", numNonCritical=" + numNonCritical +
-                ", violations=" + violations +
                 '}';
+    }
+
+    public InspectionType getType() {
+        return type;
+    }
+
+    public HazardRating getHazardRating() {
+        return hazardRating;
+    }
+
+    public String getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    public int getNumCritical() {
+        return numCritical;
+    }
+
+    public int getNumNonCritical() {
+        return numNonCritical;
     }
 
     enum Month {
