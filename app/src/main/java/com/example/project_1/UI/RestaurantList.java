@@ -225,7 +225,7 @@ public class RestaurantList extends AppCompatActivity {
 
             // Find the restaurant to work with
             Restaurant currentRestaurant = restaurantManager.get(position);
-            List<Inspection> listInspections = restaurantManager.getInspections();
+            List<Inspection> inspectionsForCurrentRestaurant = restaurantManager.getInspectionsForRestaurant(position);
 
             // Fill restaurant icon
             ImageView restaurantView = (ImageView) itemView.findViewById(R.id.restaurant_icon);
@@ -239,23 +239,26 @@ public class RestaurantList extends AppCompatActivity {
             // Fill issues
             TextView restaurantCriticalIssues = (TextView) itemView.findViewById(R.id.text_issues_found);
             int criticalIssues;
-            for (int i = 0; i < listInspections.size(); i++) {
-                if (currentRestaurant.getTrackingNumber().equals(listInspections.get(i).getTrackingNumber())) {
-                    criticalIssues = listInspections.get(i).getNumCritical();
+            if (!inspectionsForCurrentRestaurant.isEmpty()) {
+
+                for (Inspection inspection : inspectionsForCurrentRestaurant) {
+//                if (currentRestaurant.getTrackingNumber().equals(inspectionsForCurrentRestaurant.get(i).getTrackingNumber())) {
+                    criticalIssues = inspection.getNumCritical();
                     restaurantCriticalIssues.setText("Critical issues: " + criticalIssues);
                     break;
                 }
-                else {
-                    restaurantCriticalIssues.setText("Critical issues: 0");
-                }
+            } else {
+                restaurantCriticalIssues.setText("Critical issues: 0");
             }
 
             // Fill hazard icon and text
             ImageView RestaurantHazard = (ImageView) itemView.findViewById(R.id.hazard_icon);
             TextView txtRestaurantHazard = (TextView) itemView.findViewById(R.id.text_hazard_level);
-            for (int i = 0; i < listInspections.size(); i++) {
-                if (currentRestaurant.getTrackingNumber().equals(listInspections.get(i).getTrackingNumber())) {
-                    HazardRating hazard = listInspections.get(i).getHazardRating();
+            if (!inspectionsForCurrentRestaurant.isEmpty()) {
+
+                for (Inspection inspection : inspectionsForCurrentRestaurant) {
+//                if (currentRestaurant.getTrackingNumber().equals(inspectionsForCurrentRestaurant.get(i).getTrackingNumber())) {
+                    HazardRating hazard = inspection.getHazardRating();
                     switch (hazard) {
                         case LOW:
                             RestaurantHazard.setImageResource(R.drawable.green_hazard);
@@ -274,22 +277,23 @@ public class RestaurantList extends AppCompatActivity {
                             txtRestaurantHazard.setText("" + hazard);
                             txtRestaurantHazard.setTextColor(Color.RED);
                             break;
-                        }
-                    break;
+                    }
+                    //break;
                 }
-                else {
-                    RestaurantHazard.setImageResource(R.drawable.green_hazard);
-                    txtRestaurantHazard.setText("" + HazardRating.LOW);
-                    txtRestaurantHazard.setTextColor(Color.GREEN);
-                }
+            } else {
+                RestaurantHazard.setImageResource(R.drawable.green_hazard);
+                txtRestaurantHazard.setText("" + HazardRating.LOW);
+                txtRestaurantHazard.setTextColor(Color.GREEN);
             }
+
 
             // Fill inspection date
             TextView restaurantDate = (TextView) itemView.findViewById(R.id.text_inspection_date);
-            for (int i = 0; i < listInspections.size(); i++) {
-                if (currentRestaurant.getTrackingNumber().equals(listInspections.get(i).getTrackingNumber())) {
+            if (!inspectionsForCurrentRestaurant.isEmpty()) {
+                for (Inspection inspection : inspectionsForCurrentRestaurant) {
+                    //if (currentRestaurant.getTrackingNumber().equals(inspectionsForCurrentRestaurant.get(i).getTrackingNumber())) {
 
-                    Date inspectionDate = listInspections.get(i).getDate();   // Inspection date
+                    Date inspectionDate = inspection.getDate();   // Inspection date
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd"); // Set date format
                     Date currentDate = new Date();
                     simpleDateFormat.format(currentDate);   // Current date
@@ -298,11 +302,11 @@ public class RestaurantList extends AppCompatActivity {
                     long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
 
                     // Less than 30 days
-                    if(diff < 30) {
-                        restaurantDate.setText( diff + " days ago");
+                    if (diff < 30) {
+                        restaurantDate.setText(diff + " days ago");
                     }
                     // Less than one year
-                    else if(diff < 365) {
+                    else if (diff < 365) {
                         simpleDateFormat = new SimpleDateFormat("MMMM dd");
                         String strDate = simpleDateFormat.format(inspectionDate);
                         restaurantDate.setText(strDate);
@@ -316,12 +320,14 @@ public class RestaurantList extends AppCompatActivity {
 
                     break;
                 }
-                else {
-                    restaurantDate.setText("No inspections found");
-                }
+            } else {
+                restaurantDate.setText("No inspections found");
             }
+
+
             return itemView;
         }
+
     }
 
     private void sortRestaurantList() {

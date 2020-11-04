@@ -51,4 +51,17 @@ public class RestaurantManager implements Iterable<Restaurant>{
     public Iterator<Restaurant> iterator() {
         return restaurants.iterator();
     }
+
+    public ArrayList<Inspection> getInspectionsForRestaurant(int position) {
+        ArrayList<Inspection> list = new ArrayList<>();
+        Restaurant currentRestaurant = restaurants.get(position);
+
+        for (Inspection inspection : inspections) {
+            if (currentRestaurant.getTrackingNumber().equals(inspection.getTrackingNumber())) {
+                list.add(inspection);
+            }
+        }
+
+        return list;
+    }
 }
