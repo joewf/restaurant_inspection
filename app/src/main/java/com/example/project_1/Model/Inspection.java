@@ -53,18 +53,23 @@ public class Inspection {
     public InspectionType getType() {
         return type;
     }
+
     public HazardRating getHazardRating() {
         return hazardRating;
     }
+
     public String getTrackingNumber() {
         return trackingNumber;
     }
+
     public int getNumCritical() {
         return numCritical;
     }
+
     public int getNumNonCritical() {
         return numNonCritical;
     }
+
     public Date getDate() {
         return date;
     }
@@ -73,21 +78,27 @@ public class Inspection {
     public void setType(InspectionType type) {
         this.type = type;
     }
+
     public void setHazardRating(HazardRating hazardRating) {
         this.hazardRating = hazardRating;
     }
+
     public void setTrackingNumber(String trackingNumber) {
         this.trackingNumber = trackingNumber;
     }
+
     public void setDate(Date date) {
         this.date = date;
     }
+
     public void setNumCritical(int numCritical) {
         this.numCritical = numCritical;
     }
+
     public void setNumNonCritical(int numNonCritical) {
         this.numNonCritical = numNonCritical;
     }
+
     public void setViolations(List<Violation> violations) {
         this.violations = violations;
     }
@@ -103,6 +114,4 @@ public class Inspection {
                 ", numNonCritical=" + numNonCritical +
                 '}';
     }
-
-
 }
