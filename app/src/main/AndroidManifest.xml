@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".UI.InspectionReport"></activity>
+        <activity android:name=".UI.InspectionReport" />
         <activity android:name=".UI.RestaurantDetails" />
         <activity android:name=".UI.RestaurantList">
             <intent-filter>
