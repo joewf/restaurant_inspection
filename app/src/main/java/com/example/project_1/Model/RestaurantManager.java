@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class RestaurantManager implements Iterable<Restaurant>{
+public class RestaurantManager implements Iterable<Restaurant> {
 
     public static List<Restaurant> restaurants = new ArrayList<>();
     public static List<Inspection> inspections = new ArrayList<>();
@@ -16,7 +16,10 @@ public class RestaurantManager implements Iterable<Restaurant>{
     public List<Restaurant> getRestaurants() {
         return restaurants;
     }
-    public List<Inspection> getInspections() { return inspections; }
+
+    public List<Inspection> getInspections() {
+        return inspections;
+    }
 
     /*
         Singleton support
@@ -36,7 +39,9 @@ public class RestaurantManager implements Iterable<Restaurant>{
         restaurants.add(restaurant);
     }
 
-    public void addInspection(Inspection inspection) {inspections.add(inspection); }
+    public void addInspection(Inspection inspection) {
+        inspections.add(inspection);
+    }
 
 
     public void removeRestaurant(Restaurant restaurant) {

@@ -21,20 +21,20 @@ import com.example.project_1.Model.Inspection;
 import com.example.project_1.Model.InspectionType;
 import com.example.project_1.Model.Restaurant;
 import com.example.project_1.Model.RestaurantManager;
+import com.example.project_1.Model.Violation;
+import com.example.project_1.Model.ViolationSeverity;
 import com.example.project_1.R;
-
-import org.w3c.dom.Text;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -51,7 +51,7 @@ public class RestaurantList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_list);
 
-        restaurantManager = restaurantManager.getInstance();
+        restaurantManager = RestaurantManager.getInstance();
 
         setRestaurantData();
         setInspectionData();
@@ -126,6 +126,30 @@ public class RestaurantList extends AppCompatActivity {
                 }
                 sampleInspection.setHazardRating(hazardRating);
 
+                // Violations
+                if (tokens.length > 6) {
+                    Log.e("violations length ", "setInspectionData: " + (tokens.length - 6));
+
+                    // Get violations String "..."
+                    StringBuilder violationsString = new StringBuilder();
+                    for (int i = 6; i < tokens.length; i++) {
+                        //Log.e("token[i]", "loop: " + tokens[i]);
+
+                        if (i == 6) {
+                            violationsString.append(tokens[i].substring(1));
+                        } else {
+                            violationsString.append(",").append(tokens[i]);
+                        }
+                    }
+
+                    List<Violation> violationList = getViolationsFromString(violationsString.toString());
+
+                    sampleInspection.setViolations(violationList);
+
+                    Log.e("violations", "setInspectionData: " + violationList);
+                }
+
+
                 sampleInspection.setViolations(null);
                 restaurantManager.addInspection(sampleInspection);
 
@@ -135,6 +159,37 @@ public class RestaurantList extends AppCompatActivity {
             Log.wtf("Inspection List", "Error reading data file on line " + line, e);
             e.printStackTrace();
         }
+    }
+
+    private List<Violation> getViolationsFromString(String violationsString) {
+        Log.e("getViolationsFromString", "getViolationsFromString: " + violationsString);
+
+        String[] violations = violationsString.split("\\|");
+        ArrayList<Violation> list = new ArrayList<>();
+
+        String code;
+        ViolationSeverity severity;
+        String description;
+        for (String s : violations) {
+            Log.e("in loop", "getViolationsFromString: " + s);
+            String[] tokens = s.split(",");
+
+            code = tokens[0];
+
+            if (tokens[1].equals("Critical")) {
+                severity = ViolationSeverity.CRITICAL;
+            } else {
+                severity = ViolationSeverity.NON_CRITICAL;
+            }
+
+            description = tokens[2];
+
+            Violation violation = new Violation(description, severity, code);
+            Log.e("Violation OBJECT", "getViolationsFromString: " + violation);
+
+            list.add((violation));
+        }
+        return list;
     }
 
 
@@ -242,9 +297,9 @@ public class RestaurantList extends AppCompatActivity {
             if (!inspectionsForCurrentRestaurant.isEmpty()) {
 
                 for (Inspection inspection : inspectionsForCurrentRestaurant) {
-//                if (currentRestaurant.getTrackingNumber().equals(inspectionsForCurrentRestaurant.get(i).getTrackingNumber())) {
                     criticalIssues = inspection.getNumCritical();
                     restaurantCriticalIssues.setText("Critical issues: " + criticalIssues);
+
                     break;
                 }
             } else {
@@ -257,7 +312,6 @@ public class RestaurantList extends AppCompatActivity {
             if (!inspectionsForCurrentRestaurant.isEmpty()) {
 
                 for (Inspection inspection : inspectionsForCurrentRestaurant) {
-//                if (currentRestaurant.getTrackingNumber().equals(inspectionsForCurrentRestaurant.get(i).getTrackingNumber())) {
                     HazardRating hazard = inspection.getHazardRating();
                     switch (hazard) {
                         case LOW:
@@ -278,7 +332,8 @@ public class RestaurantList extends AppCompatActivity {
                             txtRestaurantHazard.setTextColor(Color.RED);
                             break;
                     }
-                    //break;
+
+                    break;
                 }
             } else {
                 RestaurantHazard.setImageResource(R.drawable.green_hazard);
@@ -291,7 +346,6 @@ public class RestaurantList extends AppCompatActivity {
             TextView restaurantDate = (TextView) itemView.findViewById(R.id.text_inspection_date);
             if (!inspectionsForCurrentRestaurant.isEmpty()) {
                 for (Inspection inspection : inspectionsForCurrentRestaurant) {
-                    //if (currentRestaurant.getTrackingNumber().equals(inspectionsForCurrentRestaurant.get(i).getTrackingNumber())) {
 
                     Date inspectionDate = inspection.getDate();   // Inspection date
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd"); // Set date format
@@ -323,7 +377,6 @@ public class RestaurantList extends AppCompatActivity {
             } else {
                 restaurantDate.setText("No inspections found");
             }
-
 
             return itemView;
         }

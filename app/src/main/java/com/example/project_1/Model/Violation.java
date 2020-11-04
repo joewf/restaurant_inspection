@@ -70,4 +70,14 @@ public class Violation {
     public void setCode(String code) {
         this.code = code;
     }
+
+    @Override
+    public String toString() {
+        return "Violation{" +
+                "description='" + description + '\'' +
+                ", nature=" + nature +
+                ", severity=" + severity +
+                ", code='" + code + '\'' +
+                '}';
+    }
 }
