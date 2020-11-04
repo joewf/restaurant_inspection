@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class RestaurantList extends AppCompatActivity {
 
@@ -85,6 +86,7 @@ public class RestaurantList extends AppCompatActivity {
                 // Set date
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
                 Date date = simpleDateFormat.parse(tokens[1]);
+
                 sampleInspection.setDate(date);
 
                 // dry inspection type
@@ -248,42 +250,37 @@ public class RestaurantList extends AppCompatActivity {
                 }
             }
 
-
-            // Fill hazard icon
+            // Fill hazard icon and text
             ImageView RestaurantHazard = (ImageView) itemView.findViewById(R.id.hazard_icon);
+            TextView txtRestaurantHazard = (TextView) itemView.findViewById(R.id.text_hazard_level);
             for (int i = 0; i < listInspections.size(); i++) {
                 if (currentRestaurant.getTrackingNumber().equals(listInspections.get(i).getTrackingNumber())) {
                     HazardRating hazard = listInspections.get(i).getHazardRating();
                     switch (hazard) {
                         case LOW:
                             RestaurantHazard.setImageResource(R.drawable.green_hazard);
+                            txtRestaurantHazard.setText("" + hazard);
+                            txtRestaurantHazard.setTextColor(Color.GREEN);
                             break;
 
                         case MODERATE:
                             RestaurantHazard.setImageResource(R.drawable.yellow_hazard);
+                            txtRestaurantHazard.setText("" + hazard);
+                            txtRestaurantHazard.setTextColor(Color.YELLOW);
                             break;
 
                         case HIGH:
                             RestaurantHazard.setImageResource(R.drawable.red_hazard);
+                            txtRestaurantHazard.setText("" + hazard);
+                            txtRestaurantHazard.setTextColor(Color.RED);
                             break;
                         }
                     break;
                 }
                 else {
                     RestaurantHazard.setImageResource(R.drawable.green_hazard);
-                }
-            }
-
-            // Fill hazard text
-            TextView txtRestaurantHazard = (TextView) itemView.findViewById(R.id.text_hazard_level);
-            for (int i = 0; i < listInspections.size(); i++) {
-                if (currentRestaurant.getTrackingNumber().equals(listInspections.get(i).getTrackingNumber())) {
-                    HazardRating hazard = listInspections.get(i).getHazardRating();
-                    txtRestaurantHazard.setText("" + hazard);
-                    break;
-                    }
-                else {
                     txtRestaurantHazard.setText("" + HazardRating.LOW);
+                    txtRestaurantHazard.setTextColor(Color.GREEN);
                 }
             }
 
@@ -291,8 +288,32 @@ public class RestaurantList extends AppCompatActivity {
             TextView restaurantDate = (TextView) itemView.findViewById(R.id.text_inspection_date);
             for (int i = 0; i < listInspections.size(); i++) {
                 if (currentRestaurant.getTrackingNumber().equals(listInspections.get(i).getTrackingNumber())) {
-                    Date date = listInspections.get(i).getDate();
-                    restaurantDate.setText("" + date);
+
+                    Date inspectionDate = listInspections.get(i).getDate();   // Inspection date
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd"); // Set date format
+                    Date currentDate = new Date();
+                    simpleDateFormat.format(currentDate);   // Current date
+                    // Subtract days
+                    long diffInMillies = Math.abs(currentDate.getTime() - inspectionDate.getTime());
+                    long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+                    // Less than 30 days
+                    if(diff < 30) {
+                        restaurantDate.setText( diff + " days ago");
+                    }
+                    // Less than one year
+                    else if(diff < 365) {
+                        simpleDateFormat = new SimpleDateFormat("MMM dd");
+                        String strDate = simpleDateFormat.format(inspectionDate);
+                        restaurantDate.setText(strDate);
+                    }
+                    // More than one year
+                    else {
+                        simpleDateFormat = new SimpleDateFormat("MMMM yyyy");
+                        String strDate = simpleDateFormat.format(inspectionDate);
+                        restaurantDate.setText(strDate);
+                    }
+
                     break;
                 }
                 else {
@@ -308,8 +329,8 @@ public class RestaurantList extends AppCompatActivity {
     private void sortRestaurantList() {
         Collections.sort(RestaurantManager.restaurants, new Comparator<Restaurant>() {
             @Override
+            // Sort ascendant order
             public int compare(Restaurant R1, Restaurant R2) {
-                // Sort ascendant order
                 return R1.getName().compareTo(R2.getName());
             }
         });
