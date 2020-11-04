@@ -11,7 +11,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 public class Inspection {
-    private List<Violation> violationLump = new ArrayList<>();
+    //private List<Violation> violationLump = new ArrayList<>();
 
 
     //private GregorianCalendar date;
@@ -28,6 +28,16 @@ public class Inspection {
 
     //int year, int month, int dayOfMonth,
     //int hazardColor, int hazardIcon
+
+    public Inspection() {
+        this.trackingNumber = null;
+        this.date = null;
+        this.type = null;
+        this.numCritical = 0;
+        this.numNonCritical = 0;
+        this.hazardRating = null;
+        this.violations = null;
+    }
 
     public Inspection(String trackingNumber, String date, InspectionType type, int numCritical,
                       int numNonCritical, HazardRating hazardRating, List<Violation> violations) {
@@ -136,7 +146,6 @@ public class Inspection {
     @Override
     public String toString() {
         return "Inspection{" +
-                "violationLump=" + violationLump +
                 ", date=" + date +
                 ", type=" + type +
                 ", hazardRating=" + hazardRating +

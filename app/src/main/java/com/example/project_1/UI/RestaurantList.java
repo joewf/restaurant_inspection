@@ -50,11 +50,82 @@ public class RestaurantList extends AppCompatActivity {
         restaurantManager = restaurantManager.getInstance();
 
         setRestaurantData();
-        //setInspectionData();
+        setInspectionData();
+        sortRestaurantList();
+        sortInspectionDate();
         populateListView();
-        sortArrayList();
         populateIcon();
 
+    }
+
+
+    private void setInspectionData() {
+        InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(is, Charset.forName("UTF-8"))
+        );
+
+        String line = "";
+        try {
+            // Step over headers
+            reader.readLine();
+
+            while ((line = reader.readLine()) != null) {
+
+                // Split by ','
+                String[] tokens = line.split(",");
+
+                // Read data from inspectionreports_itr1.csv
+                Inspection sampleInspection = new Inspection();
+                sampleInspection.setTrackingNumber(tokens[0]);
+                sampleInspection.setDate(tokens[1]);
+
+                // Inspection type
+                InspectionType inspectionType;
+                if (tokens[2].equals("\"Routine\"")) {
+                    inspectionType = InspectionType.ROUTINE;
+
+                } else {
+                    inspectionType = InspectionType.FOLLOW_UP;
+                }
+                sampleInspection.setType(inspectionType);
+
+                // Set critical issues
+                if (tokens[3].length() > 0) {
+                    sampleInspection.setNumCritical(Integer.parseInt(tokens[3]));
+                } else {
+                    sampleInspection.setNumCritical(0);
+                }
+
+                // Set non critical issues
+                if (tokens[4].length() > 0) {
+                    sampleInspection.setNumNonCritical(Integer.parseInt(tokens[4]));
+                } else {
+                    sampleInspection.setNumNonCritical(0);
+                }
+
+                // Hazard rating
+                HazardRating hazardRating = null;
+                if (tokens[5].equals("\"Low\"")) {
+                    hazardRating = HazardRating.LOW;
+                }
+                if (tokens[5].equals("\"Moderate\"")) {
+                    hazardRating = HazardRating.MODERATE;
+                }
+                if (tokens[5].equals("\"High\"")) {
+                    hazardRating = HazardRating.HIGH;
+                }
+                sampleInspection.setHazardRating(hazardRating);
+
+                sampleInspection.setViolations(null);
+                restaurantManager.addInspection(sampleInspection);
+
+                Log.d("Inspection List", "Just created: " + sampleInspection);
+            }
+        } catch (IOException e) {
+            Log.wtf("Inspection List", "Error reading data file on line " + line, e);
+            e.printStackTrace();
+        }
     }
 
 
@@ -65,45 +136,43 @@ public class RestaurantList extends AppCompatActivity {
         );
 
         String line = "";
-            try {
-                // Step over headers
-                reader.readLine();
+        try {
+            // Step over headers
+            reader.readLine();
 
-                while ( (line = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
 
-                    // Split by ','
-                    String[] tokens = line.split(",");
+                // Split by ','
+                String[] tokens = line.split(",");
 
-                    // Read the data
-                    Restaurant sampleRestaurant = new Restaurant();
-                    sampleRestaurant.setTrackingNumber(tokens[0]);
-                    sampleRestaurant.setName(tokens[1]);
-                    sampleRestaurant.setPhysicalAddress(tokens[2]);
-                    sampleRestaurant.setPhysicalCity(tokens[3]);
-                    sampleRestaurant.setFactType(tokens[4]);
-                    if (tokens[5].length() > 0) {
-                        sampleRestaurant.setLatitude(Double.parseDouble(tokens[5]));
-                    } else {
-                        sampleRestaurant.setLatitude(0);
-                    }
-                    if (tokens[6].length() > 0) {
-                        sampleRestaurant.setAltitude(Double.parseDouble(tokens[6]));
-                    } else {
-                        sampleRestaurant.setAltitude(0);
-                    }
-                    restaurantManager.add(sampleRestaurant);
-
-                    Inspection sampleInspection = new Inspection();
-
-                    Log.d("RestaurantList", "Just created: " + sampleRestaurant);
-
+                // Read the data
+                Restaurant sampleRestaurant = new Restaurant();
+                sampleRestaurant.setTrackingNumber(tokens[0]);
+                sampleRestaurant.setName(tokens[1]);
+                sampleRestaurant.setPhysicalAddress(tokens[2]);
+                sampleRestaurant.setPhysicalCity(tokens[3]);
+                sampleRestaurant.setFactType(tokens[4]);
+                if (tokens[5].length() > 0) {
+                    sampleRestaurant.setLatitude(Double.parseDouble(tokens[5]));
+                } else {
+                    sampleRestaurant.setLatitude(0);
                 }
-            } catch (IOException e) {
-                Log.wtf("RestaurantList", "Error reading data file on line " + line, e);
-                e.printStackTrace();
-            }
+                if (tokens[6].length() > 0) {
+                    sampleRestaurant.setAltitude(Double.parseDouble(tokens[6]));
+                } else {
+                    sampleRestaurant.setAltitude(0);
+                }
+                restaurantManager.addRestaurant(sampleRestaurant);
 
+                Log.d("RestaurantList", "Just created: " + sampleRestaurant);
+
+            }
+        } catch (IOException e) {
+            Log.wtf("RestaurantList", "Error reading data file on line " + line, e);
+            e.printStackTrace();
         }
+
+    }
 
     private void populateIcon() {
         restaurantIcon[0] = R.drawable.icon_tuna;
@@ -142,11 +211,12 @@ public class RestaurantList extends AppCompatActivity {
             // Make sure we have a view to work with
             View itemView = convertView;
             if (itemView == null) {
-                itemView = getLayoutInflater().inflate(R.layout.restaurant_view, parent,false);
+                itemView = getLayoutInflater().inflate(R.layout.restaurant_view, parent, false);
             }
 
             // Find the restaurant to work with
             Restaurant currentRestaurant = restaurantManager.get(position);
+            List<Inspection> listInspections = restaurantManager.getInspections();
 
             // Fill restaurant icon
             ImageView restaurantView = (ImageView) itemView.findViewById(R.id.restaurant_icon);
@@ -154,33 +224,83 @@ public class RestaurantList extends AppCompatActivity {
 
             // Fill restaurant name
             TextView restaurantName = (TextView) itemView.findViewById(R.id.text_restaurant_name);
-            restaurantName.setText( currentRestaurant.getName() );
+            restaurantName.setText(currentRestaurant.getName());
             restaurantName.setTextColor(Color.BLUE);
 
             // Fill issues
             TextView restaurantCriticalIssues = (TextView) itemView.findViewById(R.id.text_issues_found);
-            String trackingNumber = currentRestaurant.getTrackingNumber();
-
-
+            int criticalIssues = 0;
+            for (int i = 0; i < listInspections.size(); i++) {
+                if (currentRestaurant.getTrackingNumber().equals(listInspections.get(i).getTrackingNumber())) {
+                    criticalIssues += listInspections.get(i).getNumCritical();
+                    break;
+                }
+            }
+            restaurantCriticalIssues.setText("" + criticalIssues);
 
             // Fill hazard icon
+            ImageView RestaurantHazard = (ImageView) itemView.findViewById(R.id.hazard_icon);
+            for (int i = 0; i < listInspections.size(); i++) {
+                if (currentRestaurant.getTrackingNumber().equals(listInspections.get(i).getTrackingNumber())) {
+                    HazardRating hazard = listInspections.get(i).getHazardRating();
+                    switch (hazard) {
+                        case LOW:
+                            RestaurantHazard.setImageResource(R.drawable.green_hazard);
+                            break;
+
+                        case MODERATE:
+                            RestaurantHazard.setImageResource(R.drawable.yellow_hazard);
+                            break;
+
+                        case HIGH:
+                            RestaurantHazard.setImageResource(R.drawable.red_hazard);
+                            break;
+                        }
+                    break;
+                }
+                else {
+                    RestaurantHazard.setImageResource(R.drawable.green_hazard);
+                }
+            }
 
             // Fill hazard text
+            TextView txtRestaurantHazard = (TextView) itemView.findViewById(R.id.text_hazard_level);
+            for (int i = 0; i < listInspections.size(); i++) {
+                if (currentRestaurant.getTrackingNumber().equals(listInspections.get(i).getTrackingNumber())) {
+                    HazardRating hazard = listInspections.get(i).getHazardRating();
+                    txtRestaurantHazard.setText("" + hazard);
+                    break;
+                    }
+                else {
+                    txtRestaurantHazard.setText("" + HazardRating.LOW);
+                }
+            }
 
             // Fill inspection date
-
+            TextView restaurantDate = (TextView) itemView.findViewById(R.id.text_inspection_date);
+            
 
             return itemView;
 
         }
     }
 
-    private void sortArrayList() {
+    private void sortRestaurantList() {
         Collections.sort(RestaurantManager.restaurants, new Comparator<Restaurant>() {
             @Override
             public int compare(Restaurant R1, Restaurant R2) {
-                // Compare R1 name and R2 name
+                // Sort ascendant order
                 return R1.getName().compareTo(R2.getName());
+            }
+        });
+    }
+
+    private void sortInspectionDate() {
+        Collections.sort(RestaurantManager.inspections, new Comparator<Inspection>() {
+            @Override
+            // Sort descendant order
+            public int compare(Inspection I1, Inspection I2) {
+                return I2.getDate().compareTo(I1.getDate());
             }
         });
     }

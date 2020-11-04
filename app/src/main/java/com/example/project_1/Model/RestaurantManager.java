@@ -15,6 +15,7 @@ public class RestaurantManager {
     public List<Restaurant> getRestaurants() {
         return restaurants;
     }
+    public List<Inspection> getInspections() { return inspections; }
 
     /*
         Singleton support
@@ -30,17 +31,21 @@ public class RestaurantManager {
         return instance;
     }
 
-    public void add(Restaurant restaurant) {
+    public void addRestaurant(Restaurant restaurant) {
         restaurants.add(restaurant);
     }
 
-    public void remove(Restaurant restaurant) {
+    public void addInspection(Inspection inspection) {inspections.add(inspection); }
+
+
+    public void removeRestaurant(Restaurant restaurant) {
         restaurants.remove(restaurant);
     }
 
     public Restaurant get(int index) {
         return restaurants.get(index);
     }
+
 
     /*@Override
     public Iterator<Restaurant> iterator() {
