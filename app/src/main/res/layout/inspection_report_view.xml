@@ -13,29 +13,24 @@
             android:id="@+id/text_criticalIssues_found"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TextView"
-            android:textStyle="bold" />
+            android:text="TextView" />
 
         <TextView
             android:id="@+id/text_non_criticalIssues_found"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:textStyle="bold"
             android:text="TextView" />
 
         <TextView
             android:id="@+id/text_inspection_occurred"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textStyle="bold"
             android:text="TextView" />
 
         <ImageView
             android:id="@+id/icon_hazard_level"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
             android:adjustViewBounds="true"
             android:maxWidth="40dp"
             android:maxHeight="40dp"

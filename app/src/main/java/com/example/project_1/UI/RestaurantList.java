@@ -29,12 +29,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -80,14 +78,14 @@ public class RestaurantList extends AppCompatActivity {
                 String[] tokens = line.split(",");
 
                 // Read data from inspectionreports_itr1.csv
-                Inspection sampleInspection = new Inspection();
-                sampleInspection.setTrackingNumber(tokens[0]);
+                Inspection newInspection = new Inspection();
+                newInspection.setTrackingNumber(tokens[0]);
 
                 // Set date
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
                 Date date = simpleDateFormat.parse(tokens[1]);
 
-                sampleInspection.setDate(date);
+                newInspection.setDate(date);
 
                 // dry inspection type
                 InspectionType inspectionType;
@@ -97,20 +95,20 @@ public class RestaurantList extends AppCompatActivity {
                 } else {
                     inspectionType = InspectionType.FOLLOW_UP;
                 }
-                sampleInspection.setType(inspectionType);
+                newInspection.setType(inspectionType);
 
                 // Set critical issues
                 if (tokens[3].length() > 0) {
-                    sampleInspection.setNumCritical(Integer.parseInt(tokens[3]));
+                    newInspection.setNumCritical(Integer.parseInt(tokens[3]));
                 } else {
-                    sampleInspection.setNumCritical(0);
+                    newInspection.setNumCritical(0);
                 }
 
                 // Set non critical issues
                 if (tokens[4].length() > 0) {
-                    sampleInspection.setNumNonCritical(Integer.parseInt(tokens[4]));
+                    newInspection.setNumNonCritical(Integer.parseInt(tokens[4]));
                 } else {
-                    sampleInspection.setNumNonCritical(0);
+                    newInspection.setNumNonCritical(0);
                 }
 
                 // Hazard rating
@@ -124,7 +122,7 @@ public class RestaurantList extends AppCompatActivity {
                 if (tokens[5].equals("\"High\"")) {
                     hazardRating = HazardRating.HIGH;
                 }
-                sampleInspection.setHazardRating(hazardRating);
+                newInspection.setHazardRating(hazardRating);
 
                 // Violations
                 if (tokens.length > 6) {
@@ -141,19 +139,17 @@ public class RestaurantList extends AppCompatActivity {
                             violationsString.append(",").append(tokens[i]);
                         }
                     }
-
                     List<Violation> violationList = getViolationsFromString(violationsString.toString());
 
-                    sampleInspection.setViolations(violationList);
+                    newInspection.setViolations(violationList);
+
+                    restaurantManager.addInspection(newInspection);
 
                     Log.e("violations", "setInspectionData: " + violationList);
                 }
+                restaurantManager.addInspection(newInspection);
 
-
-                sampleInspection.setViolations(null);
-                restaurantManager.addInspection(sampleInspection);
-
-                Log.d("Inspection List", "Just created: " + sampleInspection);
+                Log.d("Inspection List", "Just created: " + newInspection);
             }
         } catch (IOException | ParseException e) {
             Log.wtf("Inspection List", "Error reading data file on line " + line, e);
@@ -210,25 +206,26 @@ public class RestaurantList extends AppCompatActivity {
                 String[] tokens = line.split(",");
 
                 // Read the data
-                Restaurant sampleRestaurant = new Restaurant();
-                sampleRestaurant.setTrackingNumber(tokens[0]);
-                sampleRestaurant.setName(tokens[1]);
-                sampleRestaurant.setPhysicalAddress(tokens[2]);
-                sampleRestaurant.setPhysicalCity(tokens[3]);
-                sampleRestaurant.setFactType(tokens[4]);
+                Restaurant newRestaurant = new Restaurant();
+                newRestaurant.setTrackingNumber(tokens[0]);
+                newRestaurant.setName(tokens[1]);
+                newRestaurant.setPhysicalAddress(tokens[2]);
+                newRestaurant.setPhysicalCity(tokens[3]);
+                newRestaurant.setFactType(tokens[4]);
                 if (tokens[5].length() > 0) {
-                    sampleRestaurant.setLatitude(Double.parseDouble(tokens[5]));
+                    newRestaurant.setLatitude(Double.parseDouble(tokens[5]));
                 } else {
-                    sampleRestaurant.setLatitude(0);
+                    newRestaurant.setLatitude(0);
                 }
                 if (tokens[6].length() > 0) {
-                    sampleRestaurant.setAltitude(Double.parseDouble(tokens[6]));
+                    newRestaurant.setAltitude(Double.parseDouble(tokens[6]));
                 } else {
-                    sampleRestaurant.setAltitude(0);
+                    newRestaurant.setAltitude(0);
                 }
-                restaurantManager.addRestaurant(sampleRestaurant);
 
-                Log.d("RestaurantList", "Just created: " + sampleRestaurant);
+                restaurantManager.addRestaurant(newRestaurant);
+
+                Log.d("RestaurantList", "Just created: " + newRestaurant);
 
             }
         } catch (IOException e) {
@@ -287,7 +284,7 @@ public class RestaurantList extends AppCompatActivity {
             restaurantView.setImageResource(restaurantIcon[position]);
 
             // Fill restaurant name
-            TextView restaurantName = (TextView) itemView.findViewById(R.id.text_restaurant_name);
+            TextView restaurantName = (TextView) itemView.findViewById(R.id.RestaurantDetails_text_restaurant_name);
             restaurantName.setText(currentRestaurant.getName());
             restaurantName.setTextColor(Color.BLUE);
 
@@ -315,19 +312,19 @@ public class RestaurantList extends AppCompatActivity {
                     HazardRating hazard = inspection.getHazardRating();
                     switch (hazard) {
                         case LOW:
-                            RestaurantHazard.setImageResource(R.drawable.green_hazard);
+                            RestaurantHazard.setImageResource(R.mipmap.green_hazard);
                             txtRestaurantHazard.setText("" + hazard);
                             txtRestaurantHazard.setTextColor(Color.GREEN);
                             break;
 
                         case MODERATE:
-                            RestaurantHazard.setImageResource(R.drawable.yellow_hazard);
+                            RestaurantHazard.setImageResource(R.mipmap.yellow_hazard);
                             txtRestaurantHazard.setText("" + hazard);
                             txtRestaurantHazard.setTextColor(Color.YELLOW);
                             break;
 
                         case HIGH:
-                            RestaurantHazard.setImageResource(R.drawable.red_hazard);
+                            RestaurantHazard.setImageResource(R.mipmap.red_hazard);
                             txtRestaurantHazard.setText("" + hazard);
                             txtRestaurantHazard.setTextColor(Color.RED);
                             break;
@@ -336,7 +333,7 @@ public class RestaurantList extends AppCompatActivity {
                     break;
                 }
             } else {
-                RestaurantHazard.setImageResource(R.drawable.green_hazard);
+                RestaurantHazard.setImageResource(R.mipmap.green_hazard);
                 txtRestaurantHazard.setText("" + HazardRating.LOW);
                 txtRestaurantHazard.setTextColor(Color.GREEN);
             }
