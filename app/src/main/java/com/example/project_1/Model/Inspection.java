@@ -32,7 +32,6 @@ public class Inspection {
         this.numCritical = 0;
         this.numNonCritical = 0;
         this.hazardRating = null;
-        this.violations = null;
     }
 
     public Inspection(String trackingNumber, Date date, InspectionType type, int numCritical,

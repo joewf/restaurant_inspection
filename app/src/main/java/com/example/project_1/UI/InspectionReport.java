@@ -37,7 +37,7 @@ public class InspectionReport extends AppCompatActivity {
     public static final String RESTAURANT_INDEX = "restaurant index";
     public static final String INSPECTION_INDEX = "inspection index";
     private Inspection inspection;
-    private List<Violation> violationList = new ArrayList<>();
+    private List<Violation> violationList;
     private int restaurantIndex;
     private int inspectionIndex;
 

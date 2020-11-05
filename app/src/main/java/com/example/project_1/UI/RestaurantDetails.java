@@ -83,18 +83,19 @@ public class RestaurantDetails extends AppCompatActivity {
     }
 
     private void populateListView() {
-        if (!inspectionList.isEmpty()) {
-            ArrayAdapter<Inspection> adapter = new MyListAdapter();
-            ListView list = (ListView) findViewById(R.id.RestaurantDetails_list_inspection_report);
-            list.setAdapter(adapter);
 
-            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    startActivity(InspectionReport.makeIntent(RestaurantDetails.this, restaurantIndex, position));
-                }
-            });
-        } /*else {
+        ArrayAdapter<Inspection> adapter = new MyListAdapter();
+        ListView list = (ListView) findViewById(R.id.RestaurantDetails_list_inspection_report);
+        list.setAdapter(adapter);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                startActivity(InspectionReport.makeIntent(RestaurantDetails.this, restaurantIndex, position));
+            }
+        });
+
+        /*else {
             String text[] = {"No inspections found!"};
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.inspection_report_view_no_inspections_found, text);
             ListView list = (ListView) findViewById(R.id.list_inspection_report);
@@ -142,7 +143,7 @@ public class RestaurantDetails extends AppCompatActivity {
             }*/
 
                 // Fill inspection date
-                TextView restaurantDate = (TextView) itemView.findViewById(R.id.text_inspection_occurred);
+                TextView restaurantDate = itemView.findViewById(R.id.text_inspection_occurred);
 
                 Date inspectionDate = inspection.getDate();   // Inspection date
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd"); // Set date format
