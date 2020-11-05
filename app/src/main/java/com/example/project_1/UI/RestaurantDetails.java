@@ -122,14 +122,20 @@ public class RestaurantDetails extends AppCompatActivity {
                 switch (hazard) {
                     case LOW:
                         hazardIcon.setImageResource(R.drawable.green_hazard);
+                        // Light green
+                        itemView.setBackgroundColor(Color.rgb(128,255,128));
                         break;
 
                     case MODERATE:
                         hazardIcon.setImageResource(R.drawable.yellow_hazard);
+                        // Light yellow
+                        itemView.setBackgroundColor(Color.rgb(255,255,128));
                         break;
 
                     case HIGH:
                         hazardIcon.setImageResource(R.drawable.red_hazard);
+                        // Light red
+                        itemView.setBackgroundColor(Color.rgb(255,128,128));
                         break;
                 }
 
