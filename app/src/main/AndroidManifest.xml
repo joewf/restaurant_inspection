@@ -9,8 +9,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".UI.InspectionReport" />
-        <activity android:name=".UI.RestaurantDetails" />
+        <activity
+            android:name=".UI.InspectionReport"
+            android:parentActivityName=".UI.RestaurantDetails" />
+        <activity
+            android:name=".UI.RestaurantDetails"
+            android:parentActivityName=".UI.RestaurantList" />
         <activity android:name=".UI.RestaurantList">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
