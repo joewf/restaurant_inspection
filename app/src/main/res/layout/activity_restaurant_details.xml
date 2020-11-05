@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -12,7 +11,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/text_restaurant_name"
+            android:id="@+id/RestaurantDetails_text_restaurant_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Restaurant name"
@@ -22,7 +21,7 @@
             tools:layout_editor_absoluteY="32dp" />
 
         <TextView
-            android:id="@+id/text_address"
+            android:id="@+id/RestaurantDetails_text_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -31,7 +30,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/text_GPS"
+            android:id="@+id/RestaurantDetails_text_GPS"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -40,7 +39,7 @@
             android:textStyle="bold" />
 
         <ListView
-            android:id="@+id/list_inspection_report"
+            android:id="@+id/RestaurantDetails_list_inspection_report"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="10dp"/>

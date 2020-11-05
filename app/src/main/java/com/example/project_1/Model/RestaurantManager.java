@@ -43,13 +43,16 @@ public class RestaurantManager implements Iterable<Restaurant> {
         inspections.add(inspection);
     }
 
-
     public void removeRestaurant(Restaurant restaurant) {
         restaurants.remove(restaurant);
     }
 
     public Restaurant get(int index) {
         return restaurants.get(index);
+    }
+
+    public List<Violation> getViolations(int restaurantIndex, int inspectionIndex) {
+        return getInspectionsForRestaurant(restaurantIndex).get(inspectionIndex).getViolations();
     }
 
     @Override

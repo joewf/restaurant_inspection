@@ -8,9 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -22,8 +22,6 @@ import com.example.project_1.Model.Restaurant;
 import com.example.project_1.Model.RestaurantManager;
 import com.example.project_1.R;
 
-import org.w3c.dom.Text;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 public class RestaurantDetails extends AppCompatActivity {
     public static final String RESTAURANT_INDEX = "Restaurant index";
     private Restaurant restaurant;
-    private RestaurantManager manager;
     private int restaurantIndex;
     private List<Inspection> inspectionList = new ArrayList<>();
     private TextView tvName;
@@ -68,29 +65,37 @@ public class RestaurantDetails extends AppCompatActivity {
 
         // Set name
         String name = restaurant.getName();
-        tvName = (TextView) findViewById(R.id.text_restaurant_name);
+        tvName = (TextView) findViewById(R.id.RestaurantDetails_text_restaurant_name);
         tvName.setText(name);
         tvName.setTextColor(Color.BLUE);
 
         // Set Address
         String address = restaurant.getPhysicalAddress();
-        tvAddress = (TextView) findViewById(R.id.text_address);
+        tvAddress = (TextView) findViewById(R.id.RestaurantDetails_text_address);
         tvAddress.setText("Address: " + address);
 
         // Set GPS
         double latitude = restaurant.getLatitude();
         double altitude = restaurant.getAltitude();
-        tvGPS = (TextView) findViewById(R.id.text_GPS);
+        tvGPS = (TextView) findViewById(R.id.RestaurantDetails_text_GPS);
         tvGPS.setText("GPS Coordinates: " + altitude + ", " + latitude);
 
     }
 
     private void populateListView() {
-        if (!inspectionList.isEmpty()) {
-            ArrayAdapter<Inspection> adapter = new MyListAdapter();
-            ListView list = (ListView) findViewById(R.id.list_inspection_report);
-            list.setAdapter(adapter);
-        } /*else {
+
+        ArrayAdapter<Inspection> adapter = new MyListAdapter();
+        ListView list = (ListView) findViewById(R.id.RestaurantDetails_list_inspection_report);
+        list.setAdapter(adapter);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                startActivity(InspectionReport.makeIntent(RestaurantDetails.this, restaurantIndex, position));
+            }
+        });
+
+        /*else {
             String text[] = {"No inspections found!"};
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.inspection_report_view_no_inspections_found, text);
             ListView list = (ListView) findViewById(R.id.list_inspection_report);
@@ -121,15 +126,15 @@ public class RestaurantDetails extends AppCompatActivity {
                 HazardRating hazard = inspection.getHazardRating();
                 switch (hazard) {
                     case LOW:
-                        hazardIcon.setImageResource(R.drawable.green_hazard);
+                        hazardIcon.setImageResource(R.mipmap.green_hazard);
                         break;
 
                     case MODERATE:
-                        hazardIcon.setImageResource(R.drawable.yellow_hazard);
+                        hazardIcon.setImageResource(R.mipmap.yellow_hazard);
                         break;
 
                     case HIGH:
-                        hazardIcon.setImageResource(R.drawable.red_hazard);
+                        hazardIcon.setImageResource(R.mipmap.red_hazard);
                         break;
                 }
 
@@ -138,7 +143,7 @@ public class RestaurantDetails extends AppCompatActivity {
             }*/
 
                 // Fill inspection date
-                TextView restaurantDate = (TextView) itemView.findViewById(R.id.text_inspection_occurred);
+                TextView restaurantDate = itemView.findViewById(R.id.text_inspection_occurred);
 
                 Date inspectionDate = inspection.getDate();   // Inspection date
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd"); // Set date format
