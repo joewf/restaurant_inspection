@@ -22,7 +22,7 @@ public class Inspection {
     private String trackingNumber;
     private int numCritical;
     private int numNonCritical;
-    private List<Violation> violations;
+    private List<Violation> violations = new ArrayList<>();
 
 
     public Inspection() {
@@ -103,15 +103,22 @@ public class Inspection {
         this.violations = violations;
     }
 
+//    @Override
+//    public String toString() {
+//        return "Inspection{" +
+//                "date=" + date +
+//                ", type=" + type +
+//                ", hazardRating=" + hazardRating +
+//                ", trackingNumber='" + trackingNumber + '\'' +
+//                ", numCritical=" + numCritical +
+//                ", numNonCritical=" + numNonCritical +
+//                '}';
+//    }
+
     @Override
     public String toString() {
         return "Inspection{" +
-                "date=" + date +
-                ", type=" + type +
-                ", hazardRating=" + hazardRating +
-                ", trackingNumber='" + trackingNumber + '\'' +
-                ", numCritical=" + numCritical +
-                ", numNonCritical=" + numNonCritical +
+                "violations=" + violations +
                 '}';
     }
 }

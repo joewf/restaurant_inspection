@@ -29,12 +29,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -146,13 +144,10 @@ public class RestaurantList extends AppCompatActivity {
 
                     sampleInspection.setViolations(violationList);
 
+                    restaurantManager.addInspection(sampleInspection);
+
                     Log.e("violations", "setInspectionData: " + violationList);
                 }
-
-
-                sampleInspection.setViolations(null);
-                restaurantManager.addInspection(sampleInspection);
-
                 Log.d("Inspection List", "Just created: " + sampleInspection);
             }
         } catch (IOException | ParseException e) {
@@ -287,7 +282,7 @@ public class RestaurantList extends AppCompatActivity {
             restaurantView.setImageResource(restaurantIcon[position]);
 
             // Fill restaurant name
-            TextView restaurantName = (TextView) itemView.findViewById(R.id.text_restaurant_name);
+            TextView restaurantName = (TextView) itemView.findViewById(R.id.RestaurantDetails_text_restaurant_name);
             restaurantName.setText(currentRestaurant.getName());
             restaurantName.setTextColor(Color.BLUE);
 
@@ -315,19 +310,19 @@ public class RestaurantList extends AppCompatActivity {
                     HazardRating hazard = inspection.getHazardRating();
                     switch (hazard) {
                         case LOW:
-                            RestaurantHazard.setImageResource(R.drawable.green_hazard);
+                            RestaurantHazard.setImageResource(R.mipmap.green_hazard);
                             txtRestaurantHazard.setText("" + hazard);
                             txtRestaurantHazard.setTextColor(Color.GREEN);
                             break;
 
                         case MODERATE:
-                            RestaurantHazard.setImageResource(R.drawable.yellow_hazard);
+                            RestaurantHazard.setImageResource(R.mipmap.yellow_hazard);
                             txtRestaurantHazard.setText("" + hazard);
                             txtRestaurantHazard.setTextColor(Color.YELLOW);
                             break;
 
                         case HIGH:
-                            RestaurantHazard.setImageResource(R.drawable.red_hazard);
+                            RestaurantHazard.setImageResource(R.mipmap.red_hazard);
                             txtRestaurantHazard.setText("" + hazard);
                             txtRestaurantHazard.setTextColor(Color.RED);
                             break;
@@ -336,7 +331,7 @@ public class RestaurantList extends AppCompatActivity {
                     break;
                 }
             } else {
-                RestaurantHazard.setImageResource(R.drawable.green_hazard);
+                RestaurantHazard.setImageResource(R.mipmap.green_hazard);
                 txtRestaurantHazard.setText("" + HazardRating.LOW);
                 txtRestaurantHazard.setTextColor(Color.GREEN);
             }
