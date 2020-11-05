@@ -1,4 +1,4 @@
-package com.example.project_1.UI;
+package com.example.project_1.ui;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,10 +17,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.project_1.Model.HazardRating;
-import com.example.project_1.Model.Inspection;
-import com.example.project_1.Model.Restaurant;
-import com.example.project_1.Model.RestaurantManager;
+import com.example.project_1.model.HazardRating;
+import com.example.project_1.model.Inspection;
+import com.example.project_1.model.Restaurant;
+import com.example.project_1.model.RestaurantManager;
 import com.example.project_1.R;
 
 import java.text.SimpleDateFormat;
@@ -29,14 +29,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * RestaurantDetails class models the information about a RestaurantDetails activity.
+ */
 public class RestaurantDetails extends AppCompatActivity {
     public static final String RESTAURANT_INDEX = "Restaurant index";
     private Restaurant restaurant;
     private int restaurantIndex;
     private List<Inspection> inspectionList = new ArrayList<>();
-    private TextView tvName;
-    private TextView tvAddress;
-    private TextView tvGPS;
 
     public static Intent makeIntent(Context context, int restaurantIndex) {
         Intent intent = new Intent(context, RestaurantDetails.class);
@@ -66,20 +66,20 @@ public class RestaurantDetails extends AppCompatActivity {
 
         // Set name
         String name = restaurant.getName();
-        tvName = (TextView) findViewById(R.id.RestaurantDetails_text_restaurant_name);
+        TextView tvName = (TextView) findViewById(R.id.RestaurantDetails_text_restaurant_name);
         tvName.setText(name);
         tvName.setTextColor(Color.BLUE);
 
         // Set Address
         String address = restaurant.getPhysicalAddress();
-        tvAddress = (TextView) findViewById(R.id.RestaurantDetails_text_address);
-        tvAddress.setText("Address: " + address);
+        TextView tvAddress = (TextView) findViewById(R.id.RestaurantDetails_text_address);
+        tvAddress.setText(getString(R.string.address_) + address);
 
         // Set GPS
         double latitude = restaurant.getLatitude();
         double altitude = restaurant.getAltitude();
-        tvGPS = (TextView) findViewById(R.id.RestaurantDetails_text_GPS);
-        tvGPS.setText("GPS Coordinates: " + altitude + ", " + latitude);
+        TextView tvGPS = (TextView) findViewById(R.id.RestaurantDetails_text_GPS);
+        tvGPS.setText(getString(R.string.gps) + altitude + getString(R.string.comma) + latitude);
 
     }
 
@@ -95,16 +95,6 @@ public class RestaurantDetails extends AppCompatActivity {
                 startActivity(InspectionReport.makeIntent(RestaurantDetails.this, restaurantIndex, position));
             }
         });
-
-        /*if(!inspectionList.isEmpty()) {
-
-        }
-        else {
-            String text[] = {"No inspections found!"};
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.inspection_report_view_no_inspections_found, text);
-            ListView list = (ListView) findViewById(R.id.RestaurantDetails_list_inspection_report);
-            list.setAdapter(adapter);
-        }*/
     }
 
     private class MyListAdapter extends ArrayAdapter<Inspection> {
@@ -125,24 +115,24 @@ public class RestaurantDetails extends AppCompatActivity {
                 Inspection inspection = inspectionList.get(position);
 
                 // Fill hazard icon
-                ImageView hazardIcon = (ImageView) itemView.findViewById(R.id.icon_hazard_level);
+                ImageView hazardIcon = itemView.findViewById(R.id.icon_hazard_level);
 
                 HazardRating hazard = inspection.getHazardRating();
                 switch (hazard) {
                     case LOW:
                         hazardIcon.setImageResource(R.mipmap.green_hazard);
-                        itemView.setBackgroundColor(Color.rgb(204,255,204));
+                        itemView.setBackgroundColor(Color.rgb(204, 255, 204));
                         break;
 
                     case MODERATE:
                         hazardIcon.setImageResource(R.mipmap.yellow_hazard);
-                        itemView.setBackgroundColor(Color.rgb(255,255,204));
+                        itemView.setBackgroundColor(Color.rgb(255, 255, 204));
 
                         break;
 
                     case HIGH:
                         hazardIcon.setImageResource(R.mipmap.red_hazard);
-                        itemView.setBackgroundColor(Color.rgb(255,204,204));
+                        itemView.setBackgroundColor(Color.rgb(255, 204, 204));
 
                         break;
                 }
@@ -160,7 +150,7 @@ public class RestaurantDetails extends AppCompatActivity {
 
                 // Less than 30 days
                 if (diff < 30) {
-                    restaurantDate.setText(diff + " days ago");
+                    restaurantDate.setText(diff + getString(R.string.days_ago));
                 }
                 // Less than one year
                 else if (diff < 365) {
@@ -176,13 +166,13 @@ public class RestaurantDetails extends AppCompatActivity {
                 }
 
                 // Fill issues
-                TextView textViewNumCritical = (TextView) itemView.findViewById(R.id.text_criticalIssues_found);
-                TextView textViewNumNonCritical = (TextView) itemView.findViewById(R.id.text_non_criticalIssues_found);
+                TextView textViewNumCritical = itemView.findViewById(R.id.text_criticalIssues_found);
+                TextView textViewNumNonCritical = itemView.findViewById(R.id.text_non_criticalIssues_found);
 
                 int numCritical = inspection.getNumCritical();
-                textViewNumCritical.setText("# critical issues: " + numCritical);
+                textViewNumCritical.setText(getString(R.string.critical_iss) + numCritical);
                 int numNonCritical = inspection.getNumNonCritical();
-                textViewNumNonCritical.setText("# non-critical issues: " + numNonCritical);
+                textViewNumNonCritical.setText(getString(R.string.non_critical_iss) + numNonCritical);
 
             }
 

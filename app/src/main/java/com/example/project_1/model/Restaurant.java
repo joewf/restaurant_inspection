@@ -1,11 +1,8 @@
-package com.example.project_1.Model;
-
-import com.example.project_1.R;
+package com.example.project_1.model;
 
 /**
- * Restaurant information
+ * Restaurant class models the information about a restaurant.
  */
-
 public class Restaurant {
     private String trackingNumber;
     private String name;
@@ -14,7 +11,6 @@ public class Restaurant {
     private String factType;
     private double latitude;
     private double altitude;
-    //private int restaurantIcon;
 
     public Restaurant(String trackingNumber, String name, String physicalAddress, String physicalCity, String factType, double latitude, double altitude) {
         this.trackingNumber = trackingNumber;
@@ -92,14 +88,6 @@ public class Restaurant {
     public void setAltitude(double altitude) {
         this.altitude = altitude;
     }
-
-    /*public int getRestaurantIcon(int icon) {
-        return restaurantIcon;
-    }
-
-    public void setRestaurantIcon(int restaurantIcon) {
-        this.restaurantIcon = restaurantIcon;
-    }*/
 
     @Override
     public String toString() {

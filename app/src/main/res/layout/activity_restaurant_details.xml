@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UI.RestaurantDetails"
+    tools:context=".ui.RestaurantDetails"
     android:layout_margin="5dp">
 
     <LinearLayout
@@ -15,7 +15,7 @@
             android:id="@+id/RestaurantDetails_text_restaurant_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Restaurant name"
+            android:text="@string/restaurant_name"
             android:textSize="24sp"
             android:textStyle="bold"
             tools:layout_editor_absoluteX="29dp"
@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Restaurant Address"
+            android:text="@string/restaurant_address"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="GPS coords"
+            android:text="@string/gps_coords"
             android:textSize="18sp"
             android:textStyle="bold" />
 

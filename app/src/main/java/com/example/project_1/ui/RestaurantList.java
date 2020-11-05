@@ -1,4 +1,4 @@
-package com.example.project_1.UI;
+package com.example.project_1.ui;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,29 +18,30 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.project_1.Model.HazardRating;
-import com.example.project_1.Model.Inspection;
-import com.example.project_1.Model.InspectionType;
-import com.example.project_1.Model.Restaurant;
-import com.example.project_1.Model.RestaurantManager;
-import com.example.project_1.Model.Violation;
-import com.example.project_1.Model.ViolationSeverity;
+import com.example.project_1.model.HazardRating;
+import com.example.project_1.model.Inspection;
+import com.example.project_1.model.InspectionType;
+import com.example.project_1.model.Restaurant;
+import com.example.project_1.model.RestaurantManager;
+import com.example.project_1.model.Violation;
+import com.example.project_1.model.ViolationSeverity;
 import com.example.project_1.R;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * RestaurantList class models the information about a RestaurantList activity.
+ */
 public class RestaurantList extends AppCompatActivity {
 
     private RestaurantManager restaurantManager;
@@ -56,8 +56,8 @@ public class RestaurantList extends AppCompatActivity {
 
         setRestaurantData();
         setInspectionData();
-        sortRestaurantList();
-        sortInspectionDate();
+        restaurantManager.sortRestaurantList();
+        restaurantManager.sortInspectionDate();
         populateListView();
         populateIcon();
 
@@ -67,7 +67,7 @@ public class RestaurantList extends AppCompatActivity {
     private void setInspectionData() {
         InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
         BufferedReader reader = new BufferedReader(
-                new InputStreamReader(is, Charset.forName("UTF-8"))
+                new InputStreamReader(is, StandardCharsets.UTF_8)
         );
 
         String line = "";
@@ -196,7 +196,7 @@ public class RestaurantList extends AppCompatActivity {
     private void setRestaurantData() {
         InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
         BufferedReader reader = new BufferedReader(
-                new InputStreamReader(is, Charset.forName("UTF-8"))
+                new InputStreamReader(is, StandardCharsets.UTF_8)
         );
 
         String line = "";
@@ -299,12 +299,12 @@ public class RestaurantList extends AppCompatActivity {
 
                 for (Inspection inspection : inspectionsForCurrentRestaurant) {
                     criticalIssues = inspection.getNumCritical();
-                    restaurantCriticalIssues.setText("Critical issues: " + criticalIssues);
+                    restaurantCriticalIssues.setText(getString(R.string.crit_iss) + criticalIssues);
 
                     break;
                 }
             } else {
-                restaurantCriticalIssues.setText("Critical issues: 0");
+                restaurantCriticalIssues.setText(R.string.crit_iss_0);
             }
 
             // Fill hazard icon and text
@@ -317,19 +317,19 @@ public class RestaurantList extends AppCompatActivity {
                     switch (hazard) {
                         case LOW:
                             RestaurantHazard.setImageResource(R.mipmap.green_hazard);
-                            txtRestaurantHazard.setText("" + hazard);
+                            txtRestaurantHazard.setText(getString(R.string._) + hazard);
                             txtRestaurantHazard.setTextColor(Color.GREEN);
                             break;
 
                         case MODERATE:
                             RestaurantHazard.setImageResource(R.mipmap.yellow_hazard);
-                            txtRestaurantHazard.setText("" + hazard);
+                            txtRestaurantHazard.setText(getString(R.string._) + hazard);
                             txtRestaurantHazard.setTextColor(Color.YELLOW);
                             break;
 
                         case HIGH:
                             RestaurantHazard.setImageResource(R.mipmap.red_hazard);
-                            txtRestaurantHazard.setText("" + hazard);
+                            txtRestaurantHazard.setText(getString(R.string._) + hazard);
                             txtRestaurantHazard.setTextColor(Color.RED);
                             break;
                     }
@@ -338,10 +338,9 @@ public class RestaurantList extends AppCompatActivity {
                 }
             } else {
                 RestaurantHazard.setImageResource(R.mipmap.green_hazard);
-                txtRestaurantHazard.setText("" + HazardRating.LOW);
+                txtRestaurantHazard.setText(getString(R.string._) + HazardRating.LOW);
                 txtRestaurantHazard.setTextColor(Color.GREEN);
             }
-
 
             // Fill inspection date
             TextView restaurantDate = (TextView) itemView.findViewById(R.id.text_inspection_date);
@@ -358,7 +357,7 @@ public class RestaurantList extends AppCompatActivity {
 
                     // Less than 30 days
                     if (diff < 30) {
-                        restaurantDate.setText(diff + " days ago");
+                        restaurantDate.setText(diff + getString(R.string._days_ago));
                     }
                     // Less than one year
                     else if (diff < 365) {
@@ -376,32 +375,12 @@ public class RestaurantList extends AppCompatActivity {
                     break;
                 }
             } else {
-                restaurantDate.setText("No inspections found");
+                restaurantDate.setText(R.string.no_inspection_found);
             }
 
             return itemView;
         }
 
-    }
-
-    private void sortRestaurantList() {
-        Collections.sort(RestaurantManager.restaurants, new Comparator<Restaurant>() {
-            @Override
-            // Sort ascendant order
-            public int compare(Restaurant R1, Restaurant R2) {
-                return R1.getName().compareTo(R2.getName());
-            }
-        });
-    }
-
-    private void sortInspectionDate() {
-        Collections.sort(RestaurantManager.inspections, new Comparator<Inspection>() {
-            @Override
-            // Sort descendant order
-            public int compare(Inspection I1, Inspection I2) {
-                return I2.getDate().compareTo(I1.getDate());
-            }
-        });
     }
 
     @Override

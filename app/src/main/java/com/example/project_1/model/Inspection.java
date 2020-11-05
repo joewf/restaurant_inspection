@@ -1,19 +1,12 @@
-package com.example.project_1.Model;
+package com.example.project_1.model;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
-import java.text.SimpleDateFormat;
-import java.time.Month;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalAdjuster;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
+/**
+ * Inspection class models the information about an inspection.
+ */
 public class Inspection {
 
     private InspectionType type;
@@ -101,18 +94,6 @@ public class Inspection {
     public void setViolations(List<Violation> violations) {
         this.violations = violations;
     }
-
-//    @Override
-//    public String toString() {
-//        return "Inspection{" +
-//                "date=" + date +
-//                ", type=" + type +
-//                ", hazardRating=" + hazardRating +
-//                ", trackingNumber='" + trackingNumber + '\'' +
-//                ", numCritical=" + numCritical +
-//                ", numNonCritical=" + numNonCritical +
-//                '}';
-//    }
 
     @Override
     public String toString() {

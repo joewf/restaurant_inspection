@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UI.RestaurantList">
+    tools:context=".ui.RestaurantList"
+    android:layout_margin="1dp">
 
     <ListView
         android:id="@+id/restaurantListView"

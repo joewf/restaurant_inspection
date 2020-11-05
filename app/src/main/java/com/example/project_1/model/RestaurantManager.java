@@ -1,15 +1,19 @@
-package com.example.project_1.Model;
-
-import androidx.annotation.NonNull;
+package com.example.project_1.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
+
+/**
+ * RestaurantManager class manages a list of Restaurant Objects.
+ */
 public class RestaurantManager implements Iterable<Restaurant> {
 
-    public static List<Restaurant> restaurants = new ArrayList<>();
-    public static List<Inspection> inspections = new ArrayList<>();
+    private List<Restaurant> restaurants = new ArrayList<>();
+    private List<Inspection> inspections = new ArrayList<>();
     private static RestaurantManager instance;
 
     // Return restaurant for MyListAdapter
@@ -21,9 +25,6 @@ public class RestaurantManager implements Iterable<Restaurant> {
         return inspections;
     }
 
-    /*
-        Singleton support
-     */
     private RestaurantManager() {
         // To prevent anyone else from instantiating
     }
@@ -41,10 +42,6 @@ public class RestaurantManager implements Iterable<Restaurant> {
 
     public void addInspection(Inspection inspection) {
         inspections.add(inspection);
-    }
-
-    public void removeRestaurant(Restaurant restaurant) {
-        restaurants.remove(restaurant);
     }
 
     public Restaurant get(int index) {
@@ -71,5 +68,25 @@ public class RestaurantManager implements Iterable<Restaurant> {
         }
 
         return list;
+    }
+
+    public void sortRestaurantList() {
+        Collections.sort(restaurants, new Comparator<Restaurant>() {
+            @Override
+            // Sort ascendant order
+            public int compare(Restaurant R1, Restaurant R2) {
+                return R1.getName().compareTo(R2.getName());
+            }
+        });
+    }
+
+    public void sortInspectionDate() {
+        Collections.sort(inspections, new Comparator<Inspection>() {
+            @Override
+            // Sort descendant order
+            public int compare(Inspection I1, Inspection I2) {
+                return I2.getDate().compareTo(I1.getDate());
+            }
+        });
     }
 }

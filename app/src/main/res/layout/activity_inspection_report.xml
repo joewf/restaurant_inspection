@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UI.RestaurantDetails"
+    tools:context=".ui.RestaurantDetails"
     android:background="#2D131212"
     android:orientation="vertical">
 
@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Inspection type"
+            android:text="@string/inspection_type"
             android:textSize="19sp"
             android:textStyle="bold" />
 
@@ -37,7 +37,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="# critical issues found"
+            android:text="@string/critical_issues_found"
             android:textSize="19sp"
             android:textStyle="bold" />
 
@@ -46,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="# non-critical issues found"
+            android:text="@string/non_critical_issues_found"
             android:textSize="19sp"
             android:textStyle="bold" />
 
@@ -72,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="18dp"
-                android:text="Hazard Level: "
+                android:text="@string/hazard_level_"
                 android:textSize="19sp"
                 android:textStyle="bold" />
 

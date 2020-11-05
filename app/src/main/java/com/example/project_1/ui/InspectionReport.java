@@ -1,4 +1,4 @@
-package com.example.project_1.UI;
+package com.example.project_1.ui;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,28 +19,27 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.example.project_1.Model.HazardRating;
-import com.example.project_1.Model.Inspection;
-import com.example.project_1.Model.InspectionType;
-import com.example.project_1.Model.RestaurantManager;
-import com.example.project_1.Model.Violation;
-import com.example.project_1.Model.ViolationNature;
-import com.example.project_1.Model.ViolationSeverity;
+import com.example.project_1.model.HazardRating;
+import com.example.project_1.model.Inspection;
+import com.example.project_1.model.InspectionType;
+import com.example.project_1.model.RestaurantManager;
+import com.example.project_1.model.Violation;
+import com.example.project_1.model.ViolationNature;
+import com.example.project_1.model.ViolationSeverity;
 import com.example.project_1.R;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+/**
+ * InspectionReport class models the information about a InspectionReport activity.
+ */
 public class InspectionReport extends AppCompatActivity {
     public static final String RESTAURANT_INDEX = "restaurant index";
     public static final String INSPECTION_INDEX = "inspection index";
     private Inspection inspection;
     private List<Violation> violationList;
-    private int restaurantIndex;
-    private int inspectionIndex;
 
     public static Intent makeIntent(Context context, int restaurantIndex, int inspectionIndex) {
         Intent intent = new Intent(context, InspectionReport.class);
@@ -55,8 +54,8 @@ public class InspectionReport extends AppCompatActivity {
         setContentView(R.layout.activity_inspection_report);
 
         Intent intent = getIntent();
-        restaurantIndex = intent.getIntExtra(RESTAURANT_INDEX, -1);
-        inspectionIndex = intent.getIntExtra(INSPECTION_INDEX, -1);
+        int restaurantIndex = intent.getIntExtra(RESTAURANT_INDEX, -1);
+        int inspectionIndex = intent.getIntExtra(INSPECTION_INDEX, -1);
 
         RestaurantManager manager = RestaurantManager.getInstance();
         inspection = manager.getInspectionsForRestaurant(restaurantIndex).get(inspectionIndex);
@@ -87,15 +86,15 @@ public class InspectionReport extends AppCompatActivity {
 
         // Fill type
 
-        tvInspectionType.setText("Inspection Type: " + (inspection.getType() == InspectionType.ROUTINE
-                ? "ROUTINE" : "FOLLOW-UP"));
+        tvInspectionType.setText(getString(R.string.ins_type) + (inspection.getType() == InspectionType.ROUTINE
+                ? getString(R.string.rout) : getString(R.string.fu)));
 
         // Fill # issues
 
         int numCritical = inspection.getNumCritical();
-        tvCritical.setText("# Critical Issues: " + numCritical);
+        tvCritical.setText(getString(R.string.num_crit) + numCritical);
         int numNonCritical = inspection.getNumNonCritical();
-        tvNonCritical.setText("# Non-Critical Issues: " + numNonCritical);
+        tvNonCritical.setText(getString(R.string.num_noncrit) + numNonCritical);
 
         // Fill hazard text and icon
 
@@ -103,19 +102,19 @@ public class InspectionReport extends AppCompatActivity {
         switch (hazard) {
             case LOW:
                 ivHazard.setImageResource(R.mipmap.green_hazard);
-                tvHazard.setText("Hazard Level:  " + hazard);
+                tvHazard.setText(getString(R.string.hazard_level__) + hazard);
                 tvHazard.setTextColor(Color.GREEN);
                 break;
 
             case MODERATE:
                 ivHazard.setImageResource(R.mipmap.yellow_hazard);
-                tvHazard.setText("Hazard Level:  " + hazard);
+                tvHazard.setText(getString(R.string.hazard_level__) + hazard);
                 tvHazard.setTextColor(Color.YELLOW);
                 break;
 
             case HIGH:
                 ivHazard.setImageResource(R.mipmap.red_hazard);
-                tvHazard.setText("Hazard Level:  " + hazard);
+                tvHazard.setText(getString(R.string.hazard_level__) + hazard);
                 tvHazard.setTextColor(Color.RED);
                 break;
         }
@@ -204,12 +203,12 @@ public class InspectionReport extends AppCompatActivity {
 
                 // Fill nature text
                 TextView tvNature = itemView.findViewById(R.id.InspectionReport_listItem_text_nature);
-                tvNature.setText("Nature: " + violation.getNature());
+                tvNature.setText(getString(R.string.nature_) + violation.getNature());
 
                 // Fill severity text
                 TextView tvSeverity = itemView.findViewById(R.id.InspectionReport_listItem_text_severity);
-                tvSeverity.setText("Severity: " + (violation.getSeverity() == ViolationSeverity.CRITICAL
-                        ? "CRITICAL" : "NON-CRITICAL"));
+                tvSeverity.setText(getString(R.string.severity_) + (violation.getSeverity() == ViolationSeverity.CRITICAL
+                        ? getString(R.string.crit) : getString(R.string.non_crit)));
             }
 
             return itemView;

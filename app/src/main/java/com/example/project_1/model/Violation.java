@@ -1,5 +1,8 @@
-package com.example.project_1.Model;
+package com.example.project_1.model;
 
+/**
+ * Violation class models the information about a violation.
+ */
 public class Violation {
     private String description;
     private ViolationNature nature;

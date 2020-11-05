@@ -25,7 +25,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginBottom="16dp"
         android:layout_toEndOf="@+id/restaurant_icon"
-        android:text="Issues found" />
+        android:text="@string/issues_found" />
 
     <TextView
         android:id="@+id/text_hazard_level"
@@ -35,7 +35,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginBottom="0dp"
         android:layout_toEndOf="@+id/text_issues_found"
-        android:text="Hazard level"
+        android:text="@string/hazard_level"
         android:textStyle="bold" />
 
     <ImageView
@@ -59,7 +59,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginBottom="1dp"
         android:layout_toEndOf="@+id/hazard_icon"
-        android:text="Inspection date"
+        android:text="@string/inspection_date"
         android:textStyle="bold" />
 
     <TextView
@@ -70,7 +70,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="10dp"
         android:layout_toEndOf="@+id/restaurant_icon"
-        android:text="Restaurant name"
-        android:textSize="20dp"
+        android:text="@string/restaurant_name"
+        android:textSize="20sp"
         android:textStyle="bold" />
 </RelativeLayout>

@@ -10,12 +10,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".UI.InspectionReport"
-            android:parentActivityName=".UI.RestaurantDetails" />
+            android:name=".ui.InspectionReport"
+            android:parentActivityName=".ui.RestaurantDetails" />
         <activity
-            android:name=".UI.RestaurantDetails"
-            android:parentActivityName=".UI.RestaurantList" />
-        <activity android:name=".UI.RestaurantList">
+            android:name=".ui.RestaurantDetails"
+            android:parentActivityName=".ui.RestaurantList" />
+        <activity android:name=".ui.RestaurantList">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
