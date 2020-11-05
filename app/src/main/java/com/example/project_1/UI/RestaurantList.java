@@ -146,8 +146,9 @@ public class RestaurantList extends AppCompatActivity {
                     restaurantManager.addInspection(newInspection);
 
                     Log.e("violations", "setInspectionData: " + violationList);
+                } else {
+                    restaurantManager.addInspection(newInspection);
                 }
-                restaurantManager.addInspection(newInspection);
 
                 Log.d("Inspection List", "Just created: " + newInspection);
             }
