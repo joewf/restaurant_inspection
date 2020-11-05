@@ -46,7 +46,8 @@
         android:maxLines="1"
         android:scrollHorizontally="true"
         android:text="description text"
-        android:textSize="13sp" />
+        android:textSize="13sp"
+        android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/InspectionReport_listItem_severity_icon"
