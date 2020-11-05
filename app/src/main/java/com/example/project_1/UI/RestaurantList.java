@@ -2,8 +2,10 @@ package com.example.project_1.UI;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -400,5 +402,20 @@ public class RestaurantList extends AppCompatActivity {
                 return I2.getDate().compareTo(I1.getDate());
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Would you like to exit?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        System.exit(0);
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+
     }
 }
