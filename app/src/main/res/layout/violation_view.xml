@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2D131212">
+    android:background="#66FFFFFF">
+    <!--    android:background="#2D131212"-->
 
     <ImageView
         android:id="@+id/InspectionReport_listItem_nature_icon"

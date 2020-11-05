@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -95,10 +96,13 @@ public class RestaurantDetails extends AppCompatActivity {
             }
         });
 
-        /*else {
+        /*if(!inspectionList.isEmpty()) {
+
+        }
+        else {
             String text[] = {"No inspections found!"};
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.inspection_report_view_no_inspections_found, text);
-            ListView list = (ListView) findViewById(R.id.list_inspection_report);
+            ListView list = (ListView) findViewById(R.id.RestaurantDetails_list_inspection_report);
             list.setAdapter(adapter);
         }*/
     }
@@ -127,25 +131,21 @@ public class RestaurantDetails extends AppCompatActivity {
                 switch (hazard) {
                     case LOW:
                         hazardIcon.setImageResource(R.mipmap.green_hazard);
-                        itemView.setBackgroundColor(Color.rgb(128,255,128));
+                        itemView.setBackgroundColor(Color.rgb(204,255,204));
                         break;
 
                     case MODERATE:
                         hazardIcon.setImageResource(R.mipmap.yellow_hazard);
-                        itemView.setBackgroundColor(Color.rgb(255,255,128));
+                        itemView.setBackgroundColor(Color.rgb(255,255,204));
 
                         break;
 
                     case HIGH:
                         hazardIcon.setImageResource(R.mipmap.red_hazard);
-                        itemView.setBackgroundColor(Color.rgb(255,128,128));
+                        itemView.setBackgroundColor(Color.rgb(255,204,204));
 
                         break;
                 }
-
-            /*else {
-                hazardIcon.setImageResource(R.drawable.green_hazard);
-            }*/
 
                 // Fill inspection date
                 TextView restaurantDate = itemView.findViewById(R.id.text_inspection_occurred);
@@ -155,8 +155,8 @@ public class RestaurantDetails extends AppCompatActivity {
                 Date currentDate = new Date();
                 simpleDateFormat.format(currentDate);   // Current date
                 // Subtract days
-                long diffInMillies = Math.abs(currentDate.getTime() - inspectionDate.getTime());
-                long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+                long diffInMillis = Math.abs(currentDate.getTime() - inspectionDate.getTime());
+                long diff = TimeUnit.DAYS.convert(diffInMillis, TimeUnit.MILLISECONDS);
 
                 // Less than 30 days
                 if (diff < 30) {
@@ -188,5 +188,14 @@ public class RestaurantDetails extends AppCompatActivity {
 
             return itemView;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

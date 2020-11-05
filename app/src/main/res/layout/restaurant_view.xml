@@ -31,12 +31,12 @@
         android:id="@+id/text_hazard_level"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
         android:layout_alignBottom="@+id/text_issues_found"
         android:layout_marginStart="10dp"
-        android:layout_marginBottom="-2dp"
+        android:layout_marginBottom="0dp"
         android:layout_toEndOf="@+id/text_issues_found"
-        android:text="Hazard level" />
+        android:text="Hazard level"
+        android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/hazard_icon"
@@ -44,7 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/text_issues_found"
         android:layout_marginStart="10dp"
-        android:layout_marginBottom="-2dp"
+        android:layout_marginBottom="1dp"
         android:layout_toEndOf="@+id/text_hazard_level"
         android:adjustViewBounds="true"
         android:maxWidth="20dp"
@@ -55,12 +55,12 @@
         android:id="@+id/text_inspection_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
         android:layout_alignBottom="@+id/text_issues_found"
         android:layout_marginStart="10dp"
-        android:layout_marginBottom="-2dp"
+        android:layout_marginBottom="1dp"
         android:layout_toEndOf="@+id/hazard_icon"
-        android:text="Inspection date" />
+        android:text="Inspection date"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/RestaurantDetails_text_restaurant_name"

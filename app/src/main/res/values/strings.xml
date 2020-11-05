@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Restaurant Health Inspection</string>
+    <string name="app_name">Restaurant Health Inspector</string>
     <string name="address">Address: </string>
     <string name="GPS">GPS Coordinates: </string>
 </resources>

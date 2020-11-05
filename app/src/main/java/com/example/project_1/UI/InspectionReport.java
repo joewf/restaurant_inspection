@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -80,40 +81,21 @@ public class InspectionReport extends AppCompatActivity {
         // Fill date
 
         Date inspectionDate = inspection.getDate();   // Inspection date
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd"); // Set date format
-        Date currentDate = new Date();
-        simpleDateFormat.format(currentDate);   // Current date
-        // Subtract days
-        long diffInMillies = Math.abs(currentDate.getTime() - inspectionDate.getTime());
-        long diff = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-        // Less than 30 days
-        if (diff < 30) {
-            tvDate.setText(diff + " days ago");
-        }
-        // Less than one year
-        else if (diff < 365) {
-            simpleDateFormat = new SimpleDateFormat("MMMM dd");
-            String strDate = simpleDateFormat.format(inspectionDate);
-            tvDate.setText(strDate);
-        }
-        // More than one year
-        else {
-            simpleDateFormat = new SimpleDateFormat("MMMM yyyy");
-            String strDate = simpleDateFormat.format(inspectionDate);
-            tvDate.setText(strDate);
-        }
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMMM d, yyyy");
+        String strDate = simpleDateFormat.format(inspectionDate);
+        tvDate.setText(strDate);
 
         // Fill type
 
-        tvInspectionType.setText("Inspection type: " + (inspection.getType() == InspectionType.ROUTINE
+        tvInspectionType.setText("Inspection Type: " + (inspection.getType() == InspectionType.ROUTINE
                 ? "ROUTINE" : "FOLLOW-UP"));
 
         // Fill # issues
 
         int numCritical = inspection.getNumCritical();
-        tvCritical.setText("Critical issues: " + numCritical);
+        tvCritical.setText("# Critical Issues: " + numCritical);
         int numNonCritical = inspection.getNumNonCritical();
-        tvNonCritical.setText("Non-Critical issues: " + numNonCritical);
+        tvNonCritical.setText("# Non-Critical Issues: " + numNonCritical);
 
         // Fill hazard text and icon
 
@@ -151,7 +133,7 @@ public class InspectionReport extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Violation violation = violationList.get(position);
                     new AlertDialog.Builder(InspectionReport.this).setMessage(violation.getDescription())
-                            .setTitle("Description")
+                            .setTitle("Violation Description")
                             .show();
                 }
             });
@@ -232,6 +214,15 @@ public class InspectionReport extends AppCompatActivity {
 
             return itemView;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull final MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }
 
