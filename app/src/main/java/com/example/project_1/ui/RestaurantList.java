@@ -2,13 +2,16 @@ package com.example.project_1.ui;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.*;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +21,15 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HurlStack;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.project_1.model.HazardRating;
+import com.example.project_1.model.InputStreamVolleyRequest;
 import com.example.project_1.model.Inspection;
 import com.example.project_1.model.InspectionType;
 import com.example.project_1.model.Restaurant;
@@ -27,25 +38,57 @@ import com.example.project_1.model.Violation;
 import com.example.project_1.model.ViolationSeverity;
 import com.example.project_1.R;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-/**
- * RestaurantList class models the information about a RestaurantList activity.
- */
 public class RestaurantList extends AppCompatActivity {
 
     private RestaurantManager restaurantManager;
     private int[] restaurantIcon = new int[8];
+    ProgressDialog pDialog;
+
+    // Add the request to the RequestQueue.
+
+
+    // Instantiate the cache
+    //Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
+
+    // Set up the network to use HttpURLConnection as the HTTP client.
+    //Network network = new BasicNetwork(new HurlStack());
+
+    // Instantiate the RequestQueue with the cache and network.
+    //RequestQueue requestQueue = new RequestQueue(this);
+    //RequestQueue requestQueue = Volley.newRequestQueue(this);
+
+    //RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
+    int count;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,189 +97,650 @@ public class RestaurantList extends AppCompatActivity {
 
         restaurantManager = RestaurantManager.getInstance();
 
-        setRestaurantData();
-        setInspectionData();
-        restaurantManager.sortRestaurantList();
-        restaurantManager.sortInspectionDate();
-        populateListView();
+        checkUpdateOfFraserHealthRestaurantInspectionReports();
+        //setRestaurantData();
+        //setInspectionData();
+        //sortRestaurantList();
+        //sortInspectionDate();
+        //populateListView();
         populateIcon();
 
     }
 
+    // check update
+    private void checkUpdateOfFraserHealthRestaurantInspectionReports() {
 
-    private void setInspectionData() {
-        InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(is, StandardCharsets.UTF_8)
-        );
+        String urlFraserHealthRestaurantInspectionReports = "https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports";
 
-        String line = "";
-        try {
-            // Step over headers
-            reader.readLine();
+        //final JSONObject[] restaurantRequest = new JSONObject[1];
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, urlFraserHealthRestaurantInspectionReports,
+                new Response.Listener<String>() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject fraserHealthRestaurantInspectionReportsObj = new JSONObject(response);
+                            JSONObject result = fraserHealthRestaurantInspectionReportsObj.getJSONObject("result");
+                            JSONArray resources = result.getJSONArray("resources");
+                            String inspectionReportsTimeStamp = resources.getJSONObject(0).getString("last_modified");
+                            String inspectionReportsURL = resources.getJSONObject(0).getString("url");
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS", Locale.ENGLISH);
+                            LocalDateTime lastModified = LocalDateTime.parse(inspectionReportsTimeStamp, formatter);
+                            long lastModifiedTimeInMilliseconds = lastModified.atOffset(ZoneOffset.ofHours(-7)).toInstant().toEpochMilli();
+                            long currentTimeInMilliseconds = Instant.now().toEpochMilli();
+                            Log.i("myResponse", response);
+                            Log.i("myResources", resources.toString());
+                            Log.i("myInspectionReportTimeStamp", inspectionReportsTimeStamp);
+                            Log.i("myLastModifiedTime", "Date in milli :: FOR API >= 26 >>> " + lastModifiedTimeInMilliseconds);
+                            Log.i("myCurrentTime", "current time: " + currentTimeInMilliseconds);
+                            Log.i("myURL", inspectionReportsURL);
 
-            while ((line = reader.readLine()) != null) {
-
-                // Split by ','
-                String[] tokens = line.split(",");
-
-                // Read data from inspectionreports_itr1.csv
-                Inspection newInspection = new Inspection();
-                newInspection.setTrackingNumber(tokens[0]);
-
-                // Set date
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
-                Date date = simpleDateFormat.parse(tokens[1]);
-
-                newInspection.setDate(date);
-
-                // dry inspection type
-                InspectionType inspectionType;
-                if (tokens[2].equals("\"Routine\"")) {
-                    inspectionType = InspectionType.ROUTINE;
-
-                } else {
-                    inspectionType = InspectionType.FOLLOW_UP;
-                }
-                newInspection.setType(inspectionType);
-
-                // Set critical issues
-                if (tokens[3].length() > 0) {
-                    newInspection.setNumCritical(Integer.parseInt(tokens[3]));
-                } else {
-                    newInspection.setNumCritical(0);
-                }
-
-                // Set non critical issues
-                if (tokens[4].length() > 0) {
-                    newInspection.setNumNonCritical(Integer.parseInt(tokens[4]));
-                } else {
-                    newInspection.setNumNonCritical(0);
-                }
-
-                // Hazard rating
-                HazardRating hazardRating = null;
-                if (tokens[5].equals("\"Low\"")) {
-                    hazardRating = HazardRating.LOW;
-                }
-                if (tokens[5].equals("\"Moderate\"")) {
-                    hazardRating = HazardRating.MODERATE;
-                }
-                if (tokens[5].equals("\"High\"")) {
-                    hazardRating = HazardRating.HIGH;
-                }
-                newInspection.setHazardRating(hazardRating);
-
-                // Violations
-                if (tokens.length > 6) {
-                    Log.e("violations length ", "setInspectionData: " + (tokens.length - 6));
-
-                    // Get violations String "..."
-                    StringBuilder violationsString = new StringBuilder();
-                    for (int i = 6; i < tokens.length; i++) {
-                        //Log.e("token[i]", "loop: " + tokens[i]);
-
-                        if (i == 6) {
-                            violationsString.append(tokens[i].substring(1));
-                        } else {
-                            violationsString.append(",").append(tokens[i]);
+                            promptUserDownloadUpdateDialog(lastModifiedTimeInMilliseconds, currentTimeInMilliseconds, inspectionReportsURL);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                     }
-                    List<Violation> violationList = getViolationsFromString(violationsString.toString());
-
-                    newInspection.setViolations(violationList);
-
-                    restaurantManager.addInspection(newInspection);
-
-                    Log.e("violations", "setInspectionData: " + violationList);
-                } else {
-                    restaurantManager.addInspection(newInspection);
-                }
-
-                Log.d("Inspection List", "Just created: " + newInspection);
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
             }
-        } catch (IOException | ParseException e) {
-            Log.wtf("Inspection List", "Error reading data file on line " + line, e);
-            e.printStackTrace();
+        });
+
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        requestQueue.add(stringRequest);
+
+    }
+
+
+    private void promptUserDownloadUpdateDialog(long lastModifiedTimeInMilliseconds, long currentTimeInMilliseconds, String inspectionReportsURL) {
+
+        // 20 hours = 72000000 Milliseconds
+        if (currentTimeInMilliseconds - lastModifiedTimeInMilliseconds > 72000000) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(RestaurantList.this);
+                    builder.setTitle("Last update is 20 hours ago");
+                    builder.setMessage("Do you want to download the update?");
+
+                    builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            Boolean updateAvailable = false;
+                            File oldRestaurants = new File(getFilesDir(), "oldRestaurants");
+
+                            setRestaurantData(updateAvailable, oldRestaurants);
+                            File oldInspectionReports = new File(getFilesDir(), "oldRestaurants");
+                            setInspectionData(updateAvailable, oldInspectionReports);
+                            /*restaurantManager.sortRestaurantList();
+                            restaurantManager.sortInspectionDate();
+                            populateListView();
+                            populateIcon();*/
+                            //Intent home = new Intent(getApplicationContext(), OfficeActivity.class);
+                            //startActivity(home);
+                            //finish();
+                        }
+                    });
+
+                    builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                            String urlRestaurants = "https://data.surrey.ca/api/3/action/package_show?id=restaurants";
+
+                            StringRequest stringRequest = new StringRequest(Request.Method.GET, urlRestaurants,
+                                    new Response.Listener<String>() {
+                                        @RequiresApi(api = Build.VERSION_CODES.O)
+                                        @Override
+                                        public void onResponse(String response) {
+                                            try {
+                                                JSONObject restaurants = new JSONObject(response);
+                                                JSONObject result = restaurants.getJSONObject("result");
+                                                JSONArray resources = result.getJSONArray("resources");
+                                                String restaurantsURL = resources.getJSONObject(0).getString("url");
+                                                Log.i("myURLRestaurant", restaurantsURL);
+
+                                                downloadUpdate(restaurantsURL, inspectionReportsURL);
+
+                                            } catch (JSONException e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                }
+                            });
+
+                            // Add the request to the RequestQueue.
+                            //RequestQueue requestQueue = Volley.newRequestQueue(this);
+                            Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
+                            //requestQueue.add(stringRequest);
+
+                            //Intent home = new Intent(getApplicationContext(), SchoolActivity.class);
+                            //startActivity(home);
+                            //finish();
+                        }
+                    });
+                    AlertDialog alertdialog = builder.create();
+                    alertdialog.show();
+                }
+            }, 100);
+
         }
+
+    }
+
+
+    private void downloadUpdate(String restaurantsURL, String inspectionReportsURL) {
+        // cannot save download file to res https://stackoverflow.com/questions/3374061/write-to-res-drawable-on-the-fly/3374149#3374149
+        pDialog = new ProgressDialog(this);
+        pDialog.setMessage("Loading...");
+        //pDialog.setCancelable(false);
+        final boolean[] cancelDownloading = {false};
+        pDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                pDialog.dismiss();//dismiss dialog
+                cancelDownloading[0] = true;
+                //Volley.newRequestQueue(getApplicationContext(), new HurlStack()).stop();
+                //requestQueue.stop();
+                Boolean updateAvailable = false;
+                File oldRestaurants = new File(getFilesDir(), "oldRestaurants");
+                setRestaurantData(updateAvailable, oldRestaurants);
+                File oldInspectionReports = new File(getFilesDir(), "oldRestaurants");
+                setInspectionData(updateAvailable, oldInspectionReports);
+                /*restaurantManager.sortRestaurantList();
+                restaurantManager.sortInspectionDate();*/
+                populateListView();
+                populateIcon();
+            }
+        });
+        pDialog.show();
+
+        InputStreamVolleyRequest request;
+        request = new InputStreamVolleyRequest(Request.Method.GET, restaurantsURL, new Response.Listener<byte[]>() {
+            @Override
+            public void onResponse(byte[] response) {
+                HashMap<String, Object> map = new HashMap<String, Object>();
+                try {
+                    if (response != null) {
+
+                        String filename = "newRestaurants";
+                        //filename = filename.replace(":", ".");
+                        Log.d("myRESUME FILE NAME", filename);
+
+                        try {
+                            long lenghtOfFile = response.length;
+
+                            //covert reponse to input stream
+                            InputStream input = new ByteArrayInputStream(response);
+                            //File path = Environment.getExternalStorageDirectory();
+                            File newRestaurants = new File(getFilesDir(), filename);
+                            map.put("resume_path", newRestaurants.toString());
+                            BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(newRestaurants));
+                            byte data[] = new byte[1024];
+
+                            long total = 0;
+
+                            while ((count = input.read(data)) != -1) {
+                                total += count;
+                                output.write(data, 0, count);
+                            }
+
+                            output.flush();
+                            output.close();
+                            input.close();
+
+                            downloadInspectionReports(newRestaurants, inspectionReportsURL, cancelDownloading);
+
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE. ERROR:: " + error.getMessage());
+            }
+        }, null);
+        request.setTag("tag");
+        Request<byte[]> requestQueueByte = Volley.newRequestQueue(getApplicationContext(), new HurlStack()).add(request);
+        //RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
+        //requestQueue = requestQueue.add(request);
+        if (cancelDownloading[0]) {
+            //Volley.newRequestQueue(getApplicationContext(), new HurlStack()).stop();
+            //Log.i("myStop", "stop");
+            requestQueueByte.cancel();
+        }
+        //requestQueue.add(request);
+    }
+
+
+    private void downloadInspectionReports(File newRestaurants, String inspectionReportsURL, boolean[] cancelDownloading) {
+        InputStreamVolleyRequest request;
+        request = new InputStreamVolleyRequest(Request.Method.GET, inspectionReportsURL, new Response.Listener<byte[]>() {
+            @Override
+            public void onResponse(byte[] response) {
+                HashMap<String, Object> map = new HashMap<String, Object>();
+                try {
+                    if (response != null) {
+
+                        String filename = "newInspectionReports";
+                        //filename = filename.replace(":", ".");
+                        Log.d("myRESUME FILE NAME", filename);
+
+                        try {
+                            long lenghtOfFile = response.length;
+
+                            //covert reponse to input stream
+                            InputStream input = new ByteArrayInputStream(response);
+                            //File path = Environment.getExternalStorageDirectory();
+                            File newInspectionReports = new File(getFilesDir(), filename);
+                            map.put("resume_path", newInspectionReports.toString());
+                            BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(newInspectionReports));
+                            byte data[] = new byte[1024];
+
+                            long total = 0;
+
+                            while ((count = input.read(data)) != -1) {
+                                total += count;
+                                output.write(data, 0, count);
+                            }
+
+                            output.flush();
+                            output.close();
+                            input.close();
+
+                            int fileSizeNewRestaurants = Integer.parseInt(String.valueOf(newRestaurants.length() / 1024));
+                            Log.d("myFileSize", ": " + fileSizeNewRestaurants + "KB");
+                            int fileSizeNewInspectionReports = Integer.parseInt(String.valueOf(newInspectionReports.length() / 1024));
+                            Log.d("myFileSize", ": " + fileSizeNewInspectionReports + "KB");
+
+                            pDialog.dismiss();
+                            Boolean updateAvailable = true;
+                            if (cancelDownloading[0]) {
+                                updateAvailable = false;
+                            }
+                            Log.i("myCancel", ": " + cancelDownloading[0]);
+                            setRestaurantData(updateAvailable, newRestaurants);
+                            setInspectionData(updateAvailable, newInspectionReports);
+
+                            //change here to adapt large data
+                            //sortRestaurantList();
+                            //sortInspectionDate();
+                            //populateListView();
+                            //populateIcon();
+
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE");
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE. ERROR:: " + error.getMessage());
+            }
+        }, null);
+        //Volley.newRequestQueue(getApplicationContext(), new HurlStack()).add(request);
+        Request<byte[]> requestQueueByte = Volley.newRequestQueue(getApplicationContext(), new HurlStack()).add(request);
+        if (cancelDownloading[0]) {
+            //Volley.newRequestQueue(getApplicationContext(), new HurlStack()).stop();
+            //Log.i("myStop", "stop");
+            requestQueueByte.cancel();
+        }
+        //requestQueue.add(request);
+    }
+
+
+    private void setInspectionData(Boolean updateAvailable, File newInspectionReports) {
+        if (updateAvailable) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(newInspectionReports))) {
+                String line;
+
+                reader.readLine();
+                while ((line = reader.readLine()) != null) {
+                    if (line.length() == 6) {
+                        break;
+                    }
+                    Log.i("myLine", ": " + line.length());
+                    String[] tokens = line.split(",");
+                    Log.i("myToken0", tokens[0]);
+                    //if (tokens[0] == "") {break;}
+                    Inspection sampleInspection = new Inspection();
+                    sampleInspection.setTrackingNumber(tokens[0]);
+                    Log.i("myTrackingNumber", tokens[0]);
+
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                    Date date = simpleDateFormat.parse(tokens[1]);
+
+                    sampleInspection.setDate(date);
+
+                    // dry inspection type
+                    InspectionType inspectionType;
+                    if (tokens[2].equals("Routine")) {
+                        inspectionType = InspectionType.ROUTINE;
+
+                    } else {
+                        inspectionType = InspectionType.FOLLOW_UP;
+                    }
+                    sampleInspection.setType(inspectionType);
+
+                    // Set critical issues
+                    if (tokens[3].length() > 0) {
+                        sampleInspection.setNumCritical(Integer.parseInt(tokens[3]));
+                    } else {
+                        sampleInspection.setNumCritical(0);
+                    }
+
+                    // Set non critical issues
+                    if (tokens[4].length() > 0) {
+                        sampleInspection.setNumNonCritical(Integer.parseInt(tokens[4]));
+                    } else {
+                        sampleInspection.setNumNonCritical(0);
+                    }
+
+                    // Hazard rating
+                    HazardRating hazardRating = null;
+                    if (tokens[tokens.length - 1].equals("Low")) {
+                        hazardRating = HazardRating.LOW;
+                    } else if (tokens[tokens.length - 1].equals("Moderate")) {
+                        hazardRating = HazardRating.MODERATE;
+                    } else if (tokens[tokens.length - 1].equals("High")) {
+                        hazardRating = HazardRating.HIGH;
+                    } else {
+                        hazardRating = HazardRating.LOW;
+                    }
+                    Log.i("myHazardRating", tokens[tokens.length - 1]);
+                    sampleInspection.setHazardRating(hazardRating);
+
+
+                    // Violations
+                    if (tokens.length > 6) {
+                        Log.i("myViolationsLength ", "setInspectionData: " + (tokens.length - 6));
+
+                        // Get violations String "..."
+                        StringBuilder violationsString = new StringBuilder();
+                        for (int i = 5; i < tokens.length - 1; i++) {
+                            //Log.e("token[i]", "loop: " + tokens[i]);
+                            if (i == 5) {
+                                violationsString.append(tokens[i]);
+                            } else {
+                                violationsString.append(",").append(tokens[i]);
+                            }
+                        }
+
+                        List<Violation> violationList = getViolationsFromString(violationsString.toString());
+                        //List<Violation> violationList = new ArrayList<>();
+                        sampleInspection.setViolations(violationList);
+
+                        //Log.i("myViolations", "setInspectionData: " + violationList);
+                    }
+
+                    restaurantManager.addInspection(sampleInspection);
+                    Log.i("myInspectionLength", ": " + restaurantManager.getInspections().size());
+                }
+                Log.i("myInspectionLengthFinal", ": " + restaurantManager.getInspections().size());
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+
+        } else {
+            InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(is, Charset.forName("UTF-8"))
+            );
+
+            String line = "";
+            try {
+                // Step over headers
+                reader.readLine();
+
+                while ((line = reader.readLine()) != null) {
+
+                    // Split by ','
+                    String[] tokens = line.split(",");
+
+                    // Read data from inspectionreports_itr1.csv
+                    Inspection sampleInspection = new Inspection();
+                    sampleInspection.setTrackingNumber(tokens[0]);
+                    Log.i("myTrackingNumber", tokens[0]);
+
+                    // Set date
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+                    Date date = simpleDateFormat.parse(tokens[1]);
+
+                    sampleInspection.setDate(date);
+
+                    // dry inspection type
+                    InspectionType inspectionType;
+                    if (tokens[2].equals("\"Routine\"")) {
+                        inspectionType = InspectionType.ROUTINE;
+
+                    } else {
+                        inspectionType = InspectionType.FOLLOW_UP;
+                    }
+                    sampleInspection.setType(inspectionType);
+
+                    // Set critical issues
+                    if (tokens[3].length() > 0) {
+                        sampleInspection.setNumCritical(Integer.parseInt(tokens[3]));
+                    } else {
+                        sampleInspection.setNumCritical(0);
+                    }
+
+                    // Set non critical issues
+                    if (tokens[4].length() > 0) {
+                        sampleInspection.setNumNonCritical(Integer.parseInt(tokens[4]));
+                    } else {
+                        sampleInspection.setNumNonCritical(0);
+                    }
+
+                    // Hazard rating
+                    HazardRating hazardRating = null;
+                    if (tokens[5].equals("\"Low\"")) {
+                        hazardRating = HazardRating.LOW;
+                    }
+                    if (tokens[5].equals("\"Moderate\"")) {
+                        hazardRating = HazardRating.MODERATE;
+                    }
+                    if (tokens[5].equals("\"High\"")) {
+                        hazardRating = HazardRating.HIGH;
+                    }
+                    sampleInspection.setHazardRating(hazardRating);
+
+                    // Violations
+                    if (tokens.length > 6) {
+                        //Log.e("violations length ", "setInspectionData: " + (tokens.length - 6));
+
+                        // Get violations String "..."
+                        StringBuilder violationsString = new StringBuilder();
+                        for (int i = 6; i < tokens.length; i++) {
+                            //Log.e("token[i]", "loop: " + tokens[i]);
+
+                            if (i == 6) {
+                                violationsString.append(tokens[i].substring(1));
+                            } else {
+                                violationsString.append(",").append(tokens[i]);
+                            }
+                        }
+
+                        List<Violation> violationList = getViolationsFromString(violationsString.toString());
+
+                        sampleInspection.setViolations(violationList);
+
+                        //Log.e("violations", "setInspectionData: " + violationList);
+                    }
+
+                    restaurantManager.addInspection(sampleInspection);
+
+                    Log.d("Inspection List", "Just created: " + sampleInspection);
+                }
+            } catch (IOException | ParseException e) {
+                Log.wtf("Inspection List", "Error reading data file on line " + line, e);
+                e.printStackTrace();
+            }
+        }
+
+        restaurantManager.sortRestaurantList();
+        restaurantManager.sortInspectionDate();
+        populateListView();
     }
 
     private List<Violation> getViolationsFromString(String violationsString) {
-        Log.e("getViolationsFromString", "getViolationsFromString: " + violationsString);
-
-        String[] violations = violationsString.split("\\|");
+        violationsString = violationsString.replaceAll("^\"|\"$", "");
+        Log.i("myGetViolationsFromString", "getViolationsFromString: " + violationsString);
         ArrayList<Violation> list = new ArrayList<>();
+        if (violationsString != "") {
+            String[] violations = violationsString.split("\\|");
 
-        String code;
-        ViolationSeverity severity;
-        String description;
-        for (String s : violations) {
-            Log.e("in loop", "getViolationsFromString: " + s);
-            String[] tokens = s.split(",");
+            String code;
+            ViolationSeverity severity;
+            String description;
+            for (String s : violations) {
+                Log.i("in loop", "getViolationsFromString: " + s);
+                String[] tokens = s.split(",");
 
-            code = tokens[0];
+                code = tokens[0];
 
-            if (tokens[1].equals("Critical")) {
-                severity = ViolationSeverity.CRITICAL;
-            } else {
-                severity = ViolationSeverity.NON_CRITICAL;
+                if (tokens[1].equals("Critical")) {
+                    severity = ViolationSeverity.CRITICAL;
+                } else {
+                    severity = ViolationSeverity.NON_CRITICAL;
+                }
+
+                description = tokens[2];
+
+                Violation violation = new Violation(description, severity, code);
+                //Log.e("Violation OBJECT", "getViolationsFromString: " + violation);
+
+                list.add((violation));
+
             }
-
-            description = tokens[2];
-
-            Violation violation = new Violation(description, severity, code);
-            Log.e("Violation OBJECT", "getViolationsFromString: " + violation);
-
-            list.add((violation));
         }
         return list;
     }
 
 
-    private void setRestaurantData() {
-        InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
-        BufferedReader reader = new BufferedReader(
-                new InputStreamReader(is, StandardCharsets.UTF_8)
-        );
+    private void setRestaurantData(Boolean updateAvailable, File newRestaurants) {
+        if (updateAvailable) {
+            // Common pattern to process large file
+            try (BufferedReader reader = new BufferedReader(new FileReader(newRestaurants))) {
+                String line;
 
-        String line = "";
-        try {
-            // Step over headers
-            reader.readLine();
+                reader.readLine();
+                while ((line = reader.readLine()) != null) {
+                    String[] tokens = line.split(",");
+                    Restaurant newRestaurant = new Restaurant();
+                    newRestaurant.setTrackingNumber(tokens[0]);
+                    Log.i("myRestaurantName", tokens[1]);
 
-            while ((line = reader.readLine()) != null) {
+                    /*sampleRestaurant.setName(tokens[1]);
+                    sampleRestaurant.setPhysicalAddress(tokens[2]);
+                    sampleRestaurant.setPhysicalCity(tokens[3]);
+                    sampleRestaurant.setFactType(tokens[4]);
+                    if (tokens[5].length() > 0) {
+                    sampleRestaurant.setLatitude(tokens[5]);
+                    } else {
+                        sampleRestaurant.setLatitude("0");
+                    }
+                    if (tokens[6].length() > 0) {
+                        sampleRestaurant.setAltitude(tokens[6]);
+                    } else {
+                        sampleRestaurant.setAltitude("0");
+                    }*/
+                    if (tokens.length == 7) {
+                        newRestaurant.setName(tokens[1]);
+                        newRestaurant.setPhysicalAddress(tokens[2]);
+                        newRestaurant.setPhysicalCity(tokens[3]);
+                        newRestaurant.setFactType(tokens[4]);
+                        newRestaurant.setLatitude(Double.parseDouble(tokens[5]));
+                        newRestaurant.setAltitude(Double.parseDouble(tokens[6]));
+                    } else {
+                        tokens[1] = tokens[1] + ", " + tokens[2];
+                        newRestaurant.setName(tokens[1].substring(1, tokens[1].length() - 1));
+                        newRestaurant.setPhysicalAddress(tokens[3]);
+                        newRestaurant.setPhysicalCity(tokens[4]);
+                        newRestaurant.setFactType(tokens[5]);
+                        newRestaurant.setLatitude(Double.parseDouble(tokens[6]));
+                        newRestaurant.setAltitude(Double.parseDouble(tokens[7]));
+                    }
 
-                // Split by ','
-                String[] tokens = line.split(",");
 
-                // Read the data
-                Restaurant newRestaurant = new Restaurant();
-                newRestaurant.setTrackingNumber(tokens[0]);
-                newRestaurant.setName(tokens[1]);
-                newRestaurant.setPhysicalAddress(tokens[2]);
-                newRestaurant.setPhysicalCity(tokens[3]);
-                newRestaurant.setFactType(tokens[4]);
-                if (tokens[5].length() > 0) {
-                    newRestaurant.setLatitude(Double.parseDouble(tokens[5]));
-                } else {
-                    newRestaurant.setLatitude(0);
+                    restaurantManager.addRestaurant(newRestaurant);
+
+                    //Log.d("RestaurantList", "Just created: " + sampleRestaurant);
+
                 }
-                if (tokens[6].length() > 0) {
-                    newRestaurant.setAltitude(Double.parseDouble(tokens[6]));
-                } else {
-                    newRestaurant.setAltitude(0);
-                }
-
-                restaurantManager.addRestaurant(newRestaurant);
-
-                Log.d("RestaurantList", "Just created: " + newRestaurant);
-
+                Log.i("myRestaurantLength", ": " + restaurantManager.getRestaurants().size());
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            Log.wtf("RestaurantList", "Error reading data file on line " + line, e);
-            e.printStackTrace();
-        }
+        } else {
+            InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(is, Charset.forName("UTF-8"))
+            );
 
+
+            String line = "";
+            try {
+                // Step over headers
+                reader.readLine();
+
+                while ((line = reader.readLine()) != null) {
+
+                    // Split by ','
+                    String[] tokens = line.split(",");
+
+                    // Read the data
+                    Restaurant sampleRestaurant = new Restaurant();
+                    sampleRestaurant.setTrackingNumber(tokens[0]);
+                    Log.i("myRestaurantName", tokens[1]);
+                    sampleRestaurant.setName(tokens[1]);
+                    sampleRestaurant.setPhysicalAddress(tokens[2]);
+                    sampleRestaurant.setPhysicalCity(tokens[3]);
+                    sampleRestaurant.setFactType(tokens[4]);
+                    if (tokens[5].length() > 0) {
+                        sampleRestaurant.setLatitude(Double.parseDouble(tokens[5]));
+                    } else {
+                        sampleRestaurant.setLatitude(0);
+                    }
+                    if (tokens[6].length() > 0) {
+                        sampleRestaurant.setAltitude(Double.parseDouble(tokens[6]));
+                    } else {
+                        sampleRestaurant.setAltitude(0);
+                    }
+                    restaurantManager.addRestaurant(sampleRestaurant);
+
+                    Log.d("RestaurantList", "Just created: " + sampleRestaurant);
+
+                }
+            } catch (IOException e) {
+                Log.wtf("RestaurantList", "Error reading data file on line " + line, e);
+                e.printStackTrace();
+            }
+        }
     }
 
     private void populateIcon() {
@@ -285,7 +789,7 @@ public class RestaurantList extends AppCompatActivity {
 
             // Fill restaurant icon
             ImageView restaurantView = (ImageView) itemView.findViewById(R.id.restaurant_icon);
-            restaurantView.setImageResource(restaurantIcon[position]);
+            restaurantView.setImageResource(restaurantIcon[position % 8]);
 
             // Fill restaurant name
             TextView restaurantName = (TextView) itemView.findViewById(R.id.RestaurantDetails_text_restaurant_name);
@@ -297,57 +801,61 @@ public class RestaurantList extends AppCompatActivity {
             int criticalIssues;
             if (!inspectionsForCurrentRestaurant.isEmpty()) {
 
-                for (Inspection inspection : inspectionsForCurrentRestaurant) {
-                    criticalIssues = inspection.getNumCritical();
-                    restaurantCriticalIssues.setText(getString(R.string.crit_iss) + criticalIssues);
+                /*for (Inspection inspection : inspectionsForCurrentRestaurant)*/
+                {
+                    criticalIssues = inspectionsForCurrentRestaurant.get(0).getNumCritical();
+                    restaurantCriticalIssues.setText("Critical issues: " + criticalIssues);
 
-                    break;
+                    //break;
                 }
             } else {
-                restaurantCriticalIssues.setText(R.string.crit_iss_0);
+                restaurantCriticalIssues.setText("Critical issues: 0");
             }
 
             // Fill hazard icon and text
             ImageView RestaurantHazard = (ImageView) itemView.findViewById(R.id.hazard_icon);
             TextView txtRestaurantHazard = (TextView) itemView.findViewById(R.id.text_hazard_level);
             if (!inspectionsForCurrentRestaurant.isEmpty()) {
-
-                for (Inspection inspection : inspectionsForCurrentRestaurant) {
-                    HazardRating hazard = inspection.getHazardRating();
+                Log.e("hazard loop", "getView: " + inspectionsForCurrentRestaurant.toString());
+                /*for (Inspection inspection : inspectionsForCurrentRestaurant)*/
+                {
+                    HazardRating hazard = inspectionsForCurrentRestaurant.get(0).getHazardRating();
                     switch (hazard) {
                         case LOW:
                             RestaurantHazard.setImageResource(R.mipmap.green_hazard);
-                            txtRestaurantHazard.setText(getString(R.string._) + hazard);
+                            txtRestaurantHazard.setText("" + hazard);
                             txtRestaurantHazard.setTextColor(Color.GREEN);
                             break;
 
                         case MODERATE:
                             RestaurantHazard.setImageResource(R.mipmap.yellow_hazard);
-                            txtRestaurantHazard.setText(getString(R.string._) + hazard);
+                            txtRestaurantHazard.setText("" + hazard);
                             txtRestaurantHazard.setTextColor(Color.YELLOW);
                             break;
 
                         case HIGH:
                             RestaurantHazard.setImageResource(R.mipmap.red_hazard);
-                            txtRestaurantHazard.setText(getString(R.string._) + hazard);
+                            txtRestaurantHazard.setText("" + hazard);
                             txtRestaurantHazard.setTextColor(Color.RED);
                             break;
                     }
 
-                    break;
+//                    break;
                 }
             } else {
                 RestaurantHazard.setImageResource(R.mipmap.green_hazard);
-                txtRestaurantHazard.setText(getString(R.string._) + HazardRating.LOW);
+                txtRestaurantHazard.setText("" + HazardRating.LOW);
                 txtRestaurantHazard.setTextColor(Color.GREEN);
             }
+
 
             // Fill inspection date
             TextView restaurantDate = (TextView) itemView.findViewById(R.id.text_inspection_date);
             if (!inspectionsForCurrentRestaurant.isEmpty()) {
-                for (Inspection inspection : inspectionsForCurrentRestaurant) {
+                /*for (Inspection inspection : inspectionsForCurrentRestaurant)*/
+                {
 
-                    Date inspectionDate = inspection.getDate();   // Inspection date
+                    Date inspectionDate = inspectionsForCurrentRestaurant.get(0).getDate();   // Inspection date
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd"); // Set date format
                     Date currentDate = new Date();
                     simpleDateFormat.format(currentDate);   // Current date
@@ -357,7 +865,7 @@ public class RestaurantList extends AppCompatActivity {
 
                     // Less than 30 days
                     if (diff < 30) {
-                        restaurantDate.setText(diff + getString(R.string._days_ago));
+                        restaurantDate.setText(diff + " days ago");
                     }
                     // Less than one year
                     else if (diff < 365) {
@@ -372,10 +880,10 @@ public class RestaurantList extends AppCompatActivity {
                         restaurantDate.setText(strDate);
                     }
 
-                    break;
+                    //break;
                 }
             } else {
-                restaurantDate.setText(R.string.no_inspection_found);
+                restaurantDate.setText("No inspections found");
             }
 
             return itemView;
@@ -383,18 +891,4 @@ public class RestaurantList extends AppCompatActivity {
 
     }
 
-    @Override
-    public void onBackPressed() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Would you like to exit?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        System.exit(0);
-                    }
-                })
-                .setNegativeButton("No", null)
-                .show();
-
-    }
 }
