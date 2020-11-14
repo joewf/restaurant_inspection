@@ -891,4 +891,19 @@ public class RestaurantList extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Would you like to exit?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        System.exit(0);
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+
+    }
+
 }
