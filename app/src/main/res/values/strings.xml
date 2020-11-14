@@ -37,4 +37,5 @@
     <string name="ins_type">Inspection Type:\u0020 </string>
     <string name="rout">ROUTINE</string>
     <string name="fu">FOLLOW-UP</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
