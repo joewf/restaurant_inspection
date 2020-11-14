@@ -902,7 +902,12 @@ public class RestaurantList extends AppCompatActivity {
                         startActivity(new Intent(RestaurantList.this, MapsActivity.class));
                     }
                 })
-                .setNegativeButton("No", null)
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        System.exit(0);
+                    }
+                })
                 .show();
 
     }
