@@ -891,4 +891,19 @@ public class RestaurantList extends AppCompatActivity {
         }
 
     }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Would you like to launch map?")
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        startActivity(new Intent(RestaurantList.this, MapsActivity.class));
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
+
+    }
 }
