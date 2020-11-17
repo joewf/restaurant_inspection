@@ -6,13 +6,19 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.example.project_1.R;
+import com.example.project_1.model.HazardRating;
+import com.example.project_1.model.Inspection;
 import com.example.project_1.model.Restaurant;
 import com.example.project_1.model.RestaurantManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -21,6 +27,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,8 +49,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean mLocationPermissionGranted = false;
     private Location mCurrentLocation;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+
     private List<Restaurant> mRestaurantList;
+    private List<Inspection> mRestaurantInspectionList;
     private Restaurant mCurrentRestaurant;
+    private Inspection mLastInspection;
+
+    private HazardRating hazardRating;
     private String restaurantName;
     private double latitude;
     private double longitude;
@@ -59,33 +72,100 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void addRestaurantMarker() {
 
-        Log.d(TAG, "getting restaurant LatLng");
+        Log.d(TAG, "addRestaurantMarker: getting restaurant info");
 
         // Get restaurant lists
         mRestaurantList = mRestaurantManager.getRestaurants();
         LatLng currentRestaurantLatLng;
+        MarkerOptions options;
 
         // Add a marker for for restaurant on the list
         for (int i = 0; i < mRestaurantList.size(); i++) {
-
+            // Get current restaurant
             mCurrentRestaurant = mRestaurantList.get(i);
 
-            // Get restaurant info
-            restaurantName = mCurrentRestaurant.getName();
-            Log.d(TAG, "name: " + restaurantName);
-            latitude = mCurrentRestaurant.getLatitude();
-            Log.d(TAG, "latitude: " + latitude);
-            longitude = mCurrentRestaurant.getLongitude();
-            Log.d(TAG, "longitude: " + longitude);
-            currentRestaurantLatLng = new LatLng(latitude, longitude);
+            // Get a list of inspections for the current restaurant
+            mRestaurantInspectionList = mRestaurantManager.getInspectionsForRestaurant(i);
 
-            // Set marker for each restaurant
-            MarkerOptions options = new MarkerOptions()
-                    .position(currentRestaurantLatLng)
-                    .title(restaurantName);
-            mMap.addMarker(options);
-            Log.d(TAG, "setting restaurant marker");
+            // Current restaurant inspection list is empty
+            if (mRestaurantInspectionList.isEmpty()) {
+                // Get restaurant info
+                restaurantName = mCurrentRestaurant.getName();
+                Log.d(TAG, "name: " + restaurantName);
+                latitude = mCurrentRestaurant.getLatitude();
+                Log.d(TAG, "latitude: " + latitude);
+                longitude = mCurrentRestaurant.getLongitude();
+                Log.d(TAG, "longitude: " + longitude);
+                currentRestaurantLatLng = new LatLng(latitude, longitude);
+
+                Log.d(TAG, "setting restaurant marker low");
+                options = new MarkerOptions()
+                        .position(currentRestaurantLatLng)
+                        .title(restaurantName)
+                        .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
+                mMap.addMarker(options);
+                break;
+
+            }
+
+                // Get restaurant info
+                restaurantName = mCurrentRestaurant.getName();
+                Log.d(TAG, "name: " + restaurantName);
+                latitude = mCurrentRestaurant.getLatitude();
+                Log.d(TAG, "latitude: " + latitude);
+                longitude = mCurrentRestaurant.getLongitude();
+                Log.d(TAG, "longitude: " + longitude);
+                currentRestaurantLatLng = new LatLng(latitude, longitude);
+
+                // Get the last inspection hazard
+                hazardRating = mRestaurantInspectionList.get(0).getHazardRating();
+                Log.d(TAG, "Hazard rating: " + hazardRating);
+
+                switch (hazardRating) {
+                    case LOW:
+                        Log.d(TAG, "setting restaurant marker low");
+                        // Set marker for each restaurant
+                        options = new MarkerOptions()
+                                .position(currentRestaurantLatLng)
+                                .title(restaurantName)
+                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
+                        mMap.addMarker(options);
+                        break;
+
+                    case MODERATE:
+                        Log.d(TAG, "setting restaurant marker moderate");
+                        // Set marker for each restaurant
+                        options = new MarkerOptions()
+                                .position(currentRestaurantLatLng)
+                                .title(restaurantName)
+                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_yellow_24));
+                        mMap.addMarker(options);
+                        break;
+
+                    case HIGH:
+                        Log.d(TAG, "setting restaurant marker high");
+                        // Set marker for each restaurant
+                        options = new MarkerOptions()
+                                .position(currentRestaurantLatLng)
+                                .title(restaurantName)
+                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_red_24));
+                        mMap.addMarker(options);
+                        break;
+                }
+            }
         }
+
+    private BitmapDescriptor BitmapDescriptorFromVector (Context context, int vectorResID) {
+
+        // source: https://www.youtube.com/watch?v=26bl4r3VtGQ&t=355s
+
+        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResID);
+        vectorDrawable.setBounds(0,0,vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap( vectorDrawable.getIntrinsicWidth(),
+                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        vectorDrawable.draw(canvas);
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 
     private void getLocationPermission() {
