@@ -17,6 +17,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.project_1.R;
+import com.example.project_1.model.CustomInfoWindowAdapter;
 import com.example.project_1.model.HazardRating;
 import com.example.project_1.model.Inspection;
 import com.example.project_1.model.Restaurant;
@@ -51,12 +52,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     private List<Restaurant> mRestaurantList;
-    private List<Inspection> mRestaurantInspectionList;
+    private List<Inspection> mCurrentRestaurantInspectionList;
     private Restaurant mCurrentRestaurant;
     private Inspection mLastInspection;
 
     private HazardRating hazardRating;
     private String restaurantName;
+    private String snippet;
     private double latitude;
     private double longitude;
 
@@ -78,6 +80,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mRestaurantList = mRestaurantManager.getRestaurants();
         LatLng currentRestaurantLatLng;
         MarkerOptions options;
+        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
 
         // Add a marker for for restaurant on the list
         for (int i = 0; i < mRestaurantList.size(); i++) {
@@ -85,10 +88,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Get current restaurant
             mCurrentRestaurant = mRestaurantList.get(i);
             // Get a list of inspections for the current restaurant
-            mRestaurantInspectionList = mRestaurantManager.getInspectionsForRestaurant(i);
+            mCurrentRestaurantInspectionList = mRestaurantManager.getInspectionsForRestaurant(i);
 
             // Current restaurant inspection list is not empty
-            if (!mRestaurantInspectionList.isEmpty()) {
+            if ( !mCurrentRestaurantInspectionList.isEmpty() ) {
                 // Get restaurant info
                 restaurantName = mCurrentRestaurant.getName();
                 Log.d(TAG, "name: " + restaurantName);
@@ -99,42 +102,49 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 currentRestaurantLatLng = new LatLng(latitude, longitude);
 
                 // Get the last inspection hazard
-                hazardRating = mRestaurantInspectionList.get(0).getHazardRating();
+                hazardRating = mCurrentRestaurantInspectionList.get(0).getHazardRating();
                 Log.d(TAG, "Hazard rating: " + hazardRating);
+
+                snippet = "Address: " + mCurrentRestaurant.getPhysicalAddress() + "\n"
+                        + "Hazard level: " + hazardRating;
 
                 switch (hazardRating) {
                     case LOW:
-                        Log.d(TAG, "setting restaurant marker low");
-                        // Set marker for each restaurant
+                        Log.d(TAG, "setting restaurant marker green");
+                        // Set marker
                         options = new MarkerOptions()
                                 .position(currentRestaurantLatLng)
                                 .title(restaurantName)
+                                .snippet(snippet)
                                 .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
                         mMap.addMarker(options);
                         break;
 
                     case MODERATE:
-                        Log.d(TAG, "setting restaurant marker moderate");
-                        // Set marker for each restaurant
+                        Log.d(TAG, "setting restaurant marker yellow");
+                        // Set marker
                         options = new MarkerOptions()
                                 .position(currentRestaurantLatLng)
                                 .title(restaurantName)
+                                .snippet(snippet)
                                 .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_yellow_24));
                         mMap.addMarker(options);
                         break;
 
                     case HIGH:
-                        Log.d(TAG, "setting restaurant marker high");
-                        // Set marker for each restaurant
+                        Log.d(TAG, "setting restaurant marker red");
+                        // Set marker
                         options = new MarkerOptions()
                                 .position(currentRestaurantLatLng)
                                 .title(restaurantName)
+                                .snippet(snippet)
                                 .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_red_24));
                         mMap.addMarker(options);
                         break;
                 }
-            }else{
-                // Get restaurant info
+
+            } else{
+                // Current restaurant inspection list is empty
                 restaurantName = mCurrentRestaurant.getName();
                 Log.d(TAG, "name: " + restaurantName);
                 latitude = mCurrentRestaurant.getLatitude();
@@ -142,14 +152,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 longitude = mCurrentRestaurant.getLongitude();
                 Log.d(TAG, "longitude: " + longitude);
                 currentRestaurantLatLng = new LatLng(latitude, longitude);
+                hazardRating = HazardRating.LOW;
+                snippet = "Address: " + mCurrentRestaurant.getPhysicalAddress() + "\n"
+                        + "Hazard level: " + hazardRating;
 
-                Log.d(TAG, "setting restaurant marker low");
+                Log.d(TAG, "setting restaurant marker green");
                 options = new MarkerOptions()
                         .position(currentRestaurantLatLng)
                         .title(restaurantName)
+                        .snippet(snippet)
                         .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
                 mMap.addMarker(options);
-
             }
         }
 
