@@ -6,7 +6,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -14,6 +13,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.project_1.R;
+import com.example.project_1.model.Restaurant;
+import com.example.project_1.model.RestaurantManager;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -25,6 +26,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.List;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
@@ -33,17 +36,56 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final float DEFAULT_ZOOM = 15f;
 
     private GoogleMap mMap;
+    private RestaurantManager mRestaurantManager;
     private static final String TAG = "Map activity";
     private boolean mLocationPermissionGranted = false;
     private Location mCurrentLocation;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+    private List<Restaurant> mRestaurantList;
+    private Restaurant mCurrentRestaurant;
+    private String restaurantName;
+    private double latitude;
+    private double longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        mRestaurantManager = RestaurantManager.getInstance();
         getLocationPermission();
+
+    }
+
+    private void addRestaurantMarker() {
+
+        Log.d(TAG, "getting restaurant LatLng");
+
+        // Get restaurant lists
+        mRestaurantList = mRestaurantManager.getRestaurants();
+        LatLng currentRestaurantLatLng;
+
+        // Add a marker for for restaurant on the list
+        for (int i = 0; i < mRestaurantList.size(); i++) {
+
+            mCurrentRestaurant = mRestaurantList.get(i);
+
+            // Get restaurant info
+            restaurantName = mCurrentRestaurant.getName();
+            Log.d(TAG, "name: " + restaurantName);
+            latitude = mCurrentRestaurant.getLatitude();
+            Log.d(TAG, "latitude: " + latitude);
+            longitude = mCurrentRestaurant.getLongitude();
+            Log.d(TAG, "longitude: " + longitude);
+            currentRestaurantLatLng = new LatLng(latitude, longitude);
+
+            // Set marker for each restaurant
+            MarkerOptions options = new MarkerOptions()
+                    .position(currentRestaurantLatLng)
+                    .title(restaurantName);
+            mMap.addMarker(options);
+            Log.d(TAG, "setting restaurant marker");
+        }
     }
 
     private void getLocationPermission() {
@@ -110,7 +152,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Log.d(TAG, "onComplete: found location");
                             mCurrentLocation = (Location) task.getResult();
 
-                            moveCamera(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()), DEFAULT_ZOOM);
+                            LatLng userLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+                            Log.d(TAG, "current location " + userLatLng);
+                            moveCamera(userLatLng, DEFAULT_ZOOM);
                         }
                         else {
                             Log.d(TAG, "onComplete: current location is null");
@@ -157,6 +201,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 return;
             }
             mMap.setMyLocationEnabled(true);
+            addRestaurantMarker();
         }
         /*// Add a marker in Sydney and move the camera
         LatLng sydney = new LatLng(-34, 151);

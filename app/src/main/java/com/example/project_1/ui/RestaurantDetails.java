@@ -77,7 +77,7 @@ public class RestaurantDetails extends AppCompatActivity {
 
         // Set GPS
         double latitude = restaurant.getLatitude();
-        double altitude = restaurant.getAltitude();
+        double altitude = restaurant.getLongitude();
         TextView tvGPS = (TextView) findViewById(R.id.RestaurantDetails_text_GPS);
         tvGPS.setText(getString(R.string.gps) + altitude + getString(R.string.comma) + latitude);
 

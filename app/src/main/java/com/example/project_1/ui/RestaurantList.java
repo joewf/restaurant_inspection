@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.*;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -61,8 +60,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -676,7 +673,7 @@ public class RestaurantList extends AppCompatActivity {
                         newRestaurant.setPhysicalCity(tokens[3]);
                         newRestaurant.setFactType(tokens[4]);
                         newRestaurant.setLatitude(Double.parseDouble(tokens[5]));
-                        newRestaurant.setAltitude(Double.parseDouble(tokens[6]));
+                        newRestaurant.setLongitude(Double.parseDouble(tokens[6]));
                     } else {
                         tokens[1] = tokens[1] + ", " + tokens[2];
                         newRestaurant.setName(tokens[1].substring(1, tokens[1].length() - 1));
@@ -684,7 +681,7 @@ public class RestaurantList extends AppCompatActivity {
                         newRestaurant.setPhysicalCity(tokens[4]);
                         newRestaurant.setFactType(tokens[5]);
                         newRestaurant.setLatitude(Double.parseDouble(tokens[6]));
-                        newRestaurant.setAltitude(Double.parseDouble(tokens[7]));
+                        newRestaurant.setLongitude(Double.parseDouble(tokens[7]));
                     }
 
 
@@ -728,9 +725,9 @@ public class RestaurantList extends AppCompatActivity {
                         sampleRestaurant.setLatitude(0);
                     }
                     if (tokens[6].length() > 0) {
-                        sampleRestaurant.setAltitude(Double.parseDouble(tokens[6]));
+                        sampleRestaurant.setLongitude(Double.parseDouble(tokens[6]));
                     } else {
-                        sampleRestaurant.setAltitude(0);
+                        sampleRestaurant.setLongitude(0);
                     }
                     restaurantManager.addRestaurant(sampleRestaurant);
 
