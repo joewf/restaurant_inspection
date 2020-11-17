@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -52,6 +53,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -69,6 +72,10 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class RestaurantList extends AppCompatActivity {
+
+    private static final String TAG = RestaurantList.class.getSimpleName();
+
+    private static final boolean LOAD = true;
 
     private RestaurantManager restaurantManager;
     private int[] restaurantIcon = new int[8];
@@ -98,6 +105,8 @@ public class RestaurantList extends AppCompatActivity {
         restaurantManager = RestaurantManager.getInstance();
 
         checkUpdateOfFraserHealthRestaurantInspectionReports();
+
+
         //setRestaurantData();
         //setInspectionData();
         //sortRestaurantList();
@@ -255,6 +264,8 @@ public class RestaurantList extends AppCompatActivity {
                 setInspectionData(updateAvailable, oldInspectionReports);
                 /*restaurantManager.sortRestaurantList();
                 restaurantManager.sortInspectionDate();*/
+                restaurantManager.sortRestaurantList();
+                restaurantManager.sortInspectionDate();
                 populateListView();
                 populateIcon();
             }
@@ -505,6 +516,9 @@ public class RestaurantList extends AppCompatActivity {
             }
 
 
+        } else if (LOAD) {
+            load();
+            Log.e("TAG", "setInspectionData: " + restaurantManager );
         } else {
             InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
             BufferedReader reader = new BufferedReader(
@@ -605,6 +619,9 @@ public class RestaurantList extends AppCompatActivity {
         restaurantManager.sortRestaurantList();
         restaurantManager.sortInspectionDate();
         populateListView();
+//        restaurantManager.sortRestaurantList();
+//        restaurantManager.sortInspectionDate();
+//        populateListView();
     }
 
     private List<Violation> getViolationsFromString(String violationsString) {
@@ -696,6 +713,8 @@ public class RestaurantList extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else if (LOAD) {
+            //load();
         } else {
             InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
             BufferedReader reader = new BufferedReader(
@@ -741,6 +760,8 @@ public class RestaurantList extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+
+
     }
 
     private void populateIcon() {
@@ -894,8 +915,15 @@ public class RestaurantList extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Would you like to exit?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        builder.setMessage("Would you like to save and exit?")
+                .setPositiveButton("Save and exit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        save();
+                        System.exit(0);
+                    }
+                })
+                .setNeutralButton("Exit, don't save", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         System.exit(0);
@@ -905,5 +933,38 @@ public class RestaurantList extends AppCompatActivity {
                 .show();
 
     }
+
+    public void save() {
+        ObjectOutputStream oos = null;
+        try {
+            oos = new ObjectOutputStream(this.openFileOutput("save", Context.MODE_PRIVATE));
+            oos.writeObject(restaurantManager);
+            Log.e(TAG, "save: done");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (oos != null) {
+                try {
+                    oos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void load() {
+        try {
+            ObjectInputStream ois = new ObjectInputStream(this.openFileInput("save"));
+
+            RestaurantManager temp = (RestaurantManager) ois.readObject();
+            restaurantManager = RestaurantManager.getInstance();
+            restaurantManager.setInspections(temp.getInspections());
+            restaurantManager.setRestaurants(temp.getRestaurants());
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

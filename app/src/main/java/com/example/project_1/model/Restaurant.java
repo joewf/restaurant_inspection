@@ -1,9 +1,11 @@
 package com.example.project_1.model;
 
+import java.io.Serializable;
+
 /**
  * Restaurant class models the information about a restaurant.
  */
-public class Restaurant {
+public class Restaurant implements Serializable {
     private String trackingNumber;
     private String name;
     private String physicalAddress;
