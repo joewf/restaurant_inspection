@@ -1,5 +1,6 @@
 package com.example.project_1.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * RestaurantManager class manages a list of Restaurant Objects.
  */
-public class RestaurantManager implements Iterable<Restaurant> {
+public class RestaurantManager implements Iterable<Restaurant>, Serializable {
 
     private List<Restaurant> restaurants = new ArrayList<>();
     private List<Inspection> inspections = new ArrayList<>();
@@ -34,6 +35,14 @@ public class RestaurantManager implements Iterable<Restaurant> {
             instance = new RestaurantManager();
         }
         return instance;
+    }
+
+    public void setRestaurants(List<Restaurant> restaurants) {
+        this.restaurants = restaurants;
+    }
+
+    public void setInspections(List<Inspection> inspections) {
+        this.inspections = inspections;
     }
 
     public void addRestaurant(Restaurant restaurant) {
@@ -70,6 +79,8 @@ public class RestaurantManager implements Iterable<Restaurant> {
         return list;
     }
 
+
+
     public void sortRestaurantList() {
         Collections.sort(restaurants, new Comparator<Restaurant>() {
             @Override
@@ -88,5 +99,13 @@ public class RestaurantManager implements Iterable<Restaurant> {
                 return I2.getDate().compareTo(I1.getDate());
             }
         });
+    }
+
+    @Override
+    public String toString() {
+        return "RestaurantManager{" +
+                "restaurants=" + restaurants +
+                ", inspections=" + inspections +
+                '}';
     }
 }
