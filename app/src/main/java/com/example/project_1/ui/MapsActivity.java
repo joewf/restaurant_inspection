@@ -81,33 +81,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Add a marker for for restaurant on the list
         for (int i = 0; i < mRestaurantList.size(); i++) {
+
             // Get current restaurant
             mCurrentRestaurant = mRestaurantList.get(i);
-
             // Get a list of inspections for the current restaurant
             mRestaurantInspectionList = mRestaurantManager.getInspectionsForRestaurant(i);
 
-            // Current restaurant inspection list is empty
-            if (mRestaurantInspectionList.isEmpty()) {
-                // Get restaurant info
-                restaurantName = mCurrentRestaurant.getName();
-                Log.d(TAG, "name: " + restaurantName);
-                latitude = mCurrentRestaurant.getLatitude();
-                Log.d(TAG, "latitude: " + latitude);
-                longitude = mCurrentRestaurant.getLongitude();
-                Log.d(TAG, "longitude: " + longitude);
-                currentRestaurantLatLng = new LatLng(latitude, longitude);
-
-                Log.d(TAG, "setting restaurant marker low");
-                options = new MarkerOptions()
-                        .position(currentRestaurantLatLng)
-                        .title(restaurantName)
-                        .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
-                mMap.addMarker(options);
-                break;
-
-            }
-
+            // Current restaurant inspection list is not empty
+            if (!mRestaurantInspectionList.isEmpty()) {
                 // Get restaurant info
                 restaurantName = mCurrentRestaurant.getName();
                 Log.d(TAG, "name: " + restaurantName);
@@ -152,8 +133,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mMap.addMarker(options);
                         break;
                 }
+            }else{
+                // Get restaurant info
+                restaurantName = mCurrentRestaurant.getName();
+                Log.d(TAG, "name: " + restaurantName);
+                latitude = mCurrentRestaurant.getLatitude();
+                Log.d(TAG, "latitude: " + latitude);
+                longitude = mCurrentRestaurant.getLongitude();
+                Log.d(TAG, "longitude: " + longitude);
+                currentRestaurantLatLng = new LatLng(latitude, longitude);
+
+                Log.d(TAG, "setting restaurant marker low");
+                options = new MarkerOptions()
+                        .position(currentRestaurantLatLng)
+                        .title(restaurantName)
+                        .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
+                mMap.addMarker(options);
+
             }
         }
+
+    }
 
     private BitmapDescriptor BitmapDescriptorFromVector (Context context, int vectorResID) {
 
