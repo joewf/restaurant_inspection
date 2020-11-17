@@ -12,6 +12,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:adjustViewBounds="true"
+        android:contentDescription="@string/restaurant_icon"
         android:maxWidth="80dp"
         android:maxHeight="80dp"
         tools:srcCompat="@tools:sample/avatars" />
@@ -21,11 +22,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/restaurant_icon"
-        android:textStyle="bold"
         android:layout_marginStart="10dp"
         android:layout_marginBottom="16dp"
         android:layout_toEndOf="@+id/restaurant_icon"
-        android:text="@string/issues_found" />
+        android:text="@string/issues_found"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/text_hazard_level"
@@ -47,6 +48,7 @@
         android:layout_marginBottom="1dp"
         android:layout_toEndOf="@+id/text_hazard_level"
         android:adjustViewBounds="true"
+        android:contentDescription="@string/restaurant_icon"
         android:maxWidth="20dp"
         android:maxHeight="20dp"
         tools:srcCompat="@tools:sample/avatars" />
@@ -64,13 +66,18 @@
 
     <TextView
         android:id="@+id/RestaurantDetails_text_restaurant_name"
-        android:layout_width="wrap_content"
+        android:layout_width="321dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="10dp"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="2dp"
         android:layout_toEndOf="@+id/restaurant_icon"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
         android:text="@string/restaurant_name"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold" />
 </RelativeLayout>
