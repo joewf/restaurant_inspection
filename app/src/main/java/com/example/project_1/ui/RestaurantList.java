@@ -63,8 +63,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -518,7 +516,7 @@ public class RestaurantList extends AppCompatActivity {
 
         } else if (LOAD) {
             load();
-            Log.e("TAG", "setInspectionData: " + restaurantManager );
+            Log.e("TAG", "setInspectionData: " + restaurantManager);
         } else {
             InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
             BufferedReader reader = new BufferedReader(
@@ -810,12 +808,39 @@ public class RestaurantList extends AppCompatActivity {
 
             // Fill restaurant icon
             ImageView restaurantView = (ImageView) itemView.findViewById(R.id.restaurant_icon);
-            restaurantView.setImageResource(restaurantIcon[position % 8]);
+            if (currentRestaurant.getName().replaceAll(" ", "").contains("A&W")) {
+                restaurantView.setImageResource(R.mipmap.aw_icon);
+            } else if (currentRestaurant.getName().contains("7-Eleven")) {
+                restaurantView.setImageResource(R.mipmap.seven_eleven_icon);
+            } else if (currentRestaurant.getName().contains("McDonald")) {
+                restaurantView.setImageResource(R.mipmap.mconald_icon);
+            } else if (currentRestaurant.getName().contains("Blenz")) {
+                restaurantView.setImageResource(R.mipmap.blenz_icon);
+            } else if (currentRestaurant.getName().contains("Boston Pizza")) {
+                restaurantView.setImageResource(R.mipmap.boston_pizza_icon);
+            } else if (currentRestaurant.getName().contains("Domino")) {
+                restaurantView.setImageResource(R.mipmap.domino_pizza_icon);
+            } else if (currentRestaurant.getName().contains("Freshslice")) {
+                restaurantView.setImageResource(R.mipmap.freshslice_pizza_icon);
+            } else if (currentRestaurant.getName().contains("KFC")) {
+                restaurantView.setImageResource(R.mipmap.kfc_icon);
+            } else if (currentRestaurant.getName().contains("Wendy's")) {
+                restaurantView.setImageResource(R.mipmap.wendys_icon);
+            } else if (currentRestaurant.getName().contains("Tim Horton")) {
+                restaurantView.setImageResource(R.mipmap.tim_hortons_icon);
+            } else if (currentRestaurant.getName().contains("Starbucks")) {
+                restaurantView.setImageResource(R.mipmap.starbuck_icon);
+            } else if (currentRestaurant.getName().contains("Subway")) {
+                restaurantView.setImageResource(R.mipmap.subway_icon);
+            } else {
+                restaurantView.setImageResource(restaurantIcon[position % 8]);
+            }
 
             // Fill restaurant name
             TextView restaurantName = (TextView) itemView.findViewById(R.id.RestaurantDetails_text_restaurant_name);
             restaurantName.setText(currentRestaurant.getName());
             restaurantName.setTextColor(Color.BLUE);
+            restaurantName.setSelected(true);
 
             // Fill issues
             TextView restaurantCriticalIssues = (TextView) itemView.findViewById(R.id.text_issues_found);
