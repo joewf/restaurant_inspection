@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
@@ -52,6 +53,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -67,6 +70,10 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class RestaurantList extends AppCompatActivity {
+
+    private static final String TAG = RestaurantList.class.getSimpleName();
+
+    private static final boolean LOAD = true;
 
     private RestaurantManager restaurantManager;
     private int[] restaurantIcon = new int[8];
@@ -253,6 +260,8 @@ public class RestaurantList extends AppCompatActivity {
                 setInspectionData(updateAvailable, oldInspectionReports);
                 /*restaurantManager.sortRestaurantList();
                 restaurantManager.sortInspectionDate();*/
+                restaurantManager.sortRestaurantList();
+                restaurantManager.sortInspectionDate();
                 populateListView();
                 populateIcon();
             }
@@ -503,6 +512,9 @@ public class RestaurantList extends AppCompatActivity {
             }
 
 
+        } else if (LOAD) {
+            load();
+            Log.e("TAG", "setInspectionData: " + restaurantManager);
         } else {
             InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
             BufferedReader reader = new BufferedReader(
@@ -694,6 +706,8 @@ public class RestaurantList extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } else if (LOAD) {
+            //load();
         } else {
             InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
             BufferedReader reader = new BufferedReader(
@@ -787,12 +801,70 @@ public class RestaurantList extends AppCompatActivity {
 
             // Fill restaurant icon
             ImageView restaurantView = (ImageView) itemView.findViewById(R.id.restaurant_icon);
-            restaurantView.setImageResource(restaurantIcon[position % 8]);
+            String currentRestaurantName = currentRestaurant.getName();
+            if (currentRestaurantName.replaceAll(" ", "").contains("A&W")) {
+                restaurantView.setImageResource(R.mipmap.aw_icon);
+            } else if (currentRestaurantName.contains("7-Eleven")) {
+                restaurantView.setImageResource(R.mipmap.seven_eleven_icon);
+            } else if (currentRestaurantName.contains("McDonald")) {
+                restaurantView.setImageResource(R.mipmap.mconald_icon);
+            } else if (currentRestaurantName.contains("Blenz")) {
+                restaurantView.setImageResource(R.mipmap.blenz_icon);
+            } else if (currentRestaurantName.contains("Boston Pizza")) {
+                restaurantView.setImageResource(R.mipmap.boston_pizza_icon);
+            } else if (currentRestaurantName.contains("Domino")) {
+                restaurantView.setImageResource(R.mipmap.domino_pizza_icon);
+            } else if (currentRestaurantName.contains("Freshslice")) {
+                restaurantView.setImageResource(R.mipmap.freshslice_pizza_icon);
+            } else if (currentRestaurantName.contains("KFC")) {
+                restaurantView.setImageResource(R.mipmap.kfc_icon);
+            } else if (currentRestaurantName.contains("Wendy's")) {
+                restaurantView.setImageResource(R.mipmap.wendys_icon);
+            } else if (currentRestaurantName.contains("Tim Horton")) {
+                restaurantView.setImageResource(R.mipmap.tim_hortons_icon);
+            } else if (currentRestaurantName.contains("Starbucks")) {
+                restaurantView.setImageResource(R.mipmap.starbuck_icon);
+            } else if (currentRestaurantName.contains("Subway")) {
+                restaurantView.setImageResource(R.mipmap.subway_icon);
+            } else if (currentRestaurantName.contains("Pizza")) {
+                restaurantView.setImageResource(R.drawable.icon_pizza);
+            } else if (currentRestaurantName.contains("Sushi")
+                    || currentRestaurantName.contains("Japanese")) {
+                restaurantView.setImageResource(R.drawable.icon_tuna);
+            } else if (currentRestaurantName.endsWith("Pub")
+                    || currentRestaurantName.contains("Beer")) {
+                restaurantView.setImageResource(R.drawable.icon_beer);
+            } else if (currentRestaurantName.contains("Grill")
+                    || currentRestaurantName.contains("BBQ")
+                    || currentRestaurant.getName().contains("Chicken")) {
+                restaurantView.setImageResource(R.drawable.icon_chicken);
+            } else if (currentRestaurantName.contains("Pho")
+                    || currentRestaurantName.contains("Thai")
+                    || currentRestaurantName.contains("Asia")
+                    || currentRestaurant.getName().contains("Chinese")) {
+                restaurantView.setImageResource(R.drawable.icon_chinese_food);
+            } else if (currentRestaurantName.contains("Burger")) {
+                restaurantView.setImageResource(R.drawable.icon_hamburgers);
+            } else if (currentRestaurantName.contains("Coffee")
+                    || currentRestaurantName.contains("Cafe")) {
+                restaurantView.setImageResource(R.drawable.icon_coffee);
+            } else if (currentRestaurantName.contains("Indian")) {
+                restaurantView.setImageResource(R.drawable.icon_indian_food);
+            } else if (currentRestaurantName.contains("Korea")) {
+                restaurantView.setImageResource(R.drawable.icon_korean_food);
+            } else if (currentRestaurantName.contains("Fish")) {
+                restaurantView.setImageResource(R.drawable.icon_fish_n_chips);
+            } else if (currentRestaurantName.contains("Bubble")) {
+                restaurantView.setImageResource(R.drawable.icon_bubble_tea);
+            } else {
+                restaurantView.setImageResource(R.drawable.icon_restaurant);
+            }
 
             // Fill restaurant name
             TextView restaurantName = (TextView) itemView.findViewById(R.id.RestaurantDetails_text_restaurant_name);
-            restaurantName.setText(currentRestaurant.getName());
+            restaurantName.setText(currentRestaurantName);
             restaurantName.setTextColor(Color.BLUE);
+            restaurantName.setSelected(true);
 
             // Fill issues
             TextView restaurantCriticalIssues = (TextView) itemView.findViewById(R.id.text_issues_found);
@@ -893,19 +965,55 @@ public class RestaurantList extends AppCompatActivity {
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage("Would you like to launch map?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Save and exit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        save();
+                        System.exit(0);
+                    }
+                })
+                .setNeutralButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         startActivity(new Intent(RestaurantList.this, MapsActivity.class));
                     }
                 })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        System.exit(0);
-                    }
-                })
+                .setNegativeButton("Cancel", null)
                 .show();
 
     }
+
+    public void save() {
+        ObjectOutputStream oos = null;
+        try {
+            oos = new ObjectOutputStream(this.openFileOutput("save", Context.MODE_PRIVATE));
+            oos.writeObject(restaurantManager);
+            Log.e(TAG, "save: done");
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (oos != null) {
+                try {
+                    oos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public void load() {
+        try {
+            ObjectInputStream ois = new ObjectInputStream(this.openFileInput("save"));
+
+            RestaurantManager temp = (RestaurantManager) ois.readObject();
+            restaurantManager = RestaurantManager.getInstance();
+            restaurantManager.setInspections(temp.getInspections());
+            restaurantManager.setRestaurants(temp.getRestaurants());
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

@@ -63,7 +63,7 @@ public class RestaurantDetails extends AppCompatActivity {
 
 
         if (restaurantIndex != -1) {
-            restaurant = manager.get(restaurantIndex);
+            restaurant = manager.getRestaurants().get(restaurantIndex);
             inspectionList = manager.getInspectionsForRestaurant(restaurantIndex);
         }
 

@@ -1,5 +1,6 @@
 package com.example.project_1.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -7,7 +8,7 @@ import java.util.List;
 /**
  * Inspection class models the information about an inspection.
  */
-public class Inspection {
+public class Inspection implements Serializable {
 
     private InspectionType type;
     private HazardRating hazardRating;
