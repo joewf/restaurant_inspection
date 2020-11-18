@@ -39,6 +39,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -60,20 +61,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final float DEFAULT_ZOOM = 15f;
 
     private GoogleMap mMap;
-    //private View restaurantClicker;
+    private GoogleMapOptions mGoogleMapOptions;
     private static final String TAG = "Map activity";
     private boolean mLocationPermissionGranted = false;
     private Location mCurrentLocation;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private Marker mMarker;
-    private TextView tvSnippet;
-    private ImageView ivSnippet;
 
     private RestaurantManager mRestaurantManager;
     private List<Restaurant> mRestaurantList;
     private List<Inspection> mCurrentRestaurantInspectionList;
     private Restaurant mCurrentRestaurant;
-    private Inspection mLastInspection;
 
     private HazardRating hazardRating;
     private String restaurantName;
@@ -261,7 +258,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Log.d(TAG, "Initiating map");
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        SupportMapFragment mapFragment = SupportMapFragment.newInstance(mGoogleMapOptions);
+                mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(MapsActivity.this);
     }
