@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -37,10 +38,17 @@ public class RestaurantDetails extends AppCompatActivity {
     private Restaurant restaurant;
     private int restaurantIndex;
     private List<Inspection> inspectionList = new ArrayList<>();
+    private List<Restaurant> restaurantList = new ArrayList<>();
 
     public static Intent makeIntent(Context context, int restaurantIndex) {
         Intent intent = new Intent(context, RestaurantDetails.class);
         intent.putExtra(RESTAURANT_INDEX, restaurantIndex);
+        return intent;
+    }
+
+    public static Intent makeIntent(Context context, String tracking) {
+        Intent intent = new Intent(context, RestaurantDetails.class);
+        intent.putExtra("tracking number", tracking);
         return intent;
     }
 
@@ -51,6 +59,8 @@ public class RestaurantDetails extends AppCompatActivity {
 
         RestaurantManager manager = RestaurantManager.getInstance();
         restaurantIndex = getIntent().getIntExtra(RESTAURANT_INDEX, -1);
+        String trackingNumber = getIntent().getStringExtra("tracking number");
+
 
         if (restaurantIndex != -1) {
             restaurant = manager.get(restaurantIndex);
@@ -58,7 +68,6 @@ public class RestaurantDetails extends AppCompatActivity {
         }
 
         getRestaurantDetails();
-
         populateListView();
     }
 

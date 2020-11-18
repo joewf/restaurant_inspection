@@ -1,19 +1,32 @@
 package com.example.project_1.ui;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.view.menu.ActionMenuItemView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.ClipData;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.text.Layout;
 import android.util.Log;
+import android.view.View;
+import android.widget.Adapter;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.project_1.R;
@@ -31,11 +44,13 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.util.List;
+import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -45,12 +60,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public static final float DEFAULT_ZOOM = 15f;
 
     private GoogleMap mMap;
-    private RestaurantManager mRestaurantManager;
+    //private View restaurantClicker;
     private static final String TAG = "Map activity";
     private boolean mLocationPermissionGranted = false;
     private Location mCurrentLocation;
     private FusedLocationProviderClient mFusedLocationProviderClient;
+    private Marker mMarker;
+    private TextView tvSnippet;
+    private ImageView ivSnippet;
 
+    private RestaurantManager mRestaurantManager;
     private List<Restaurant> mRestaurantList;
     private List<Inspection> mCurrentRestaurantInspectionList;
     private Restaurant mCurrentRestaurant;
@@ -81,6 +100,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng currentRestaurantLatLng;
         MarkerOptions options;
         mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
+
+
 
         // Add a marker for for restaurant on the list
         for (int i = 0; i < mRestaurantList.size(); i++) {
@@ -142,6 +163,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mMap.addMarker(options);
                         break;
                 }
+                // Get restaurant full info after clicking the info window
+                startFullRestaurantInfo(mRestaurantList.indexOf(mCurrentRestaurant));
+
 
             } else{
                 // Current restaurant inspection list is empty
@@ -165,7 +189,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mMap.addMarker(options);
             }
         }
+    }
 
+    private void startFullRestaurantInfo(int restaurantIndex) {
+
+        mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                Intent intent = RestaurantDetails.makeIntent(MapsActivity.this,
+                        restaurantIndex);
+                startActivity(intent);
+            }
+        });
     }
 
     private BitmapDescriptor BitmapDescriptorFromVector (Context context, int vectorResID) {
