@@ -12,16 +12,16 @@ public class Restaurant implements Serializable {
     private String physicalCity;
     private String factType;
     private double latitude;
-    private double altitude;
+    private double longitude;
 
-    public Restaurant(String trackingNumber, String name, String physicalAddress, String physicalCity, String factType, double latitude, double altitude) {
+    public Restaurant(String trackingNumber, String name, String physicalAddress, String physicalCity, String factType, double latitude, double longitude) {
         this.trackingNumber = trackingNumber;
         this.name = name;
         this.physicalAddress = physicalAddress;
         this.physicalCity = physicalCity;
         this.factType = factType;
         this.latitude = latitude;
-        this.altitude = altitude;
+        this.longitude = longitude;
     }
 
     // Default constructor to read cvs file
@@ -32,7 +32,7 @@ public class Restaurant implements Serializable {
         this.physicalCity = null;
         this.factType = null;
         this.latitude = 0;
-        this.altitude = 0;
+        this.longitude = 0;
     }
 
     public String getTrackingNumber() {
@@ -83,12 +83,12 @@ public class Restaurant implements Serializable {
         this.latitude = latitude;
     }
 
-    public double getAltitude() {
-        return altitude;
+    public double getLongitude() {
+        return longitude;
     }
 
-    public void setAltitude(double altitude) {
-        this.altitude = altitude;
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 
     @Override
@@ -100,7 +100,7 @@ public class Restaurant implements Serializable {
                 ", physicalCity='" + physicalCity + '\'' +
                 ", factType='" + factType + '\'' +
                 ", latitude=" + latitude +
-                ", altitude=" + altitude +
+                ", altitude=" + longitude +
                 '}';
     }
 }

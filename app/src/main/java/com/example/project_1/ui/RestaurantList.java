@@ -103,8 +103,6 @@ public class RestaurantList extends AppCompatActivity {
         restaurantManager = RestaurantManager.getInstance();
 
         checkUpdateOfFraserHealthRestaurantInspectionReports();
-
-
         //setRestaurantData();
         //setInspectionData();
         //sortRestaurantList();
@@ -617,9 +615,6 @@ public class RestaurantList extends AppCompatActivity {
         restaurantManager.sortRestaurantList();
         restaurantManager.sortInspectionDate();
         populateListView();
-//        restaurantManager.sortRestaurantList();
-//        restaurantManager.sortInspectionDate();
-//        populateListView();
     }
 
     private List<Violation> getViolationsFromString(String violationsString) {
@@ -690,7 +685,7 @@ public class RestaurantList extends AppCompatActivity {
                         newRestaurant.setPhysicalCity(tokens[3]);
                         newRestaurant.setFactType(tokens[4]);
                         newRestaurant.setLatitude(Double.parseDouble(tokens[5]));
-                        newRestaurant.setAltitude(Double.parseDouble(tokens[6]));
+                        newRestaurant.setLongitude(Double.parseDouble(tokens[6]));
                     } else {
                         tokens[1] = tokens[1] + ", " + tokens[2];
                         newRestaurant.setName(tokens[1].substring(1, tokens[1].length() - 1));
@@ -698,7 +693,7 @@ public class RestaurantList extends AppCompatActivity {
                         newRestaurant.setPhysicalCity(tokens[4]);
                         newRestaurant.setFactType(tokens[5]);
                         newRestaurant.setLatitude(Double.parseDouble(tokens[6]));
-                        newRestaurant.setAltitude(Double.parseDouble(tokens[7]));
+                        newRestaurant.setLongitude(Double.parseDouble(tokens[7]));
                     }
 
 
@@ -744,9 +739,9 @@ public class RestaurantList extends AppCompatActivity {
                         sampleRestaurant.setLatitude(0);
                     }
                     if (tokens[6].length() > 0) {
-                        sampleRestaurant.setAltitude(Double.parseDouble(tokens[6]));
+                        sampleRestaurant.setLongitude(Double.parseDouble(tokens[6]));
                     } else {
-                        sampleRestaurant.setAltitude(0);
+                        sampleRestaurant.setLongitude(0);
                     }
                     restaurantManager.addRestaurant(sampleRestaurant);
 
@@ -758,8 +753,6 @@ public class RestaurantList extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-
-
     }
 
     private void populateIcon() {
@@ -971,7 +964,7 @@ public class RestaurantList extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Would you like to save and exit?")
+        builder.setMessage("Would you like to launch map?")
                 .setPositiveButton("Save and exit", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -979,13 +972,13 @@ public class RestaurantList extends AppCompatActivity {
                         System.exit(0);
                     }
                 })
-                .setNeutralButton("Exit, don't save", new DialogInterface.OnClickListener() {
+                .setNeutralButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        System.exit(0);
+                        startActivity(new Intent(RestaurantList.this, MapsActivity.class));
                     }
                 })
-                .setNegativeButton("No", null)
+                .setNegativeButton("Cancel", null)
                 .show();
 
     }
