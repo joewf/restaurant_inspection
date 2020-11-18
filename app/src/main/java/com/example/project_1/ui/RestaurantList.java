@@ -808,37 +808,68 @@ public class RestaurantList extends AppCompatActivity {
 
             // Fill restaurant icon
             ImageView restaurantView = (ImageView) itemView.findViewById(R.id.restaurant_icon);
-            if (currentRestaurant.getName().replaceAll(" ", "").contains("A&W")) {
+            String currentRestaurantName = currentRestaurant.getName();
+            if (currentRestaurantName.replaceAll(" ", "").contains("A&W")) {
                 restaurantView.setImageResource(R.mipmap.aw_icon);
-            } else if (currentRestaurant.getName().contains("7-Eleven")) {
+            } else if (currentRestaurantName.contains("7-Eleven")) {
                 restaurantView.setImageResource(R.mipmap.seven_eleven_icon);
-            } else if (currentRestaurant.getName().contains("McDonald")) {
+            } else if (currentRestaurantName.contains("McDonald")) {
                 restaurantView.setImageResource(R.mipmap.mconald_icon);
-            } else if (currentRestaurant.getName().contains("Blenz")) {
+            } else if (currentRestaurantName.contains("Blenz")) {
                 restaurantView.setImageResource(R.mipmap.blenz_icon);
-            } else if (currentRestaurant.getName().contains("Boston Pizza")) {
+            } else if (currentRestaurantName.contains("Boston Pizza")) {
                 restaurantView.setImageResource(R.mipmap.boston_pizza_icon);
-            } else if (currentRestaurant.getName().contains("Domino")) {
+            } else if (currentRestaurantName.contains("Domino")) {
                 restaurantView.setImageResource(R.mipmap.domino_pizza_icon);
-            } else if (currentRestaurant.getName().contains("Freshslice")) {
+            } else if (currentRestaurantName.contains("Freshslice")) {
                 restaurantView.setImageResource(R.mipmap.freshslice_pizza_icon);
-            } else if (currentRestaurant.getName().contains("KFC")) {
+            } else if (currentRestaurantName.contains("KFC")) {
                 restaurantView.setImageResource(R.mipmap.kfc_icon);
-            } else if (currentRestaurant.getName().contains("Wendy's")) {
+            } else if (currentRestaurantName.contains("Wendy's")) {
                 restaurantView.setImageResource(R.mipmap.wendys_icon);
-            } else if (currentRestaurant.getName().contains("Tim Horton")) {
+            } else if (currentRestaurantName.contains("Tim Horton")) {
                 restaurantView.setImageResource(R.mipmap.tim_hortons_icon);
-            } else if (currentRestaurant.getName().contains("Starbucks")) {
+            } else if (currentRestaurantName.contains("Starbucks")) {
                 restaurantView.setImageResource(R.mipmap.starbuck_icon);
-            } else if (currentRestaurant.getName().contains("Subway")) {
+            } else if (currentRestaurantName.contains("Subway")) {
                 restaurantView.setImageResource(R.mipmap.subway_icon);
+            } else if (currentRestaurantName.contains("Pizza")) {
+                restaurantView.setImageResource(R.drawable.icon_pizza);
+            } else if (currentRestaurantName.contains("Sushi")
+                    || currentRestaurantName.contains("Japanese")) {
+                restaurantView.setImageResource(R.drawable.icon_tuna);
+            } else if (currentRestaurantName.endsWith("Pub")
+                    || currentRestaurantName.contains("Beer")) {
+                restaurantView.setImageResource(R.drawable.icon_beer);
+            } else if (currentRestaurantName.contains("Grill")
+                    || currentRestaurantName.contains("BBQ")
+                    || currentRestaurant.getName().contains("Chicken")) {
+                restaurantView.setImageResource(R.drawable.icon_chicken);
+            } else if (currentRestaurantName.contains("Pho")
+                    || currentRestaurantName.contains("Thai")
+                    || currentRestaurantName.contains("Asia")
+                    || currentRestaurant.getName().contains("Chinese")) {
+                restaurantView.setImageResource(R.drawable.icon_chinese_food);
+            } else if (currentRestaurantName.contains("Burger")) {
+                restaurantView.setImageResource(R.drawable.icon_hamburgers);
+            } else if (currentRestaurantName.contains("Coffee")
+                    || currentRestaurantName.contains("Cafe")) {
+                restaurantView.setImageResource(R.drawable.icon_coffee);
+            } else if (currentRestaurantName.contains("Indian")) {
+                restaurantView.setImageResource(R.drawable.icon_indian_food);
+            } else if (currentRestaurantName.contains("Korea")) {
+                restaurantView.setImageResource(R.drawable.icon_korean_food);
+            } else if (currentRestaurantName.contains("Fish")) {
+                restaurantView.setImageResource(R.drawable.icon_fish_n_chips);
+            } else if (currentRestaurantName.contains("Bubble")) {
+                restaurantView.setImageResource(R.drawable.icon_bubble_tea);
             } else {
-                restaurantView.setImageResource(restaurantIcon[position % 8]);
+                restaurantView.setImageResource(R.drawable.icon_restaurant);
             }
 
             // Fill restaurant name
             TextView restaurantName = (TextView) itemView.findViewById(R.id.RestaurantDetails_text_restaurant_name);
-            restaurantName.setText(currentRestaurant.getName());
+            restaurantName.setText(currentRestaurantName);
             restaurantName.setTextColor(Color.BLUE);
             restaurantName.setSelected(true);
 
