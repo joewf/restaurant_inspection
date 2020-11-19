@@ -25,6 +25,7 @@ public class ClusterMarker implements ClusterItem {
     private String title;
     private String snippet;
     private BitmapDescriptor icon;
+    private IconGenerator iconGenerator;
     private int mIcon;
 
     public ClusterMarker(LatLng position) {
@@ -44,7 +45,8 @@ public class ClusterMarker implements ClusterItem {
         this.position = marker.getPosition();
         this.title = marker.getTitle();
         this.snippet = marker.getSnippet();
-        this.icon = marker.getIcon();
+        this.icon = getIcon();
+
     }
 
     public ClusterMarker(LatLng position, String title, String snippet) {
