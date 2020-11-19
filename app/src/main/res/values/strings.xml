@@ -39,4 +39,6 @@
     <string name="fu">FOLLOW-UP</string>
     <string name="title_activity_maps">Map</string>
     <string name="restaurant_icon">restaurant icon</string>
+    <string name="list_view">List View</string>
+    <string name="map_view">Map View</string>
 </resources>

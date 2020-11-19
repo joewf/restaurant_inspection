@@ -106,6 +106,10 @@ public class RestaurantDetails extends AppCompatActivity {
         });
     }
 
+    public void myOnClick(View view) {
+
+    }
+
     private class MyListAdapter extends ArrayAdapter<Inspection> {
         public MyListAdapter() {
             super(RestaurantDetails.this, R.layout.inspection_report_view, inspectionList);

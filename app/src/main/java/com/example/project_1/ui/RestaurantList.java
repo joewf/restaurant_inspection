@@ -72,12 +72,18 @@ import java.util.concurrent.TimeUnit;
 public class RestaurantList extends AppCompatActivity {
 
     private static final String TAG = RestaurantList.class.getSimpleName();
+    private static final String LAST_UPDATED_TIME = "last updated time";
+    private static final String LAST_MODIFIED_TIME = "last modified time";
 
     private static boolean loadedFromSave = false;
 
     private RestaurantManager restaurantManager;
     private int[] restaurantIcon = new int[8];
     ProgressDialog pDialog;
+
+    private long lastUpdatedTimeInMilliseconds;
+    private long lastModifiedTimeInMilliseconds;
+
 
     // Add the request to the RequestQueue.
 
@@ -100,11 +106,24 @@ public class RestaurantList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_list);
 
+        lastUpdatedTimeInMilliseconds = getIntent().getLongExtra(LAST_UPDATED_TIME, 0);
+        lastModifiedTimeInMilliseconds = getIntent().getLongExtra(LAST_MODIFIED_TIME, 0);
+
+        Log.e(TAG, "onCreate: " + lastUpdatedTimeInMilliseconds);
+;
         restaurantManager = RestaurantManager.getInstance();
 
-        load();
-        checkUpdateOfFraserHealthRestaurantInspectionReports();
+//        load();
+//        checkUpdateOfFraserHealthRestaurantInspectionReports();
+        populateListView();
 
+    }
+
+    public static Intent makeIntent(Context context, long lastUpdatedTimeInMilliseconds, long lastModifiedTimeInMilliseconds) {
+        Intent intent = new Intent(context, RestaurantList.class);
+        intent.putExtra(LAST_UPDATED_TIME, lastUpdatedTimeInMilliseconds);
+        intent.putExtra(LAST_MODIFIED_TIME, lastModifiedTimeInMilliseconds);
+        return intent;
     }
 
     // check update
@@ -783,6 +802,10 @@ public class RestaurantList extends AppCompatActivity {
         });
     }
 
+    public void myOnClick(View view) {
+        startActivity(new Intent(RestaurantList.this, MapsActivity.class));
+    }
+
     private class MyListAdapter extends ArrayAdapter<Restaurant> {
         public MyListAdapter() {
             super(RestaurantList.this, R.layout.restaurant_view, restaurantManager.getRestaurants());
@@ -966,20 +989,21 @@ public class RestaurantList extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Would you like to launch map?")
+        builder.setMessage("Would you like to exit?")
                 .setPositiveButton("Save and exit", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        save();
+                        //save();
+                        finishAffinity();
                         System.exit(0);
                     }
                 })
-                .setNeutralButton("Yes", new DialogInterface.OnClickListener() {
+                /*.setNeutralButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         startActivity(new Intent(RestaurantList.this, MapsActivity.class));
                     }
-                })
+                })*/
                 .setNegativeButton("Cancel", null)
                 .show();
 
@@ -990,6 +1014,8 @@ public class RestaurantList extends AppCompatActivity {
         try {
             oos = new ObjectOutputStream(this.openFileOutput("save", Context.MODE_PRIVATE));
             oos.writeObject(restaurantManager);
+            oos.writeLong(lastUpdatedTimeInMilliseconds);
+            oos.writeLong(lastModifiedTimeInMilliseconds);
             Log.e(TAG, "save: done");
         } catch (IOException e) {
             e.printStackTrace();
@@ -1003,30 +1029,5 @@ public class RestaurantList extends AppCompatActivity {
             }
         }
     }
-
-    public boolean load() {
-        try {
-            ObjectInputStream ois = new ObjectInputStream(this.openFileInput("save"));
-
-            Log.e(TAG, "load: loading...");
-
-            RestaurantManager temp;
-            if ((temp = (RestaurantManager) ois.readObject()) == null) {
-                Log.e(TAG, "load: ois not available");
-
-                return false;
-            } else {
-                restaurantManager = RestaurantManager.getInstance();
-                restaurantManager.setInspections(temp.getInspections());
-                restaurantManager.setRestaurants(temp.getRestaurants());
-                loadedFromSave = true;
-                return true;
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
 
 }

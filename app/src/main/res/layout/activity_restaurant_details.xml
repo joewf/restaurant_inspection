@@ -37,7 +37,10 @@
             android:layout_marginTop="10dp"
             android:text="@string/gps_coords"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:clickable="true"
+            android:onClick="myOnClick"
+            android:focusable="true" />
 
         <ListView
             android:id="@+id/RestaurantDetails_list_inspection_report"
