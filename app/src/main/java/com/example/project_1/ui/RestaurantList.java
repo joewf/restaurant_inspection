@@ -420,6 +420,7 @@ public class RestaurantList extends AppCompatActivity {
     private void setInspectionData(Boolean updateAvailable, File newInspectionReports) {
         if (updateAvailable) {
             try (BufferedReader reader = new BufferedReader(new FileReader(newInspectionReports))) {
+                restaurantManager.emptyInspections();
                 String line;
 
                 reader.readLine();
@@ -656,6 +657,7 @@ public class RestaurantList extends AppCompatActivity {
         if (updateAvailable) {
             // Common pattern to process large file
             try (BufferedReader reader = new BufferedReader(new FileReader(newRestaurants))) {
+                restaurantManager.emptyRestaurants();
                 String line;
 
                 reader.readLine();

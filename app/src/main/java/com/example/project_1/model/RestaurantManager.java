@@ -121,4 +121,12 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
 
         return -1;
     }
+
+    public void emptyRestaurants() {
+        restaurants.clear();
+    }
+
+    public void emptyInspections() {
+        inspections.clear();
+    }
 }
