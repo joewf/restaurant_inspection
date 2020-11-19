@@ -802,8 +802,8 @@ public class RestaurantList extends AppCompatActivity {
         });
     }
 
-    public void myOnClick(View view) {
-        startActivity(new Intent(RestaurantList.this, MapsActivity.class));
+    public void onClickFAB(View view) {
+        startActivity(new Intent(getApplicationContext(), MapsActivity.class));
     }
 
     private class MyListAdapter extends ArrayAdapter<Restaurant> {

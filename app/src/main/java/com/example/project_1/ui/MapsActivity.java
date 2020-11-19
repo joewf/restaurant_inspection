@@ -126,9 +126,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private long lastModifiedTimeInMilliseconds = 0;
     private boolean exitAllActivities = false;
     private long currentLastModifiedTimeInMilliseconds = 0;
+    private static LatLng coordinateInRestaurantDetail;
+    private static boolean backFromRestaurantDetail = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
@@ -139,6 +142,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //getLocationPermission();
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.e(TAG, "onStart: ");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.e(TAG, "onResume: ");
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        if (backFromRestaurantDetail) {
+            Log.e(TAG, "onRestart: " + coordinateInRestaurantDetail);
+            moveCamera(coordinateInRestaurantDetail, DEFAULT_ZOOM);
+        }
+
+        Log.e(TAG, "onRestart: ");
     }
 
     private void addRestaurantMarker() {
@@ -453,7 +481,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // 20 hours = 72000000 Milliseconds
         if ((!loadedFromSave || (currentTimeInMilliseconds - lastUpdatedTimeInMilliseconds > 72000000))
-        && (currentLastModifiedTimeInMilliseconds != lastModifiedTimeInMilliseconds)) {
+                && (currentLastModifiedTimeInMilliseconds != lastModifiedTimeInMilliseconds)) {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -1137,12 +1165,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void myOnClick(View view) {
+        backFromRestaurantDetail = false;
         startActivity(RestaurantList.makeIntent(getApplicationContext(), lastUpdatedTimeInMilliseconds, lastModifiedTimeInMilliseconds));
     }
 
-    public static Intent makeIntent(Context context, LatLng coordinate) {
+    public static Intent makeIntent(Context context, double latitude, double longitude, boolean fromRestaurantDetail) {
         Intent intent = new Intent(context, MapsActivity.class);
-        intent.putExtra(COORDINATE, coordinate);
+        coordinateInRestaurantDetail = new LatLng(latitude, longitude);
+        backFromRestaurantDetail = fromRestaurantDetail;
+        return intent;
+    }
+
+    public static Intent makeIntent(Context context, boolean fromRestaurantDetail) {
+        Intent intent = new Intent(context, MapsActivity.class);
+        backFromRestaurantDetail = fromRestaurantDetail;
         return intent;
     }
 }

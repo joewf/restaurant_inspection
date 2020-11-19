@@ -25,7 +25,7 @@
         android:layout_marginBottom="28dp"
         android:clickable="true"
         android:focusable="true"
-        android:onClick="myOnClick"
+        android:onClick="onClickFAB"
         app:srcCompat="@drawable/ic_baseline_map_24" />
 
     <!--<Switch
