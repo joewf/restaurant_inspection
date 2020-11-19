@@ -1,14 +1,12 @@
 package com.example.project_1.ui;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.view.menu.ActionMenuItemView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,19 +15,11 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.text.Layout;
 import android.util.Log;
-import android.view.View;
-import android.widget.Adapter;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.project_1.R;
+import com.example.project_1.model.ClusterMarker;
 import com.example.project_1.model.CustomInfoWindowAdapter;
 import com.example.project_1.model.HazardRating;
 import com.example.project_1.model.Inspection;
@@ -49,9 +39,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterManager;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -62,6 +54,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private GoogleMap mMap;
     private GoogleMapOptions mGoogleMapOptions;
+    private ClusterManager<ClusterMarker> mClusterManager;
+    private Marker mMarker;
     private static final String TAG = "Map activity";
     private boolean mLocationPermissionGranted = false;
     private Location mCurrentLocation;
@@ -70,6 +64,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private RestaurantManager mRestaurantManager;
     private List<Restaurant> mRestaurantList;
     private List<Inspection> mCurrentRestaurantInspectionList;
+    private List<ClusterMarker> mClusterMarkersList = new ArrayList<>();
     private Restaurant mCurrentRestaurant;
 
     private HazardRating hazardRating;
@@ -96,11 +91,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mRestaurantList = mRestaurantManager.getRestaurants();
         LatLng currentRestaurantLatLng;
         MarkerOptions options;
+
         mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
+        mClusterManager = new ClusterManager<ClusterMarker>(this, mMap);
+        mMap.setOnCameraIdleListener(mClusterManager);
 
-
-
-        // Add a marker for for restaurant on the list
+        // Add a marker for each restaurant on the list
         for (int i = 0; i < mRestaurantList.size(); i++) {
 
             // Get current restaurant
@@ -135,7 +131,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 .title(restaurantName)
                                 .snippet(snippet)
                                 .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
-                        mMap.addMarker(options);
+                        //mMarker = mMap.addMarker(options);
+
+                       //mClusterMarkersList.add(new ClusterMarker(options));
+                        mClusterMarkersList.add(new ClusterMarker(currentRestaurantLatLng));
+                        mClusterManager.addItems(mClusterMarkersList);
+                        mClusterManager.cluster();
                         break;
 
                     case MODERATE:
@@ -146,7 +147,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 .title(restaurantName)
                                 .snippet(snippet)
                                 .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_yellow_24));
-                        mMap.addMarker(options);
+                        //mMarker = mMap.addMarker(options);
+
+                        // Cluster the markers
+                        //mClusterMarkersList.add(new ClusterMarker(options));
+                        mClusterMarkersList.add(new ClusterMarker(currentRestaurantLatLng));
+                        mClusterManager.addItems(mClusterMarkersList);
+                        mClusterManager.cluster();
                         break;
 
                     case HIGH:
@@ -157,7 +164,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 .title(restaurantName)
                                 .snippet(snippet)
                                 .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_red_24));
-                        mMap.addMarker(options);
+                        //mMarker = mMap.addMarker(options);
+
+                        //mClusterMarkersList.add(new ClusterMarker(options));
+                        mClusterMarkersList.add(new ClusterMarker(currentRestaurantLatLng));
+                        mClusterManager.addItems(mClusterMarkersList);
+                        mClusterManager.cluster();
                         break;
                 }
                 // Get restaurant full info after clicking the info window
@@ -183,8 +195,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .title(restaurantName)
                         .snippet(snippet)
                         .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
-                mMap.addMarker(options);
+                //mMarker = mMap.addMarker(options);
+
+                //mClusterMarkersList.add(new ClusterMarker(options));
+                mClusterMarkersList.add(new ClusterMarker(currentRestaurantLatLng));
+                mClusterManager.addItems(mClusterMarkersList);
+                mClusterManager.cluster();
             }
+
         }
     }
 
@@ -200,7 +218,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    private BitmapDescriptor BitmapDescriptorFromVector (Context context, int vectorResID) {
+    public BitmapDescriptor BitmapDescriptorFromVector (Context context, int vectorResID) {
 
         // source: https://www.youtube.com/watch?v=26bl4r3VtGQ&t=355s
 
@@ -256,11 +274,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void initiateMap() {
 
+        mGoogleMapOptions = new GoogleMapOptions();
+        mGoogleMapOptions.zoomControlsEnabled(true);
+
         Log.d(TAG, "Initiating map");
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = SupportMapFragment.newInstance(mGoogleMapOptions);
-                mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction()
+                .replace(R.id.map, mapFragment);
+        ft.commit();
         mapFragment.getMapAsync(MapsActivity.this);
     }
 
