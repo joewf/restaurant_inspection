@@ -1,9 +1,11 @@
 package com.example.project_1.model;
 
+import java.io.Serializable;
+
 /**
  * Violation class models the information about a violation.
  */
-public class Violation {
+public class Violation implements Serializable {
     private String description;
     private ViolationNature nature;
     private ViolationSeverity severity;
