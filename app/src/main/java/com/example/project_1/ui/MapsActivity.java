@@ -128,6 +128,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private long currentLastModifiedTimeInMilliseconds = 0;
     private static LatLng coordinateInRestaurantDetail;
     private static boolean backFromRestaurantDetail = false;
+    HashMap<Integer, Marker> markerMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,7 +164,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (backFromRestaurantDetail) {
             Log.e(TAG, "onRestart: " + coordinateInRestaurantDetail);
+            int index = mRestaurantManager.getIndexFromLatLng(coordinateInRestaurantDetail.latitude, coordinateInRestaurantDetail.longitude);
             moveCamera(coordinateInRestaurantDetail, DEFAULT_ZOOM);
+            markerMap.get(index).showInfoWindow();
         }
 
         Log.e(TAG, "onRestart: ");
@@ -188,6 +191,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Get a list of inspections for the current restaurant
             mCurrentRestaurantInspectionList = mRestaurantManager.getInspectionsForRestaurant(i);
 
+            Marker marker = null;
             // Current restaurant inspection list is not empty
             if (!mCurrentRestaurantInspectionList.isEmpty()) {
                 // Get restaurant info
@@ -215,7 +219,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 .title(restaurantName)
                                 .snippet(snippet)
                                 .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
-                        mMap.addMarker(options);
+                        marker = mMap.addMarker(options);
                         break;
 
                     case MODERATE:
@@ -226,7 +230,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 .title(restaurantName)
                                 .snippet(snippet)
                                 .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_yellow_24));
-                        mMap.addMarker(options);
+                        marker = mMap.addMarker(options);
                         break;
 
                     case HIGH:
@@ -237,7 +241,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 .title(restaurantName)
                                 .snippet(snippet)
                                 .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_red_24));
-                        mMap.addMarker(options);
+                        marker = mMap.addMarker(options);
                         break;
                 }
 
@@ -261,9 +265,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .title(restaurantName)
                         .snippet(snippet)
                         .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
-                mMap.addMarker(options);
+                marker = mMap.addMarker(options);
             }
 
+            markerMap.put(i, marker);
         }
 
         // Get restaurant full info after clicking the info window
