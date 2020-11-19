@@ -1,63 +1,36 @@
 package com.example.project_1.model;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 
-import com.example.project_1.R;
 import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterItem;
-import com.google.maps.android.ui.IconGenerator;
 
 public class ClusterMarker implements ClusterItem {
 
     private LatLng position;
     private String title;
     private String snippet;
-    private BitmapDescriptor icon;
-    private IconGenerator iconGenerator;
-    private int mIcon;
+    private BitmapDescriptor mIcon;
+    private int icon;
+    private HazardRating hazardRating;
 
-    public ClusterMarker(LatLng position) {
+    public ClusterMarker(String title, String snippet, LatLng position, HazardRating hazardRating) {
+
         this.position = position;
+        this.title = title;
+        this.snippet = snippet;
+        setHazardRating(hazardRating);
     }
 
-    public ClusterMarker(String title, String snippet, LatLng position, BitmapDescriptor icon ) {
+    public ClusterMarker(String title, String snippet, LatLng position, int icon) {
 
         this.position = position;
         this.title = title;
         this.snippet = snippet;
         this.icon = icon;
-    }
-
-    public ClusterMarker(MarkerOptions marker) {
-
-        this.position = marker.getPosition();
-        this.title = marker.getTitle();
-        this.snippet = marker.getSnippet();
-        this.icon = getIcon();
-
-    }
-
-    public ClusterMarker(LatLng position, String title, String snippet) {
-
-        this.position = position;
-        this.title = title;
-        this.snippet = snippet;
-    }
-
-    public ClusterMarker() {
-
     }
 
     @NonNull
@@ -90,11 +63,25 @@ public class ClusterMarker implements ClusterItem {
         this.snippet = snippet;
     }
 
-    public BitmapDescriptor getIcon() {
+    public void setIcon(int icon) {
+        this.icon = icon;
+    }
+
+    public int getIcon() {
         return icon;
     }
 
-    public void setIcon(BitmapDescriptor icon) {
-        this.icon = icon;
+    public HazardRating getHazard(){
+        return hazardRating;
+    }
+
+    public void setHazardRating(HazardRating hazardRating) {
+        if(this.hazardRating == HazardRating.LOW) {
+            this.hazardRating = HazardRating.LOW;
+        }else if(this.hazardRating == HazardRating.MODERATE) {
+            this.hazardRating = hazardRating.MODERATE;
+        }else{
+            this.hazardRating = hazardRating.HIGH;
+        }
     }
 }
