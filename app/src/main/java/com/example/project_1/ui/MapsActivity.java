@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.Manifest;
 import android.content.Context;
@@ -29,6 +30,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -69,6 +71,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String snippet;
     private double latitude;
     private double longitude;
+    private GoogleMapOptions mGoogleMapOptions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -253,9 +256,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void initiateMap() {
 
         Log.d(TAG, "Initiating map");
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        /*SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+        mapFragment.getMapAsync(MapsActivity.this);*/
+
+        mGoogleMapOptions = new GoogleMapOptions();
+        mGoogleMapOptions.zoomControlsEnabled(true);
+
+        Log.d(TAG, "Initiating map");
+        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        SupportMapFragment mapFragment = SupportMapFragment.newInstance(mGoogleMapOptions);
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction()
+                .replace(R.id.map, mapFragment);
+        ft.commit();
         mapFragment.getMapAsync(MapsActivity.this);
     }
 
