@@ -1,14 +1,11 @@
 package com.example.project_1.ui;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.view.menu.ActionMenuItemView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
-import android.app.Activity;
-import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,15 +14,8 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
-import android.text.Layout;
 import android.util.Log;
-import android.view.View;
-import android.widget.Adapter;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,7 +40,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.util.List;
-import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -102,7 +91,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
 
 
-
         // Add a marker for for restaurant on the list
         for (int i = 0; i < mRestaurantList.size(); i++) {
 
@@ -112,7 +100,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mCurrentRestaurantInspectionList = mRestaurantManager.getInspectionsForRestaurant(i);
 
             // Current restaurant inspection list is not empty
-            if ( !mCurrentRestaurantInspectionList.isEmpty() ) {
+            if (!mCurrentRestaurantInspectionList.isEmpty()) {
                 // Get restaurant info
                 restaurantName = mCurrentRestaurant.getName();
                 Log.d(TAG, "name: " + restaurantName);
@@ -163,11 +151,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         mMap.addMarker(options);
                         break;
                 }
-                // Get restaurant full info after clicking the info window
-                startFullRestaurantInfo(mRestaurantList.indexOf(mCurrentRestaurant));
 
 
-            } else{
+            } else {
                 // Current restaurant inspection list is empty
                 restaurantName = mCurrentRestaurant.getName();
                 Log.d(TAG, "name: " + restaurantName);
@@ -188,28 +174,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
                 mMap.addMarker(options);
             }
+
         }
+
+        // Get restaurant full info after clicking the info window
+        setCallbackToStartFullRestaurantInfo();
     }
 
-    private void startFullRestaurantInfo(int restaurantIndex) {
+    private void setCallbackToStartFullRestaurantInfo() {
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
+                LatLng markerLatLng = marker.getPosition();
+
                 Intent intent = RestaurantDetails.makeIntent(MapsActivity.this,
-                        restaurantIndex);
+                        mRestaurantManager.getIndexFromLatLng(markerLatLng.latitude, markerLatLng.longitude));
                 startActivity(intent);
+
             }
         });
     }
 
-    private BitmapDescriptor BitmapDescriptorFromVector (Context context, int vectorResID) {
+    private BitmapDescriptor BitmapDescriptorFromVector(Context context, int vectorResID) {
 
         // source: https://www.youtube.com/watch?v=26bl4r3VtGQ&t=355s
 
         Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResID);
-        vectorDrawable.setBounds(0,0,vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
-        Bitmap bitmap = Bitmap.createBitmap( vectorDrawable.getIntrinsicWidth(),
+        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
+        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
                 vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         vectorDrawable.draw(canvas);
@@ -283,8 +276,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             LatLng userLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
                             Log.d(TAG, "current location " + userLatLng);
                             moveCamera(userLatLng, DEFAULT_ZOOM);
-                        }
-                        else {
+                        } else {
                             Log.d(TAG, "onComplete: current location is null");
                             Toast.makeText(MapsActivity.this,
                                     "unable to get current location",

@@ -73,7 +73,7 @@ public class RestaurantList extends AppCompatActivity {
 
     private static final String TAG = RestaurantList.class.getSimpleName();
 
-    private static final boolean LOAD = true;
+    private static boolean loadedFromSave = false;
 
     private RestaurantManager restaurantManager;
     private int[] restaurantIcon = new int[8];
@@ -102,13 +102,8 @@ public class RestaurantList extends AppCompatActivity {
 
         restaurantManager = RestaurantManager.getInstance();
 
+        load();
         checkUpdateOfFraserHealthRestaurantInspectionReports();
-        //setRestaurantData();
-        //setInspectionData();
-        //sortRestaurantList();
-        //sortInspectionDate();
-        //populateListView();
-        populateIcon();
 
     }
 
@@ -186,6 +181,10 @@ public class RestaurantList extends AppCompatActivity {
                             //Intent home = new Intent(getApplicationContext(), OfficeActivity.class);
                             //startActivity(home);
                             //finish();
+                            restaurantManager.sortRestaurantList();
+                            restaurantManager.sortInspectionDate();
+                            populateListView();
+                            Log.e(TAG, "onClick: " + restaurantManager);
                         }
                     });
 
@@ -387,7 +386,10 @@ public class RestaurantList extends AppCompatActivity {
                             //sortInspectionDate();
                             //populateListView();
                             //populateIcon();
-
+                            restaurantManager.sortRestaurantList();
+                            restaurantManager.sortInspectionDate();
+                            populateListView();
+                            Log.e(TAG, "onClick: " + restaurantManager);
 
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -512,10 +514,10 @@ public class RestaurantList extends AppCompatActivity {
             }
 
 
-        } else if (LOAD) {
+        } /*else if (LOAD) {
             load();
             Log.e("TAG", "setInspectionData: " + restaurantManager);
-        } else {
+        }*/ else if (!loadedFromSave) {
             InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(is, Charset.forName("UTF-8"))
@@ -612,9 +614,7 @@ public class RestaurantList extends AppCompatActivity {
             }
         }
 
-        restaurantManager.sortRestaurantList();
-        restaurantManager.sortInspectionDate();
-        populateListView();
+
     }
 
     private List<Violation> getViolationsFromString(String violationsString) {
@@ -706,9 +706,9 @@ public class RestaurantList extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (LOAD) {
+        } /*else if (LOAD) {
             //load();
-        } else {
+        }*/ else if (!loadedFromSave) {
             InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(is, Charset.forName("UTF-8"))
@@ -1002,17 +1002,28 @@ public class RestaurantList extends AppCompatActivity {
         }
     }
 
-    public void load() {
+    public boolean load() {
         try {
             ObjectInputStream ois = new ObjectInputStream(this.openFileInput("save"));
 
-            RestaurantManager temp = (RestaurantManager) ois.readObject();
-            restaurantManager = RestaurantManager.getInstance();
-            restaurantManager.setInspections(temp.getInspections());
-            restaurantManager.setRestaurants(temp.getRestaurants());
+            Log.e(TAG, "load: loading...");
+
+            RestaurantManager temp;
+            if ((temp = (RestaurantManager) ois.readObject()) == null) {
+                Log.e(TAG, "load: ois not available");
+
+                return false;
+            } else {
+                restaurantManager = RestaurantManager.getInstance();
+                restaurantManager.setInspections(temp.getInspections());
+                restaurantManager.setRestaurants(temp.getRestaurants());
+                loadedFromSave = true;
+                return true;
+            }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+        return false;
     }
 
 

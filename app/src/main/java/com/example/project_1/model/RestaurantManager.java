@@ -80,7 +80,6 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
     }
 
 
-
     public void sortRestaurantList() {
         Collections.sort(restaurants, new Comparator<Restaurant>() {
             @Override
@@ -107,5 +106,19 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
                 "restaurants=" + restaurants +
                 ", inspections=" + inspections +
                 '}';
+    }
+
+    public int getIndexFromLatLng(double latitude, double longitude) {
+
+        for (int i = 0; i < restaurants.size(); i++) {
+            Restaurant current = restaurants.get(i);
+            double currentLatitude = current.getLatitude();
+            double currentLongitude = current.getLongitude();
+            if (currentLatitude == latitude && currentLongitude == longitude) {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }
