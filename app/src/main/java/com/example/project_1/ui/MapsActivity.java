@@ -131,7 +131,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private long currentLastModifiedTimeInMilliseconds = 0;
     private static LatLng coordinateInRestaurantDetail;
     private static boolean backFromRestaurantDetail = false;
-    HashMap<Integer, Marker> markerMap = new HashMap<>();
+    private static String trackingNumberInRestaurantDetail;
+    HashMap<String, Marker> markerMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,7 +170,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.e(TAG, "onRestart: " + coordinateInRestaurantDetail);
             int index = mRestaurantManager.getIndexFromLatLng(coordinateInRestaurantDetail.latitude, coordinateInRestaurantDetail.longitude);
             moveCamera(coordinateInRestaurantDetail, DEFAULT_ZOOM);
-            markerMap.get(index).showInfoWindow();
+            markerMap.get(trackingNumberInRestaurantDetail).showInfoWindow();
         }
 
         Log.e(TAG, "onRestart: ");
@@ -271,7 +272,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 marker = mMap.addMarker(options);
             }
 
-            markerMap.put(i, marker);
+            markerMap.put(mCurrentRestaurant.getTrackingNumber(), marker);
         }
 
         // Get restaurant full info after clicking the info window
@@ -1177,10 +1178,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startActivity(RestaurantList.makeIntent(getApplicationContext(), lastUpdatedTimeInMilliseconds, lastModifiedTimeInMilliseconds));
     }
 
-    public static Intent makeIntent(Context context, double latitude, double longitude, boolean fromRestaurantDetail) {
+    public static Intent makeIntent(Context context, double latitude, double longitude, String trackingNumber, boolean fromRestaurantDetail) {
         Intent intent = new Intent(context, MapsActivity.class);
         coordinateInRestaurantDetail = new LatLng(latitude, longitude);
         backFromRestaurantDetail = fromRestaurantDetail;
+        trackingNumberInRestaurantDetail = trackingNumber;
         return intent;
     }
 

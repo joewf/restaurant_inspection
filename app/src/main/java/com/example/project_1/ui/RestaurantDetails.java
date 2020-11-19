@@ -110,7 +110,7 @@ public class RestaurantDetails extends AppCompatActivity {
 
     public void myOnClick(View view) {
         Log.e("TAG", "myOnClick: " + restaurant.getLatitude() + "," + restaurant.getLongitude() );
-        startActivity(MapsActivity.makeIntent(getApplicationContext(), restaurant.getLatitude(), restaurant.getLongitude(), true));
+        startActivity(MapsActivity.makeIntent(getApplicationContext(), restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getTrackingNumber(), true));
     }
 
     private class MyListAdapter extends ArrayAdapter<Inspection> {
