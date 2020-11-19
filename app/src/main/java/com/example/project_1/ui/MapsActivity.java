@@ -133,8 +133,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
                         //mMarker = mMap.addMarker(options);
 
-                       //mClusterMarkersList.add(new ClusterMarker(options));
-                        mClusterMarkersList.add(new ClusterMarker(currentRestaurantLatLng));
+                        mClusterMarkersList.add(new ClusterMarker(options));
+                        //mClusterMarkersList.add(new ClusterMarker(currentRestaurantLatLng));
                         mClusterManager.addItems(mClusterMarkersList);
                         mClusterManager.cluster();
                         break;
@@ -150,8 +150,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         //mMarker = mMap.addMarker(options);
 
                         // Cluster the markers
-                        //mClusterMarkersList.add(new ClusterMarker(options));
-                        mClusterMarkersList.add(new ClusterMarker(currentRestaurantLatLng));
+                        mClusterMarkersList.add(new ClusterMarker(options));
+                        //mClusterMarkersList.add(new ClusterMarker(currentRestaurantLatLng));
                         mClusterManager.addItems(mClusterMarkersList);
                         mClusterManager.cluster();
                         break;
@@ -166,8 +166,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                 .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_red_24));
                         //mMarker = mMap.addMarker(options);
 
-                        //mClusterMarkersList.add(new ClusterMarker(options));
-                        mClusterMarkersList.add(new ClusterMarker(currentRestaurantLatLng));
+                        mClusterMarkersList.add(new ClusterMarker(options));
+                        //mClusterMarkersList.add(new ClusterMarker(currentRestaurantLatLng));
                         mClusterManager.addItems(mClusterMarkersList);
                         mClusterManager.cluster();
                         break;
@@ -197,8 +197,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
                 //mMarker = mMap.addMarker(options);
 
-                //mClusterMarkersList.add(new ClusterMarker(options));
-                mClusterMarkersList.add(new ClusterMarker(currentRestaurantLatLng));
+                mClusterMarkersList.add(new ClusterMarker(options));
+                //mClusterMarkersList.add(new ClusterMarker(currentRestaurantLatLng));
                 mClusterManager.addItems(mClusterMarkersList);
                 mClusterManager.cluster();
             }
