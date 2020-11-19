@@ -122,6 +122,18 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
         return -1;
     }
 
+    public int getIndexFromTrackingNumber(String tracking) {
+
+        for (int i = 0; i < restaurants.size(); i++) {
+            Restaurant current = restaurants.get(i);
+            if (current.getTrackingNumber().equals(tracking)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     public void emptyRestaurants() {
         restaurants.clear();
     }

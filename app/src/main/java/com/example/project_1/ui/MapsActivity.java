@@ -168,7 +168,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         if (backFromRestaurantDetail) {
             Log.e(TAG, "onRestart: " + coordinateInRestaurantDetail);
-            int index = mRestaurantManager.getIndexFromLatLng(coordinateInRestaurantDetail.latitude, coordinateInRestaurantDetail.longitude);
             moveCamera(coordinateInRestaurantDetail, DEFAULT_ZOOM);
             markerMap.get(trackingNumberInRestaurantDetail).showInfoWindow();
         }
@@ -284,11 +283,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
-                LatLng markerLatLng = marker.getPosition();
+                int index = -1;
+                for (int i = 0; i < mRestaurantList.size(); i++) {
+                    Restaurant current = mRestaurantList.get(i);
+                    if (markerMap.get(current.getTrackingNumber()).equals(marker)) {
+                        index = i;
+                        break;
+                    }
+                }
 
-                Intent intent = RestaurantDetails.makeIntent(MapsActivity.this,
-                        mRestaurantManager.getIndexFromLatLng(markerLatLng.latitude, markerLatLng.longitude));
-                startActivity(intent);
+                Log.e(TAG, "onInfoWindowClick: " + index);
+
+                if (index != -1) {
+                    Intent intent = RestaurantDetails.makeIntent(MapsActivity.this,
+                            index);
+                    startActivity(intent);
+
+                }
 
             }
         });
