@@ -9,6 +9,9 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * InputStreamVolleyRequest class models the information about a InputStreamVolleyRequest.
+ */
 public class InputStreamVolleyRequest extends Request<byte[]> {
     private final Response.Listener<byte[]> mListener;
     private Map<String, String> mParams;

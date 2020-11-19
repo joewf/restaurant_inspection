@@ -69,6 +69,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * RestaurantList class models the information about a RestaurantList activity.
+ */
 public class RestaurantList extends AppCompatActivity {
 
     private static final String TAG = RestaurantList.class.getSimpleName();

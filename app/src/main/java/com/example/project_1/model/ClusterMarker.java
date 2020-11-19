@@ -6,6 +6,9 @@ import androidx.annotation.Nullable;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.clustering.ClusterItem;
 
+/**
+ * ClusterMarker class models the information about a ClusterMarker.
+ */
 public class ClusterMarker implements ClusterItem {
 
     private LatLng position;
