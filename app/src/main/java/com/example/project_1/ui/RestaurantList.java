@@ -69,15 +69,24 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * RestaurantList class models the information about a RestaurantList activity.
+ */
 public class RestaurantList extends AppCompatActivity {
 
     private static final String TAG = RestaurantList.class.getSimpleName();
+    private static final String LAST_UPDATED_TIME = "last updated time";
+    private static final String LAST_MODIFIED_TIME = "last modified time";
 
-    private static final boolean LOAD = true;
+    private static boolean loadedFromSave = false;
 
     private RestaurantManager restaurantManager;
     private int[] restaurantIcon = new int[8];
     ProgressDialog pDialog;
+
+    private long lastUpdatedTimeInMilliseconds;
+    private long lastModifiedTimeInMilliseconds;
+
 
     // Add the request to the RequestQueue.
 
@@ -100,16 +109,24 @@ public class RestaurantList extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant_list);
 
+        lastUpdatedTimeInMilliseconds = getIntent().getLongExtra(LAST_UPDATED_TIME, 0);
+        lastModifiedTimeInMilliseconds = getIntent().getLongExtra(LAST_MODIFIED_TIME, 0);
+
+        Log.e(TAG, "onCreate: " + lastUpdatedTimeInMilliseconds);
+;
         restaurantManager = RestaurantManager.getInstance();
 
-        checkUpdateOfFraserHealthRestaurantInspectionReports();
-        //setRestaurantData();
-        //setInspectionData();
-        //sortRestaurantList();
-        //sortInspectionDate();
-        //populateListView();
-        populateIcon();
+//        load();
+//        checkUpdateOfFraserHealthRestaurantInspectionReports();
+        populateListView();
 
+    }
+
+    public static Intent makeIntent(Context context, long lastUpdatedTimeInMilliseconds, long lastModifiedTimeInMilliseconds) {
+        Intent intent = new Intent(context, RestaurantList.class);
+        intent.putExtra(LAST_UPDATED_TIME, lastUpdatedTimeInMilliseconds);
+        intent.putExtra(LAST_MODIFIED_TIME, lastModifiedTimeInMilliseconds);
+        return intent;
     }
 
     private void startMap() {
@@ -190,6 +207,10 @@ public class RestaurantList extends AppCompatActivity {
                             //Intent home = new Intent(getApplicationContext(), OfficeActivity.class);
                             //startActivity(home);
                             //finish();
+                            restaurantManager.sortRestaurantList();
+                            restaurantManager.sortInspectionDate();
+                            populateListView();
+                            Log.e(TAG, "onClick: " + restaurantManager);
                         }
                     });
 
@@ -391,7 +412,10 @@ public class RestaurantList extends AppCompatActivity {
                             //sortInspectionDate();
                             //populateListView();
                             //populateIcon();
-
+                            restaurantManager.sortRestaurantList();
+                            restaurantManager.sortInspectionDate();
+                            populateListView();
+                            Log.e(TAG, "onClick: " + restaurantManager);
 
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -422,6 +446,7 @@ public class RestaurantList extends AppCompatActivity {
     private void setInspectionData(Boolean updateAvailable, File newInspectionReports) {
         if (updateAvailable) {
             try (BufferedReader reader = new BufferedReader(new FileReader(newInspectionReports))) {
+                restaurantManager.emptyInspections();
                 String line;
 
                 reader.readLine();
@@ -516,10 +541,10 @@ public class RestaurantList extends AppCompatActivity {
             }
 
 
-        } else if (LOAD) {
+        } /*else if (LOAD) {
             load();
             Log.e("TAG", "setInspectionData: " + restaurantManager);
-        } else {
+        }*/ else if (!loadedFromSave) {
             InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(is, Charset.forName("UTF-8"))
@@ -616,9 +641,7 @@ public class RestaurantList extends AppCompatActivity {
             }
         }
 
-        restaurantManager.sortRestaurantList();
-        restaurantManager.sortInspectionDate();
-        populateListView();
+
     }
 
     private List<Violation> getViolationsFromString(String violationsString) {
@@ -660,6 +683,7 @@ public class RestaurantList extends AppCompatActivity {
         if (updateAvailable) {
             // Common pattern to process large file
             try (BufferedReader reader = new BufferedReader(new FileReader(newRestaurants))) {
+                restaurantManager.emptyRestaurants();
                 String line;
 
                 reader.readLine();
@@ -710,9 +734,9 @@ public class RestaurantList extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (LOAD) {
+        } /*else if (LOAD) {
             //load();
-        } else {
+        }*/ else if (!loadedFromSave) {
             InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(is, Charset.forName("UTF-8"))
@@ -783,6 +807,10 @@ public class RestaurantList extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    public void onClickFAB(View view) {
+        startActivity(new Intent(getApplicationContext(), MapsActivity.class));
     }
 
     private class MyListAdapter extends ArrayAdapter<Restaurant> {
@@ -968,20 +996,21 @@ public class RestaurantList extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Would you like to launch map?")
+        builder.setMessage("Would you like to exit?")
                 .setPositiveButton("Save and exit", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        save();
+                        //save();
+                        finishAffinity();
                         System.exit(0);
                     }
                 })
-                .setNeutralButton("Yes", new DialogInterface.OnClickListener() {
+                /*.setNeutralButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         startActivity(new Intent(RestaurantList.this, MapsActivity.class));
                     }
-                })
+                })*/
                 .setNegativeButton("Cancel", null)
                 .show();
 
@@ -992,6 +1021,8 @@ public class RestaurantList extends AppCompatActivity {
         try {
             oos = new ObjectOutputStream(this.openFileOutput("save", Context.MODE_PRIVATE));
             oos.writeObject(restaurantManager);
+            oos.writeLong(lastUpdatedTimeInMilliseconds);
+            oos.writeLong(lastModifiedTimeInMilliseconds);
             Log.e(TAG, "save: done");
         } catch (IOException e) {
             e.printStackTrace();
@@ -1005,19 +1036,5 @@ public class RestaurantList extends AppCompatActivity {
             }
         }
     }
-
-    public void load() {
-        try {
-            ObjectInputStream ois = new ObjectInputStream(this.openFileInput("save"));
-
-            RestaurantManager temp = (RestaurantManager) ois.readObject();
-            restaurantManager = RestaurantManager.getInstance();
-            restaurantManager.setInspections(temp.getInspections());
-            restaurantManager.setRestaurants(temp.getRestaurants());
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-
 
 }

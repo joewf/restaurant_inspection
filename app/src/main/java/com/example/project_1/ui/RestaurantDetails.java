@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,7 @@ import com.example.project_1.model.Inspection;
 import com.example.project_1.model.Restaurant;
 import com.example.project_1.model.RestaurantManager;
 import com.example.project_1.R;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -104,6 +106,11 @@ public class RestaurantDetails extends AppCompatActivity {
                 startActivity(InspectionReport.makeIntent(RestaurantDetails.this, restaurantIndex, position));
             }
         });
+    }
+
+    public void myOnClick(View view) {
+        Log.e("TAG", "myOnClick: " + restaurant.getLatitude() + "," + restaurant.getLongitude() );
+        startActivity(MapsActivity.makeIntent(getApplicationContext(), restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getTrackingNumber(), true));
     }
 
     private class MyListAdapter extends ArrayAdapter<Inspection> {
