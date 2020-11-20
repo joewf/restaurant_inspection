@@ -35,7 +35,6 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.project_1.R;
-import com.example.project_1.model.CustomInfoWindowAdapter;
 import com.example.project_1.model.HazardRating;
 import com.example.project_1.model.InputStreamVolleyRequest;
 import com.example.project_1.model.Inspection;
@@ -183,8 +182,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mRestaurantList = mRestaurantManager.getRestaurants();
         LatLng currentRestaurantLatLng;
         MarkerOptions options;
-        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
-
 
         // Add a marker for for restaurant on the list
         for (int i = 0; i < mRestaurantList.size(); i++) {
