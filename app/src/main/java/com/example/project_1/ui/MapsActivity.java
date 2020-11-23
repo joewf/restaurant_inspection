@@ -174,7 +174,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (backFromRestaurantDetail) {
             Log.e(TAG, "onRestart: " + coordinateInRestaurantDetail);
             moveCamera(coordinateInRestaurantDetail, DEFAULT_ZOOM);
-            renderer.getMarker(markerMap.get(trackingNumberInRestaurantDetail)).showInfoWindow();
+            //renderer.getMarker(markerMap.get(trackingNumberInRestaurantDetail)).showInfoWindow();
         }
 
         Log.e(TAG, "onRestart: ");
