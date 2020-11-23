@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.view.LayoutInflater;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -35,7 +36,9 @@ import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.project_1.R;
-import com.example.project_1.model.CustomInfoWindowAdapter;
+import com.example.project_1.model.ClusterMarker;
+import com.example.project_1.model.CustomClusterRenderer;
+import com.example.project_1.model.CustomInfoViewAdapter;
 import com.example.project_1.model.HazardRating;
 import com.example.project_1.model.InputStreamVolleyRequest;
 import com.example.project_1.model.Inspection;
@@ -58,6 +61,10 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterManager;
+
+import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -100,39 +107,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String COORDINATE = "coordinate";
 
     private GoogleMap mMap;
-    //private View restaurantClicker;
+    private GoogleMapOptions mGoogleMapOptions;
+    private ClusterManager<ClusterMarker> mClusterManager;
+    private Marker mMarker;
     private static final String TAG = "Map activity";
     private boolean mLocationPermissionGranted = false;
     private Location mCurrentLocation;
     private FusedLocationProviderClient mFusedLocationProviderClient;
-    private Marker mMarker;
-    private TextView tvSnippet;
-    private ImageView ivSnippet;
 
     private RestaurantManager mRestaurantManager;
     private List<Restaurant> mRestaurantList;
     private List<Inspection> mCurrentRestaurantInspectionList;
+    private List<ClusterMarker> mClusterMarkersList = new ArrayList<>();
     private Restaurant mCurrentRestaurant;
-    private Inspection mLastInspection;
 
     private HazardRating hazardRating;
     private String restaurantName;
     private String snippet;
     private double latitude;
     private double longitude;
-    private GoogleMapOptions mGoogleMapOptions;
 
     ProgressDialog pDialog;
     private static boolean loadedFromSave = false;
     private int count;
     private long lastUpdatedTimeInMilliseconds = 0;
     private long lastModifiedTimeInMilliseconds = 0;
-    private boolean exitAllActivities = false;
     private long currentLastModifiedTimeInMilliseconds = 0;
     private static LatLng coordinateInRestaurantDetail;
     private static boolean backFromRestaurantDetail = false;
     private static String trackingNumberInRestaurantDetail;
-    HashMap<String, Marker> markerMap = new HashMap<>();
+    HashMap<String, ClusterMarker> markerMap = new HashMap<>();
+    private CustomClusterRenderer renderer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,7 +174,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (backFromRestaurantDetail) {
             Log.e(TAG, "onRestart: " + coordinateInRestaurantDetail);
             moveCamera(coordinateInRestaurantDetail, DEFAULT_ZOOM);
-            markerMap.get(trackingNumberInRestaurantDetail).showInfoWindow();
+            //renderer.getMarker(markerMap.get(trackingNumberInRestaurantDetail)).showInfoWindow();
         }
 
         Log.e(TAG, "onRestart: ");
@@ -177,16 +182,54 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void addRestaurantMarker() {
 
+        mClusterManager = new ClusterManager<ClusterMarker>(this, mMap);
+        renderer = new CustomClusterRenderer(this, mMap, mClusterManager);
+        mClusterManager.setRenderer(renderer);
+
+        // Cluster click listener
+        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterMarker>() {
+            @Override
+            public boolean onClusterClick(Cluster<ClusterMarker> cluster) {
+                Toast.makeText(MapsActivity.this, "Cluster item click",
+                        Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+
+        // Cluster item
+        mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<ClusterMarker>() {
+            @Override
+            public boolean onClusterItemClick(ClusterMarker item) {
+                Toast.makeText(MapsActivity.this, "Cluster item click",
+                        Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
+
+
+        mClusterManager.getMarkerCollection().setInfoWindowAdapter(new CustomInfoViewAdapter(LayoutInflater.from(this)));
+        mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterMarker>() {
+            @Override
+            public void onClusterItemInfoWindowClick(ClusterMarker item) {
+                Toast.makeText(MapsActivity.this, "Cluster item click",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        mMap.setOnCameraIdleListener(mClusterManager);
+        mMap.setOnMarkerClickListener(mClusterManager);
+        mMap.setInfoWindowAdapter(mClusterManager.getMarkerManager());
+        mMap.setOnInfoWindowClickListener(mClusterManager);
+
+
         Log.d(TAG, "addRestaurantMarker: getting restaurant info");
 
         // Get restaurant lists
         mRestaurantList = mRestaurantManager.getRestaurants();
         LatLng currentRestaurantLatLng;
         MarkerOptions options;
-        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(MapsActivity.this));
 
-
-        // Add a marker for for restaurant on the list
+        // Add a marker for each restaurant on the list
         for (int i = 0; i < mRestaurantList.size(); i++) {
 
             // Get current restaurant
@@ -194,7 +237,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             // Get a list of inspections for the current restaurant
             mCurrentRestaurantInspectionList = mRestaurantManager.getInspectionsForRestaurant(i);
 
-            Marker marker = null;
+            ClusterMarker clusterMarker = null;
             // Current restaurant inspection list is not empty
             if (!mCurrentRestaurantInspectionList.isEmpty()) {
                 // Get restaurant info
@@ -217,36 +260,57 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case LOW:
                         Log.d(TAG, "setting restaurant marker green");
                         // Set marker
-                        options = new MarkerOptions()
+                        /*options = new MarkerOptions()
                                 .position(currentRestaurantLatLng)
                                 .title(restaurantName)
                                 .snippet(snippet)
-                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
-                        marker = mMap.addMarker(options);
+                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));*/
+                        //mMarker = mMap.addMarker(options);
+
+                        //mClusterMarkersList.add(new ClusterMarker(options));
+                        //mClusterManager.addItems(mClusterMarkersList);
+                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, 1);
+                        mClusterManager.addItem(clusterMarker);
+                        mClusterManager.cluster();
                         break;
 
                     case MODERATE:
                         Log.d(TAG, "setting restaurant marker yellow");
                         // Set marker
-                        options = new MarkerOptions()
+                        /*options = new MarkerOptions()
                                 .position(currentRestaurantLatLng)
                                 .title(restaurantName)
                                 .snippet(snippet)
-                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_yellow_24));
-                        marker = mMap.addMarker(options);
+                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_yellow_24));*/
+                        //mMarker = mMap.addMarker(options);
+
+                        // Cluster the markers
+                        //mClusterMarkersList.add(new ClusterMarker(options));
+                        //mClusterManager.addItems(mClusterMarkersList);
+                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, 2);
+                        mClusterManager.addItem(clusterMarker);
+                        mClusterManager.cluster();
                         break;
 
                     case HIGH:
                         Log.d(TAG, "setting restaurant marker red");
                         // Set marker
-                        options = new MarkerOptions()
+                        /*options = new MarkerOptions()
                                 .position(currentRestaurantLatLng)
                                 .title(restaurantName)
                                 .snippet(snippet)
-                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_red_24));
-                        marker = mMap.addMarker(options);
+                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_red_24));*/
+                        //mMarker = mMap.addMarker(options);
+
+                        //mClusterMarkersList.add(new ClusterMarker(options));
+                        //mClusterManager.addItems(mClusterMarkersList);
+                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, 3);
+                        mClusterManager.addItem(clusterMarker);
+                        mClusterManager.cluster();
                         break;
                 }
+                // Get restaurant full info after clicking the info window
+//                startFullRestaurantInfo(mRestaurantList.indexOf(mCurrentRestaurant));
 
 
             } else {
@@ -263,19 +327,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         + "Hazard level: " + hazardRating;
 
                 Log.d(TAG, "setting restaurant marker green");
-                options = new MarkerOptions()
+                /*options = new MarkerOptions()
                         .position(currentRestaurantLatLng)
                         .title(restaurantName)
                         .snippet(snippet)
-                        .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));
-                marker = mMap.addMarker(options);
+                        .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));*/
+                //mMarker = mMap.addMarker(options);
+
+                //mClusterMarkersList.add(new ClusterMarker(options));
+                //mClusterManager.addItems(mClusterMarkersList);
+                clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, 1);
+                mClusterManager.addItem(clusterMarker);
+                mClusterManager.cluster();
             }
 
-            markerMap.put(mCurrentRestaurant.getTrackingNumber(), marker);
+            markerMap.put(mCurrentRestaurant.getTrackingNumber(), clusterMarker);
+
         }
 
         // Get restaurant full info after clicking the info window
-        setCallbackToStartFullRestaurantInfo();
+        mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterMarker>() {
+            @Override
+            public void onClusterItemInfoWindowClick(ClusterMarker item) {
+                int index = -1;
+                for (int i = 0; i < mRestaurantList.size(); i++) {
+                    Restaurant current = mRestaurantList.get(i);
+                    if (markerMap.get(current.getTrackingNumber()).equals(item)) {
+                        index = i;
+                        break;
+                    }
+                }
+
+                Log.e(TAG, "onInfoWindowClick: " + index);
+
+                if (index != -1) {
+                    Intent intent = RestaurantDetails.makeIntent(MapsActivity.this,
+                            index);
+                    startActivity(intent);
+
+                }
+
+            }
+        });
     }
 
     private void setCallbackToStartFullRestaurantInfo() {
@@ -305,7 +398,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    private BitmapDescriptor BitmapDescriptorFromVector(Context context, int vectorResID) {
+    public BitmapDescriptor BitmapDescriptorFromVector(Context context, int vectorResID) {
 
         // source: https://www.youtube.com/watch?v=26bl4r3VtGQ&t=355s
 
@@ -361,13 +454,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void initiateMap() {
 
-        Log.d(TAG, "Initiating map");
-
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        /*SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(MapsActivity.this);*/
-
         mGoogleMapOptions = new GoogleMapOptions();
         mGoogleMapOptions.zoomControlsEnabled(true);
 
@@ -418,15 +504,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         Log.d(TAG, "onMapReady: creating google map");
@@ -441,13 +518,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
+
             mMap.setMyLocationEnabled(true);
             addRestaurantMarker();
         }
-        /*// Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));*/
     }
 
 

@@ -129,6 +129,10 @@ public class RestaurantList extends AppCompatActivity {
         return intent;
     }
 
+    private void startMap() {
+        startActivity(new Intent(this, MapsActivity.class) );
+    }
+
     // check update
     private void checkUpdateOfFraserHealthRestaurantInspectionReports() {
 
@@ -158,6 +162,7 @@ public class RestaurantList extends AppCompatActivity {
                             Log.i("myURL", inspectionReportsURL);
 
                             promptUserDownloadUpdateDialog(lastModifiedTimeInMilliseconds, currentTimeInMilliseconds, inspectionReportsURL);
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -171,7 +176,6 @@ public class RestaurantList extends AppCompatActivity {
 
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
         requestQueue.add(stringRequest);
-
     }
 
 
