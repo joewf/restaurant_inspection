@@ -16,7 +16,6 @@ public class ClusterMarker implements ClusterItem {
     private LatLng position;
     private String title;
     private String snippet;
-    private BitmapDescriptor mIcon;
     private int icon;
     private HazardRating hazardRating;
 
@@ -34,6 +33,10 @@ public class ClusterMarker implements ClusterItem {
         this.title = title;
         this.snippet = snippet;
         this.icon = icon;
+    }
+
+    public ClusterMarker() {
+
     }
 
     @NonNull
