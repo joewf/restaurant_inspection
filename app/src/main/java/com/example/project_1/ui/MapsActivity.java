@@ -24,6 +24,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -116,7 +117,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private GoogleMapOptions mGoogleMapOptions;
     private ClusterManager<ClusterMarker> mClusterManager;
-    private Marker mMarker;
+    private ClusterMarker mMarker = null;
     private static final String TAG = "Map activity";
     private boolean mLocationPermissionGranted = false;
     private Location mCurrentLocation;
@@ -159,26 +160,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         mRestaurantManager = RestaurantManager.getInstance();
-        createSpinners();
+        //createSpinners();
         mSearchText = (EditText) findViewById(R.id.input_search);
         mGPS = (ImageView) findViewById(R.id.ic_gps);
 
-        initSearch();
-
-        load();
+        //load();
         checkUpdateOfFraserHealthRestaurantInspectionReports();
-
-        //getLocationPermission();
+        initSearch();
 
     }
 
     private void createSpinners() {
+
         mSpinnerHazard = findViewById(R.id.spinner_hazard);
         ArrayAdapter<CharSequence> adapterHazard = ArrayAdapter.createFromResource(this, R.array.hazards,
         android.R.layout.simple_spinner_item);
         adapterHazard.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerHazard.setAdapter(adapterHazard);
         mSpinnerHazard.setOnItemSelectedListener(this);
+
 
         mSpinnerIssues = findViewById(R.id.spinner_issues);
         ArrayAdapter<CharSequence> adapterIssues = ArrayAdapter.createFromResource(this, R.array.issues,
@@ -232,16 +232,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 return false;
             }
         });
+
+        hideKeyboard();
     }
 
-    private void searchRestaurants() {
-
-        Log.d(TAG, "searchRestaurants: search restaurants");
-
-        String searchString = mSearchText.getText().toString(); // Get the name from search
-
-
-    }
 
     private void addRestaurantMarker() {
 
@@ -263,7 +257,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mRestaurantList = mRestaurantManager.getRestaurants();
         mClusterMarkersList = new ArrayList<>();
         LatLng currentRestaurantLatLng;
-        MarkerOptions options;
 
         // Add a marker for each restaurant on the list
         for (int i = 0; i < mRestaurantList.size(); i++) {
@@ -369,6 +362,44 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+    }
+
+    private void searchRestaurants() {
+        Log.d(TAG, "searchRestaurants: searching restaurants");
+
+        String searchString = mSearchText.getText().toString(); // Get the name from search
+
+        mClusterManager.clearItems();
+        mClusterManager.cluster();
+
+        Log.d(TAG, " search string: " + searchString);
+        String sushi = "104 Sushi & Co.";
+
+        for(int i = 0; i < mClusterMarkersList.size(); i ++) {
+            mMarker = mClusterMarkersList.get(i);     // Get current marker
+
+            Log.d(TAG, " title: " + mMarker.getTitle());
+            Log.d(TAG, " contains: " + mMarker.getTitle().contains(searchString));
+
+            if(mMarker.getTitle().contains("Sushi")) {
+
+                Log.d(TAG, "Adding mMarker");
+                mClusterManager.addItem(mMarker);
+                mClusterManager.cluster();
+                Log.d(TAG, "Finishing adding marker");
+                
+            }
+        }
+
+        //moveCamera(mMarker.getPosition(), DEFAULT_ZOOM);
+
+        hideKeyboard();
+
+    }
+
+    // Hide keyboard after search
+    private void hideKeyboard() {
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     private void setCallbackToStartFullRestaurantInfo() {
@@ -498,6 +529,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 + " long " + latLng.longitude);
         // Update map current location
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+        hideKeyboard();
     }
 
     @Override
