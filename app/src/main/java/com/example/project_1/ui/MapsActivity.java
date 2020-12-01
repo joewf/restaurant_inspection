@@ -367,7 +367,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void searchRestaurants() {
         Log.d(TAG, "searchRestaurants: searching restaurants");
 
-        String searchString = mSearchText.getText().toString(); // Get the name from search
+        String searchString = mSearchText.getText().toString().replaceAll(" ", "").toLowerCase(); // Get the name from search
 
         mClusterManager.clearItems();
         mClusterManager.cluster();
@@ -379,9 +379,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMarker = mClusterMarkersList.get(i);     // Get current marker
 
             Log.d(TAG, " title: " + mMarker.getTitle());
+            Log.d(TAG, " lowercase title: " + mMarker.getTitle().toLowerCase());
             Log.d(TAG, " contains: " + mMarker.getTitle().contains(searchString));
 
-            if(mMarker.getTitle().contains("Sushi")) {
+            if(mMarker.getTitle().toLowerCase().contains(searchString)) {
 
                 Log.d(TAG, "Adding mMarker");
                 mClusterManager.addItem(mMarker);
