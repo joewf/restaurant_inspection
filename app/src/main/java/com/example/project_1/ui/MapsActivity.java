@@ -381,13 +381,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             Log.d(TAG, " title: " + mMarker.getTitle());
             Log.d(TAG, " contains: " + mMarker.getTitle().contains(searchString));
 
-            if(mMarker.getTitle().contains("Sushi")) {
+            if(mMarker.getTitle().contains("Pizza")) {
 
                 Log.d(TAG, "Adding mMarker");
                 mClusterManager.addItem(mMarker);
                 mClusterManager.cluster();
                 Log.d(TAG, "Finishing adding marker");
-                
+
             }
         }
 
