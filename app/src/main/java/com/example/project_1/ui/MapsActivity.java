@@ -26,8 +26,10 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.view.LayoutInflater;
 import android.widget.Toast;
@@ -134,6 +136,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private EditText mSearchText;
     private ImageView mGPS;
+    private Spinner mSpinnerHazard;
+    private Spinner mSpinnerIssues;
 
     ProgressDialog pDialog;
     private static boolean loadedFromSave = false;
@@ -153,15 +157,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+
         mRestaurantManager = RestaurantManager.getInstance();
+        createSpinners();
         mSearchText = (EditText) findViewById(R.id.input_search);
         mGPS = (ImageView) findViewById(R.id.ic_gps);
+
         initSearch();
 
         load();
         checkUpdateOfFraserHealthRestaurantInspectionReports();
 
         //getLocationPermission();
+
+    }
+
+    private void createSpinners() {
+        mSpinnerHazard = findViewById(R.id.spinner_hazard);
+        ArrayAdapter<CharSequence> adapterHazard = ArrayAdapter.createFromResource(this, R.array.hazards,
+        android.R.layout.simple_spinner_item);
+        adapterHazard.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerHazard.setAdapter(adapterHazard);
+        mSpinnerHazard.setOnItemSelectedListener(this);
+
+        mSpinnerIssues = findViewById(R.id.spinner_issues);
+        ArrayAdapter<CharSequence> adapterIssues = ArrayAdapter.createFromResource(this, R.array.issues,
+                android.R.layout.simple_spinner_item);
+        adapterIssues.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerIssues.setAdapter(adapterIssues);
+        mSpinnerIssues.setOnItemSelectedListener(this);
 
     }
 
@@ -217,8 +241,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         String searchString = mSearchText.getText().toString(); // Get the name from search
 
 
-
-
     }
 
     private void addRestaurantMarker() {
@@ -228,34 +250,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mClusterManager.setRenderer(renderer);
         mClusterManager.getMarkerCollection().setInfoWindowAdapter(new CustomInfoViewAdapter(LayoutInflater.from(this)));
 
-        // Cluster click listener
-        /*mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterMarker>() {
-            @Override
-            public boolean onClusterClick(Cluster<ClusterMarker> cluster) {
-                Toast.makeText(MapsActivity.this, "Cluster item click",
-                        Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
-
-        // Cluster item
-        mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<ClusterMarker>() {
-            @Override
-            public boolean onClusterItemClick(ClusterMarker item) {
-                Toast.makeText(MapsActivity.this, "Cluster item click",
-                        Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
-
-
-        mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterMarker>() {
-            @Override
-            public void onClusterItemInfoWindowClick(ClusterMarker item) {
-                Toast.makeText(MapsActivity.this, "Cluster item click",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });*/
 
         mMap.setOnCameraIdleListener(mClusterManager);
         mMap.setOnMarkerClickListener(mClusterManager);
@@ -302,15 +296,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case LOW:
                         Log.d(TAG, "setting restaurant marker green");
                         // Set marker
-                        /*options = new MarkerOptions()
-                                .position(currentRestaurantLatLng)
-                                .title(restaurantName)
-                                .snippet(snippet)
-                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));*/
-                        //mMarker = mMap.addMarker(options);
-
-                        //mClusterMarkersList.add(new ClusterMarker(options));
-                        //mClusterManager.addItems(mClusterMarkersList);
                         clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, GREEN);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
@@ -320,16 +305,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case MODERATE:
                         Log.d(TAG, "setting restaurant marker yellow");
                         // Set marker
-                        /*options = new MarkerOptions()
-                                .position(currentRestaurantLatLng)
-                                .title(restaurantName)
-                                .snippet(snippet)
-                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_yellow_24));*/
-                        //mMarker = mMap.addMarker(options);
-
-                        // Cluster the markers
-                        //mClusterMarkersList.add(new ClusterMarker(options));
-                        //mClusterManager.addItems(mClusterMarkersList);
                         clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, YELLOW);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
@@ -339,15 +314,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case HIGH:
                         Log.d(TAG, "setting restaurant marker red");
                         // Set marker
-                        /*options = new MarkerOptions()
-                                .position(currentRestaurantLatLng)
-                                .title(restaurantName)
-                                .snippet(snippet)
-                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_red_24));*/
-                        //mMarker = mMap.addMarker(options);
-
-                        //mClusterMarkersList.add(new ClusterMarker(options));
-                        //mClusterManager.addItems(mClusterMarkersList);
                         clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, RED);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
@@ -432,18 +398,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    public BitmapDescriptor BitmapDescriptorFromVector(Context context, int vectorResID) {
-
-        // source: https://www.youtube.com/watch?v=26bl4r3VtGQ&t=355s
-
-        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResID);
-        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
-                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.draw(canvas);
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
 
     private void getLocationPermission() {
         Log.d(TAG, "Getting permission location");
@@ -1320,12 +1274,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-
+    public void onItemSelected(AdapterView<?> hazard, View view, int position, long l) {
+        String text = hazard.getItemAtPosition(position).toString();
+        Toast.makeText(hazard.getContext(), text, Toast.LENGTH_SHORT).show();
+        
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+
 }
