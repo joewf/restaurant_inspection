@@ -28,6 +28,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -160,7 +161,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         mRestaurantManager = RestaurantManager.getInstance();
-        //createSpinners();
+        createSpinners();
         mSearchText = (EditText) findViewById(R.id.input_search);
         mGPS = (ImageView) findViewById(R.id.ic_gps);
 
@@ -186,6 +187,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         adapterIssues.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerIssues.setAdapter(adapterIssues);
         mSpinnerIssues.setOnItemSelectedListener(this);
+
+        Button reset = (Button) findViewById(R.id.button_reset_markers);
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addRestaurantMarker();
+                Toast.makeText(MapsActivity.this, "Search reset", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -239,6 +249,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void addRestaurantMarker() {
 
+        if(mClusterManager != null) {
+            mClusterManager.clearItems();
+            mClusterManager.cluster();
+        }
+
         mClusterManager = new ClusterManager<ClusterMarker>(this, mMap);
         renderer = new CustomClusterRenderer(this, mMap, mClusterManager);
         mClusterManager.setRenderer(renderer);
@@ -249,7 +264,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(mClusterManager);
         mMap.setInfoWindowAdapter(mClusterManager.getMarkerManager());
         mMap.setOnInfoWindowClickListener(mClusterManager);
-
 
         Log.d(TAG, "addRestaurantMarker: getting restaurant info");
 
@@ -371,9 +385,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mClusterManager.clearItems();
         mClusterManager.cluster();
-
-        Log.d(TAG, " search string: " + searchString);
-        String sushi = "104 Sushi & Co.";
 
         for(int i = 0; i < mClusterMarkersList.size(); i ++) {
             mMarker = mClusterMarkersList.get(i);     // Get current marker
@@ -1307,9 +1318,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> hazard, View view, int position, long l) {
-        String text = hazard.getItemAtPosition(position).toString();
-        Toast.makeText(hazard.getContext(), text, Toast.LENGTH_SHORT).show();
+    public void onItemSelected(AdapterView<?> item, View view, int position, long l) {
+        String text = item.getItemAtPosition(position).toString();
+        Toast.makeText(item.getContext(), text, Toast.LENGTH_SHORT).show();
         
     }
 
