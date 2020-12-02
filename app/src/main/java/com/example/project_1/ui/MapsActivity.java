@@ -161,7 +161,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mSearchText = (EditText) findViewById(R.id.input_search);
         mGPS = (ImageView) findViewById(R.id.ic_gps);
 
-        //load();
+        load();
         checkUpdateOfFraserHealthRestaurantInspectionReports();
         initSearch();
 

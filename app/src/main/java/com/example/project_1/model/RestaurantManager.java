@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,6 +18,7 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
     private List<Inspection> inspections = new ArrayList<>();
     private List<Restaurant> favRestaurants = new ArrayList<>();
     private static RestaurantManager instance;
+    private final HashMap<Restaurant, Integer> favInspectionNumMap = new HashMap<>();
 
     // Return restaurant for MyListAdapter
     public List<Restaurant> getRestaurants() {
@@ -28,7 +30,11 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
     }
 
     private RestaurantManager() {
-        // To prevent anyone else from instantiating
+
+        // Initialize hash map
+        for (Restaurant current: favRestaurants) {
+            favInspectionNumMap.put(current, 0);
+        }
     }
 
     public static RestaurantManager getInstance() {
@@ -88,6 +94,19 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
         return list;
     }
 
+    public void initFavInspectionNumMap() {
+        ArrayList<Inspection> list = new ArrayList<>();
+
+        for (Restaurant currentRestaurant : favRestaurants) {
+            int count = 0;
+            for (Inspection inspection : inspections) {
+                if (currentRestaurant.getTrackingNumber().equals(inspection.getTrackingNumber())) {
+                    count++;
+                }
+            }
+            favInspectionNumMap.put(currentRestaurant, count);
+        }
+    }
 
     public void sortRestaurantList() {
         Collections.sort(restaurants, new Comparator<Restaurant>() {
@@ -115,6 +134,10 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
                 "restaurants=" + restaurants +
                 ", inspections=" + inspections +
                 '}';
+    }
+
+    public HashMap<Restaurant, Integer> getFavInspectionNumMap() {
+        return favInspectionNumMap;
     }
 
     public int getIndexFromLatLng(double latitude, double longitude) {
@@ -149,5 +172,9 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
 
     public void emptyInspections() {
         inspections.clear();
+    }
+
+    public boolean isFavorite(Restaurant restaurant) {
+        return favRestaurants.contains(restaurant);
     }
 }

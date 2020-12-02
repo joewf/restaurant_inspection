@@ -834,6 +834,8 @@ public class RestaurantList extends AppCompatActivity {
             // Set Favorite
             if (currentRestaurant.isFavorite()) {
                 itemView.setBackgroundColor(Color.parseColor("#ffffcc"));
+            } else {
+                itemView.setBackgroundColor(Color.parseColor("#2D131212"));
             }
 
             // Fill restaurant icon
@@ -923,6 +925,13 @@ public class RestaurantList extends AppCompatActivity {
             ImageView RestaurantHazard = (ImageView) itemView.findViewById(R.id.hazard_icon);
             TextView txtRestaurantHazard = (TextView) itemView.findViewById(R.id.text_hazard_level);
             if (!inspectionsForCurrentRestaurant.isEmpty()) {
+
+                if(currentRestaurant.isFavorite()) {
+                    txtRestaurantHazard.setBackgroundColor(Color.parseColor("#2D131212"));
+                } else {
+                    txtRestaurantHazard.setBackgroundColor(Color.TRANSPARENT);
+                }
+
                 Log.e("hazard loop", "getView: " + inspectionsForCurrentRestaurant.toString());
                 /*for (Inspection inspection : inspectionsForCurrentRestaurant)*/
                 {
@@ -1005,7 +1014,7 @@ public class RestaurantList extends AppCompatActivity {
                 .setPositiveButton("Save and exit", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //save();
+                        save();
                         finishAffinity();
                         System.exit(0);
                     }
