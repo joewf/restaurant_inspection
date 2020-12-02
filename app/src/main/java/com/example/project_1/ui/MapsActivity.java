@@ -14,9 +14,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -62,11 +59,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.maps.android.clustering.ClusterManager;
@@ -133,6 +127,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private HazardRating hazardRating;
     private String restaurantName;
     private String snippet;
+    private String spinnerHazardText;
+    private int spinnerIssuesInt;
     private double latitude;
     private double longitude;
 
@@ -173,6 +169,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void createSpinners() {
 
+        // Drop down for hazard
         mSpinnerHazard = findViewById(R.id.spinner_hazard);
         ArrayAdapter<CharSequence> adapterHazard = ArrayAdapter.createFromResource(this, R.array.hazards,
         android.R.layout.simple_spinner_item);
@@ -180,7 +177,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mSpinnerHazard.setAdapter(adapterHazard);
         mSpinnerHazard.setOnItemSelectedListener(this);
 
-
+        // Drop down for issues
         mSpinnerIssues = findViewById(R.id.spinner_issues);
         ArrayAdapter<CharSequence> adapterIssues = ArrayAdapter.createFromResource(this, R.array.issues,
                 android.R.layout.simple_spinner_item);
@@ -188,6 +185,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mSpinnerIssues.setAdapter(adapterIssues);
         mSpinnerIssues.setOnItemSelectedListener(this);
 
+        // Reset search button
         Button reset = (Button) findViewById(R.id.button_reset_markers);
         reset.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -232,11 +230,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionID, KeyEvent keyEvent) {
-                if(actionID == EditorInfo.IME_ACTION_SEARCH
-                || actionID == EditorInfo.IME_ACTION_DONE
-                || keyEvent.getAction() == keyEvent.ACTION_DOWN
-                || keyEvent.getAction() == keyEvent.KEYCODE_ENTER){
+                if(actionID == EditorInfo.IME_ACTION_SEARCH             // Search when clicking on search icon
+                || actionID == EditorInfo.IME_ACTION_DONE               // Search when
+                || keyEvent.getAction() == keyEvent.ACTION_DOWN         // Search when hiding keyboard
+                || keyEvent.getAction() == keyEvent.KEYCODE_ENTER){     // Search when pressing enter
 
+                    // Search restaurants based on name
                     searchRestaurants();
                 }
                 return false;
@@ -249,6 +248,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void addRestaurantMarker() {
 
+        // Clear markers when there are markers in the map
         if(mClusterManager != null) {
             mClusterManager.clearItems();
             mClusterManager.cluster();
@@ -303,7 +303,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case LOW:
                         Log.d(TAG, "setting restaurant marker green");
                         // Set marker
-                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, GREEN);
+                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, hazardRating, GREEN);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
@@ -312,7 +312,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case MODERATE:
                         Log.d(TAG, "setting restaurant marker yellow");
                         // Set marker
-                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, YELLOW);
+                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, hazardRating, YELLOW);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
@@ -321,7 +321,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case HIGH:
                         Log.d(TAG, "setting restaurant marker red");
                         // Set marker
-                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, RED);
+                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, hazardRating, RED);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
@@ -342,7 +342,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         + "Hazard level: " + hazardRating;
 
                 Log.d(TAG, "setting restaurant marker green");
-                clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, 1);
+                clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, hazardRating, GREEN);
                 mClusterManager.addItem(clusterMarker);
                 mClusterMarkersList.add(clusterMarker);
                 mClusterManager.cluster();
@@ -378,35 +378,74 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+
+
     private void searchRestaurants() {
         Log.d(TAG, "searchRestaurants: searching restaurants");
 
-        String searchString = mSearchText.getText().toString().replaceAll(" ", "").toLowerCase(); // Get the name from search
+        // Get the name from search
+        String searchString = mSearchText.getText().toString().replaceAll(" ", "").toLowerCase();
 
-        mClusterManager.clearItems();
-        mClusterManager.cluster();
+        // Get hazard from drop down list
+        getHazardFromDropDownList();
+
+        // If there are markers, delete them
+        if(mClusterManager != null) {
+            mClusterManager.clearItems();
+            mClusterManager.cluster();
+        }
+
 
         for(int i = 0; i < mClusterMarkersList.size(); i ++) {
             mMarker = mClusterMarkersList.get(i);     // Get current marker
 
             Log.d(TAG, " title: " + mMarker.getTitle());
             Log.d(TAG, " lowercase title: " + mMarker.getTitle().toLowerCase());
-            Log.d(TAG, " contains: " + mMarker.getTitle().contains(searchString));
 
+            // Check marker name
             if(mMarker.getTitle().toLowerCase().contains(searchString)) {
 
-                Log.d(TAG, "Adding mMarker");
-                mClusterManager.addItem(mMarker);
-                mClusterManager.cluster();
-                Log.d(TAG, "Finishing adding marker");
-                
+                // No hazard check
+                if (hazardRating.equals(HazardRating.NONE)) {
+                    Log.d(TAG, "No hazard check");
+                    mClusterManager.addItem(mMarker);
+                    mClusterManager.cluster();
+                }
+                // Check hazard
+                if(hazardRating.equals(mMarker.getHazard())) {
+                    Log.d(TAG, "Checking hazard: " + mMarker.getHazard() );
+                    mClusterManager.addItem(mMarker);
+                    mClusterManager.cluster();
+                }
+
             }
         }
 
-        //moveCamera(mMarker.getPosition(), DEFAULT_ZOOM);
 
         hideKeyboard();
 
+    }
+
+    private void getHazardFromDropDownList() {
+
+        // Get hazard level from drop down list
+        spinnerHazardText = mSpinnerHazard.getSelectedItem().toString().toUpperCase();
+        Log.d(TAG, "LEVEL: " + spinnerHazardText);
+        switch(spinnerHazardText) {
+            case "NONE":
+                hazardRating = HazardRating.NONE;
+                break;
+            case "LOW":
+                hazardRating = HazardRating.LOW;
+                break;
+            case "MODERATE":
+                hazardRating = HazardRating.MODERATE;
+                break;
+            case "HIGH":
+                hazardRating = HazardRating.HIGH;
+                break;
+        }
+        Log.d(TAG, "Hazard rating: " + hazardRating);
     }
 
     // Hide keyboard after search
@@ -1318,9 +1357,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> item, View view, int position, long l) {
-        String text = item.getItemAtPosition(position).toString();
-        Toast.makeText(item.getContext(), text, Toast.LENGTH_SHORT).show();
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
+
+        String text = parent.getItemAtPosition(position).toString();
+
+        /*if(text.equals("LOW")) {
+            hazardRating = HazardRating.LOW;
+        }
+        else if(text.equals("MODERATE")) {
+            hazardRating = HazardRating.MODERATE;
+        }
+        else {
+            hazardRating = HazardRating.HIGH;
+        }
+
+        searchRestaurants(hazardRating);*/
+
+        Toast.makeText(parent.getContext(), text, Toast.LENGTH_SHORT).show();
         
     }
 

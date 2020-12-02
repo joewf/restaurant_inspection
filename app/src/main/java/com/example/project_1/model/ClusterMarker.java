@@ -28,11 +28,12 @@ public class ClusterMarker implements ClusterItem {
         setHazardRating(hazardRating);
     }
 
-    public ClusterMarker(String title, String snippet, LatLng position, int icon) {
+    public ClusterMarker(String title, String snippet, LatLng position, HazardRating hazardRating, int icon) {
 
         this.position = position;
         this.title = title;
         this.snippet = snippet;
+        this.hazardRating = hazardRating;
         this.icon = icon;
     }
 
