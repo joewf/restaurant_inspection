@@ -102,14 +102,14 @@ public class Restaurant implements Serializable {
 
     @Override
     public String toString() {
-        return "Restaurant{" +
+        return "\nRestaurant{" +
                 "trackingNumber='" + trackingNumber + '\'' +
-                ", name='" + name + '\'' +
-                ", physicalAddress='" + physicalAddress + '\'' +
-                ", physicalCity='" + physicalCity + '\'' +
-                ", factType='" + factType + '\'' +
-                ", latitude=" + latitude +
-                ", altitude=" + longitude +
+                "name='" + name + '\'' +
+//                ", physicalAddress='" + physicalAddress + '\'' +
+//                ", physicalCity='" + physicalCity + '\'' +
+//                ", factType='" + factType + '\'' +
+//                ", latitude=" + latitude +
+//                ", altitude=" + longitude +
                 '}';
     }
 }

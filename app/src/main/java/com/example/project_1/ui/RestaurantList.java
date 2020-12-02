@@ -113,7 +113,7 @@ public class RestaurantList extends AppCompatActivity {
         lastModifiedTimeInMilliseconds = getIntent().getLongExtra(LAST_MODIFIED_TIME, 0);
 
         Log.e(TAG, "onCreate: " + lastUpdatedTimeInMilliseconds);
-;
+        ;
         restaurantManager = RestaurantManager.getInstance();
 
 //        load();
@@ -130,7 +130,7 @@ public class RestaurantList extends AppCompatActivity {
     }
 
     private void startMap() {
-        startActivity(new Intent(this, MapsActivity.class) );
+        startActivity(new Intent(this, MapsActivity.class));
     }
 
     // check update
@@ -810,7 +810,8 @@ public class RestaurantList extends AppCompatActivity {
     }
 
     public void onClickFAB(View view) {
-        startActivity(new Intent(getApplicationContext(), MapsActivity.class));
+        startActivity(MapsActivity.makeIntent(getApplicationContext(), BackFrom.RestaurantList)
+        );
     }
 
     private class MyListAdapter extends ArrayAdapter<Restaurant> {
@@ -831,8 +832,9 @@ public class RestaurantList extends AppCompatActivity {
             Restaurant currentRestaurant = restaurantManager.get(position);
             List<Inspection> inspectionsForCurrentRestaurant = restaurantManager.getInspectionsForRestaurant(position);
 
+            boolean isFav = restaurantManager.getFavTrackingNumList().contains(currentRestaurant.getTrackingNumber().replaceAll("\"",""));
             // Set Favorite
-            if (currentRestaurant.isFavorite()) {
+            if (isFav) {
                 itemView.setBackgroundColor(Color.parseColor("#ffffcc"));
             } else {
                 itemView.setBackgroundColor(Color.parseColor("#2D131212"));
@@ -926,13 +928,13 @@ public class RestaurantList extends AppCompatActivity {
             TextView txtRestaurantHazard = (TextView) itemView.findViewById(R.id.text_hazard_level);
             if (!inspectionsForCurrentRestaurant.isEmpty()) {
 
-                if(currentRestaurant.isFavorite()) {
+                if (isFav) {
                     txtRestaurantHazard.setBackgroundColor(Color.parseColor("#2D131212"));
                 } else {
                     txtRestaurantHazard.setBackgroundColor(Color.TRANSPARENT);
                 }
 
-                Log.e("hazard loop", "getView: " + inspectionsForCurrentRestaurant.toString());
+                //Log.e("hazard loop", "getView: " + inspectionsForCurrentRestaurant.toString());
                 /*for (Inspection inspection : inspectionsForCurrentRestaurant)*/
                 {
                     HazardRating hazard = inspectionsForCurrentRestaurant.get(0).getHazardRating();
@@ -1014,6 +1016,11 @@ public class RestaurantList extends AppCompatActivity {
                 .setPositiveButton("Save and exit", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        //restaurantManager.updateFavTrackingNumList();
+
+                        Log.e(TAG, "onBackPressed: " + restaurantManager.getFavTrackingNumList());
+
+                        restaurantManager.updateFavInspectionNumMap();
                         save();
                         finishAffinity();
                         System.exit(0);

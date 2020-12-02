@@ -81,7 +81,8 @@ public class RestaurantDetails extends AppCompatActivity {
     private void setFavoriteButtonCallback() {
         LikeButton favBtn = findViewById(R.id.star_button);
 
-        if (restaurant.isFavorite()){
+        if (restaurantManager.getFavTrackingNumList().contains(restaurant.getTrackingNumber().replaceAll("\"", ""))){
+            restaurant.setFavorite(true);
             favBtn.setLiked(true);
         }
 
@@ -141,7 +142,7 @@ public class RestaurantDetails extends AppCompatActivity {
 
     public void myOnClick(View view) {
         Log.e("TAG", "myOnClick: " + restaurant.getLatitude() + "," + restaurant.getLongitude() );
-        startActivity(MapsActivity.makeIntent(getApplicationContext(), restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getTrackingNumber(), true));
+        startActivity(MapsActivity.makeIntent(getApplicationContext(), restaurant.getLatitude(), restaurant.getLongitude(), restaurant.getTrackingNumber(), BackFrom.RestaurantDetails));
     }
 
     private class MyListAdapter extends ArrayAdapter<Inspection> {
