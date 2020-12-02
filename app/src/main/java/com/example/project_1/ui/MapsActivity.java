@@ -422,6 +422,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 // No hazard check search
                 if (hazardRating.equals(HazardRating.NONE)) {
+
                     Log.d(TAG, "No hazard check");
 
                     /*
@@ -429,7 +430,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                      the total number of issues
                      */
 
-                    // Check for empty inspection lists
+                    // Add issues for non empty inspection lists
                     if(currentMarkerInspectionListSize != 0) {
                         for(int j = 0; j < currentMarkerInspectionListSize; j++) {
 
@@ -457,28 +458,35 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if(numCritical <= spinnerIssuesNum)  {
 
                         // Check at least the latest inspection is less than 1 year
-                        Date lastInspectionDate = currentMarkerInspectionsList.get(0).getDate();
-                        if (lastInspectionDate != null) {
-                            long diffInMilliSeLastInspection = Math.abs(currentDate.getTime() - lastInspectionDate.getTime());
-                            long diff = TimeUnit.DAYS.convert(diffInMilliSeLastInspection, TimeUnit.MILLISECONDS);
-                            Log.d(TAG, "DAYS: " + diff);
+                        if(currentMarkerInspectionListSize != 0) {
+                            Date lastInspectionDate = currentMarkerInspectionsList.get(0).getDate();
+                            if (lastInspectionDate != null) {
+                                long diffInMilliSeLastInspection = Math.abs(currentDate.getTime() - lastInspectionDate.getTime());
+                                long diff = TimeUnit.DAYS.convert(diffInMilliSeLastInspection, TimeUnit.MILLISECONDS);
+                                Log.d(TAG, "DAYS: " + diff);
 
-                            if (diff < 365) {
-                                Log.d(TAG, "NUMBER OF CRITICAL: " + numCritical);
-                                Log.d(TAG, "Adding marker to the map: " + mMarker.getTitle());
-                                mClusterManager.addItem(mMarker);
-                                mClusterManager.cluster();
+                                if (diff < 365) {
+                                    Log.d(TAG, "NUMBER OF CRITICAL: " + numCritical);
+                                    Log.d(TAG, "Adding marker to the map: " + mMarker.getTitle());
+                                    mClusterManager.addItem(mMarker);
+                                    mClusterManager.cluster();
+                                }
+
                             }
+
                         }
+
                     }
 
                 }
+
 
                 // Check hazard search
                 if(hazardRating.equals(mMarker.getHazard())) {
 
                     Log.d(TAG, "Hazard check");
-                    // Check for empty inspection lists
+
+                    // Add issues for non empty inspection lists
                     if(currentMarkerInspectionListSize != 0) {
                         for(int j = 0; j < currentMarkerInspectionListSize; j++) {
 
@@ -506,25 +514,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if(numCritical <= spinnerIssuesNum)  {
 
                         // Check at least the latest inspection is less than 1 year
-                        Date lastInspectionDate = currentMarkerInspectionsList.get(0).getDate();
-                        if (lastInspectionDate != null) {
-                            long diffInMilliSeLastInspection = Math.abs(currentDate.getTime() - lastInspectionDate.getTime());
-                            long diff = TimeUnit.DAYS.convert(diffInMilliSeLastInspection, TimeUnit.MILLISECONDS);
-                            Log.d(TAG, "DAYS: " + diff);
+                        if(currentMarkerInspectionListSize != 0) {
+                            Date lastInspectionDate = currentMarkerInspectionsList.get(0).getDate();
 
-                            if (diff < 365) {
-                                Log.d(TAG, "NUMBER OF CRITICAL: " + numCritical);
-                                Log.d(TAG, "Adding marker to the map: " + mMarker.getTitle());
-                                mClusterManager.addItem(mMarker);
-                                mClusterManager.cluster();
+                            if (lastInspectionDate != null) {
+                                long diffInMilliSeLastInspection = Math.abs(currentDate.getTime() - lastInspectionDate.getTime());
+                                long diff = TimeUnit.DAYS.convert(diffInMilliSeLastInspection, TimeUnit.MILLISECONDS);
+                                Log.d(TAG, "DAYS: " + diff);
+
+                                if (diff < 365) {
+                                    Log.d(TAG, "NUMBER OF CRITICAL: " + numCritical);
+                                    Log.d(TAG, "Adding marker to the map: " + mMarker.getTitle());
+                                    mClusterManager.addItem(mMarker);
+                                    mClusterManager.cluster();
+                                }
+
                             }
+
                         }
+
                     }
+
                 }
 
             }
         }
-
 
         hideKeyboard();
 
