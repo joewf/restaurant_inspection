@@ -831,6 +831,11 @@ public class RestaurantList extends AppCompatActivity {
             Restaurant currentRestaurant = restaurantManager.get(position);
             List<Inspection> inspectionsForCurrentRestaurant = restaurantManager.getInspectionsForRestaurant(position);
 
+            // Set Favorite
+            if (currentRestaurant.isFavorite()) {
+                itemView.setBackgroundColor(Color.parseColor("#ffffcc"));
+            }
+
             // Fill restaurant icon
             ImageView restaurantView = (ImageView) itemView.findViewById(R.id.restaurant_icon);
             String currentRestaurantName = currentRestaurant.getName();
@@ -1037,4 +1042,10 @@ public class RestaurantList extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        populateListView();
+    }
 }

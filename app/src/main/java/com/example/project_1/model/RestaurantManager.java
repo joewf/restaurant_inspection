@@ -15,6 +15,7 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
 
     private List<Restaurant> restaurants = new ArrayList<>();
     private List<Inspection> inspections = new ArrayList<>();
+    private List<Restaurant> favRestaurants = new ArrayList<>();
     private static RestaurantManager instance;
 
     // Return restaurant for MyListAdapter
@@ -47,6 +48,14 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
 
     public void addRestaurant(Restaurant restaurant) {
         restaurants.add(restaurant);
+    }
+
+    public void addFavRestaurant(Restaurant restaurant) {
+        favRestaurants.add(restaurant);
+    }
+
+    public void removeFavRestaurant(Restaurant restaurant) {
+        favRestaurants.remove(restaurant);
     }
 
     public void addInspection(Inspection inspection) {

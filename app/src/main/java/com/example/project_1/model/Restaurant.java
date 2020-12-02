@@ -13,6 +13,7 @@ public class Restaurant implements Serializable {
     private String factType;
     private double latitude;
     private double longitude;
+    private boolean favorite = false;
 
     public Restaurant(String trackingNumber, String name, String physicalAddress, String physicalCity, String factType, double latitude, double longitude) {
         this.trackingNumber = trackingNumber;
@@ -89,6 +90,14 @@ public class Restaurant implements Serializable {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
     }
 
     @Override
