@@ -41,4 +41,20 @@
     <string name="restaurant_icon">restaurant icon</string>
     <string name="list_view">List View</string>
     <string name="map_view">Map View</string>
+    <string name="reset_button">RESET\nSEARCH</string>
+
+    <string-array name="hazards">
+        <item>NONE</item>
+        <item>LOW</item>
+        <item>MODERATE</item>
+        <item>HIGH</item>
+    </string-array>
+
+    <string-array name="issues">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
 </resources>

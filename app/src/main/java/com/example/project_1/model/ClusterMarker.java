@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterItem;
 
@@ -16,7 +17,6 @@ public class ClusterMarker implements ClusterItem {
     private LatLng position;
     private String title;
     private String snippet;
-    private BitmapDescriptor mIcon;
     private int icon;
     private HazardRating hazardRating;
 
@@ -28,12 +28,17 @@ public class ClusterMarker implements ClusterItem {
         setHazardRating(hazardRating);
     }
 
-    public ClusterMarker(String title, String snippet, LatLng position, int icon) {
+    public ClusterMarker(String title, String snippet, LatLng position, HazardRating hazardRating, int icon) {
 
         this.position = position;
         this.title = title;
         this.snippet = snippet;
+        this.hazardRating = hazardRating;
         this.icon = icon;
+    }
+
+    public ClusterMarker() {
+
     }
 
     @NonNull
