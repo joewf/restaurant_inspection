@@ -13,6 +13,7 @@ public class Restaurant implements Serializable {
     private String factType;
     private double latitude;
     private double longitude;
+    private boolean favorite = false;
 
     public Restaurant(String trackingNumber, String name, String physicalAddress, String physicalCity, String factType, double latitude, double longitude) {
         this.trackingNumber = trackingNumber;
@@ -91,16 +92,24 @@ public class Restaurant implements Serializable {
         this.longitude = longitude;
     }
 
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        this.favorite = favorite;
+    }
+
     @Override
     public String toString() {
-        return "Restaurant{" +
+        return "\nRestaurant{" +
                 "trackingNumber='" + trackingNumber + '\'' +
-                ", name='" + name + '\'' +
-                ", physicalAddress='" + physicalAddress + '\'' +
-                ", physicalCity='" + physicalCity + '\'' +
-                ", factType='" + factType + '\'' +
-                ", latitude=" + latitude +
-                ", altitude=" + longitude +
+                "name='" + name + '\'' +
+//                ", physicalAddress='" + physicalAddress + '\'' +
+//                ", physicalCity='" + physicalCity + '\'' +
+//                ", factType='" + factType + '\'' +
+//                ", latitude=" + latitude +
+//                ", altitude=" + longitude +
                 '}';
     }
 }

@@ -146,10 +146,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private long lastModifiedTimeInMilliseconds = 0;
     private long currentLastModifiedTimeInMilliseconds = 0;
     private static LatLng coordinateInRestaurantDetail;
-    private static boolean backFromRestaurantDetail = false;
+    private static BackFrom backFrom = BackFrom.DEFAULT;
     private static String trackingNumberInRestaurantDetail;
     HashMap<String, ClusterMarker> markerMap = new HashMap<>();
     private CustomClusterRenderer renderer;
+    private HashMap<String, Integer> favInspectionNumMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,13 +158,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        load();
 
         mRestaurantManager = RestaurantManager.getInstance();
-        createDropDownLists();
+        favInspectionNumMap = new HashMap<>(mRestaurantManager.getFavMap());
+
+        createSpinners();
         mSearchText = (EditText) findViewById(R.id.input_search);
         mGPS = (ImageView) findViewById(R.id.ic_gps);
 
-        //load();
         checkUpdateOfFraserHealthRestaurantInspectionReports();
         initSearch();
 
@@ -174,7 +177,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Drop down list for hazard
         mSpinnerHazard = findViewById(R.id.spinner_hazard);
         ArrayAdapter<CharSequence> adapterHazard = ArrayAdapter.createFromResource(this, R.array.hazards,
-        android.R.layout.simple_spinner_item);
+                android.R.layout.simple_spinner_item);
         adapterHazard.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerHazard.setAdapter(adapterHazard);
         mSpinnerHazard.setOnItemSelectedListener(this);
@@ -210,6 +213,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onResume() {
         super.onResume();
 
+//        if (backFrom == BackFrom.RestaurantList) {
+//            showNewInspectionOnFav();
+//        }
+
         Log.e(TAG, "onResume: ");
     }
 
@@ -217,10 +224,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onRestart() {
         super.onRestart();
 
-        if (backFromRestaurantDetail) {
+        if (backFrom.equals(BackFrom.RestaurantDetails)) {
             Log.e(TAG, "onRestart: " + coordinateInRestaurantDetail);
             moveCamera(coordinateInRestaurantDetail, DEFAULT_ZOOM);
-            //renderer.getMarker(markerMap.get(trackingNumberInRestaurantDetail)).showInfoWindow();
         }
 
         Log.e(TAG, "onRestart: ");
@@ -251,7 +257,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void addRestaurantMarker() {
 
         // Clear markers when there are markers in the map
-        if(mClusterManager != null) {
+        if (mClusterManager != null) {
             mClusterManager.clearItems();
             mClusterManager.cluster();
         }
@@ -384,7 +390,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-
     private void searchRestaurants() {
         Log.d(TAG, "searchRestaurants: searching restaurants");
 
@@ -401,7 +406,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, "Current Date: " + currentDate);
 
         // If there are markers, delete them
-        if(mClusterManager != null) {
+        if (mClusterManager != null) {
             mClusterManager.clearItems();
             mClusterManager.cluster();
         }
@@ -557,7 +562,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Get hazard level from drop down list
         spinnerHazardText = mSpinnerHazard.getSelectedItem().toString().toUpperCase();
         Log.d(TAG, "LEVEL: " + spinnerHazardText);
-        switch(spinnerHazardText) {
+        switch (spinnerHazardText) {
             case "NONE":
                 hazardRating = HazardRating.NONE;
                 break;
@@ -811,7 +816,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             }
 
                             getLocationPermission();
-                            Log.e(TAG, "onClick: " + mRestaurantManager);
+                            //Log.e(TAG, "onClick: " + mRestaurantManager);
                         }
                     });
 
@@ -1021,9 +1026,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             //populateIcon();
                             mRestaurantManager.sortRestaurantList();
                             mRestaurantManager.sortInspectionDate();
+
+                            showNewInspectionOnFav();
+
                             save();
+
                             getLocationPermission();
-                            Log.e(TAG, "onClick: " + mRestaurantManager);
+                            //Log.e(TAG, "onClick: " + mRestaurantManager);
 
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -1048,6 +1057,65 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             requestQueueByte.cancel();
         }
         //requestQueue.add(request);
+    }
+
+    private void showNewInspectionOnFav() {
+        mRestaurantManager.updateFavInspectionNumMap();
+
+        Log.e(TAG, "showNewInspectionOnFav: favInspectionNumMap " + favInspectionNumMap);
+        Log.e(TAG, "showNewInspectionOnFav: FavMap " + mRestaurantManager.getFavMap());
+
+        ArrayList<Restaurant> favWithNewInspection = mRestaurantManager.getFavRestaurantWithNewInspection(favInspectionNumMap);
+
+//        if (loadedFromSave) {
+            //favWithNewInspection = mRestaurantManager.getFavRestaurants();
+//        }
+
+        Log.e(TAG, "showNewInspectionOnFav: fav " + mRestaurantManager.getFavRestaurants());
+        Log.e(TAG, "showNewInspectionOnFav: fav with update " + favWithNewInspection);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(MapsActivity.this, android.R.layout.simple_list_item_1);
+
+        for (Restaurant restaurant : favWithNewInspection) {
+            Inspection mostRecentInspection = mRestaurantManager.getMostRecentInspection(restaurant);
+
+            String strDate = "";
+            String hazard = "";
+            if (mostRecentInspection != null) {
+                Date mostRecentDate = mostRecentInspection.getDate();
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMMM d, yyyy");
+                strDate = simpleDateFormat.format(mostRecentDate);
+
+                hazard = mostRecentInspection.getHazardRating().toString();
+            }
+
+            String info = restaurant.getName()
+                    + "\n\t\taddress: " + restaurant.getPhysicalAddress()
+                    + "\n\t\tmost recent: " + strDate
+                    + "\n\t\thazard level: " + hazard;
+            adapter.add(info);
+        }
+
+
+        ArrayList<Restaurant> finalFavWithNewInspection = favWithNewInspection;
+        if (finalFavWithNewInspection.isEmpty()) {
+            builder.setMessage("No new inspection found for your favourite restaurants!")
+                    .setPositiveButton("OK", null);
+        } else {
+            builder.setTitle("New inspections found for your favourite restaurants:");
+        }
+        builder
+                .setAdapter(adapter, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = RestaurantDetails.makeIntent(MapsActivity.this,
+                                mRestaurantManager.getIndexFromTrackingNumber(finalFavWithNewInspection.get(which).getTrackingNumber().replaceAll("\"", "")));
+                        startActivity(intent);
+                    }
+                })
+                .show();
+
     }
 
 
@@ -1427,8 +1495,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mRestaurantManager = RestaurantManager.getInstance();
                 mRestaurantManager.setInspections(temp.getInspections());
                 mRestaurantManager.setRestaurants(temp.getRestaurants());
+                Log.e(TAG, "load: FavTrackingNumList " + temp.getFavTrackingNumList());
+                mRestaurantManager.setFavTrackingNumList(temp.getFavTrackingNumList());
+                mRestaurantManager.setFavMap(temp.getFavMap());
                 lastUpdatedTimeInMilliseconds = ois.readLong();
                 lastModifiedTimeInMilliseconds = ois.readLong();
+
+                mRestaurantManager.updateFavList();
 
                 loadedFromSave = true;
                 return true;
@@ -1446,7 +1519,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .setPositiveButton("Save and exit", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        //save();
+                        //mRestaurantManager.updateFavTrackingNumList();
+
+                        Log.e(TAG, "onBackPressed: " + mRestaurantManager.getFavTrackingNumList());
+
+                        mRestaurantManager.updateFavInspectionNumMap();
+                        save();
                         System.exit(0);
                     }
                 })
@@ -1462,21 +1540,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void myOnClick(View view) {
-        backFromRestaurantDetail = false;
+        backFrom = BackFrom.DEFAULT;
+
+        Log.e(TAG, "myOnClick: " + mRestaurantManager.getFavRestaurants());
+
         startActivity(RestaurantList.makeIntent(getApplicationContext(), lastUpdatedTimeInMilliseconds, lastModifiedTimeInMilliseconds));
     }
 
-    public static Intent makeIntent(Context context, double latitude, double longitude, String trackingNumber, boolean fromRestaurantDetail) {
+    public static Intent makeIntent(Context context, double latitude, double longitude, String trackingNumber, BackFrom where) {
         Intent intent = new Intent(context, MapsActivity.class);
         coordinateInRestaurantDetail = new LatLng(latitude, longitude);
-        backFromRestaurantDetail = fromRestaurantDetail;
+        backFrom = where;
         trackingNumberInRestaurantDetail = trackingNumber;
         return intent;
     }
 
-    public static Intent makeIntent(Context context, boolean fromRestaurantDetail) {
+    public static Intent makeIntent(Context context, BackFrom where) {
         Intent intent = new Intent(context, MapsActivity.class);
-        backFromRestaurantDetail = fromRestaurantDetail;
+        backFrom = where;
         return intent;
     }
 
