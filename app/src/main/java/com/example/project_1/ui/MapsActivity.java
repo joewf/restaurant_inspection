@@ -14,16 +14,21 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.view.LayoutInflater;
 import android.widget.Toast;
@@ -54,14 +59,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.maps.android.clustering.Cluster;
 import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
@@ -89,27 +90,30 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /**
  * MapsActivity class models the information about a MapsActivity activity.
  */
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, AdapterView.OnItemSelectedListener {
 
     private static final String FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     private static final int LOCATION_PERMISSION_REQUEST = 101;
     public static final float DEFAULT_ZOOM = 15f;
     private static final String COORDINATE = "coordinate";
+    public static final int GREEN = 1;
+    public static final int YELLOW = 2;
+    public static final int RED = 3;
 
     private GoogleMap mMap;
     private GoogleMapOptions mGoogleMapOptions;
     private ClusterManager<ClusterMarker> mClusterManager;
-    private Marker mMarker;
+    private ClusterMarker mMarker = null;
     private static final String TAG = "Map activity";
     private boolean mLocationPermissionGranted = false;
     private Location mCurrentLocation;
@@ -118,14 +122,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private RestaurantManager mRestaurantManager;
     private List<Restaurant> mRestaurantList;
     private List<Inspection> mCurrentRestaurantInspectionList;
-    private List<ClusterMarker> mClusterMarkersList = new ArrayList<>();
+    private List<ClusterMarker> mClusterMarkersList;
     private Restaurant mCurrentRestaurant;
+    private Inspection mCurrentInspection;
 
     private HazardRating hazardRating;
     private String restaurantName;
     private String snippet;
+    private String spinnerHazardText;
+    private int spinnerIssuesNum;
     private double latitude;
     private double longitude;
+
+    private EditText mSearchText;
+    private ImageView mGPS;
+    private Spinner mSpinnerHazard;
+    private Spinner mSpinnerIssues;
 
     ProgressDialog pDialog;
     private static boolean loadedFromSave = false;
@@ -145,14 +157,48 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+
         mRestaurantManager = RestaurantManager.getInstance();
+        createDropDownLists();
+        mSearchText = (EditText) findViewById(R.id.input_search);
+        mGPS = (ImageView) findViewById(R.id.ic_gps);
 
-        load();
+        //load();
         checkUpdateOfFraserHealthRestaurantInspectionReports();
-
-        //getLocationPermission();
+        initSearch();
 
     }
+
+    private void createDropDownLists() {
+
+        // Drop down list for hazard
+        mSpinnerHazard = findViewById(R.id.spinner_hazard);
+        ArrayAdapter<CharSequence> adapterHazard = ArrayAdapter.createFromResource(this, R.array.hazards,
+        android.R.layout.simple_spinner_item);
+        adapterHazard.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerHazard.setAdapter(adapterHazard);
+        mSpinnerHazard.setOnItemSelectedListener(this);
+
+        // Drop down list for issues
+        mSpinnerIssues = findViewById(R.id.spinner_issues);
+        ArrayAdapter<CharSequence> adapterIssues = ArrayAdapter.createFromResource(this, R.array.issues,
+                android.R.layout.simple_spinner_item);
+        adapterIssues.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerIssues.setAdapter(adapterIssues);
+        mSpinnerIssues.setOnItemSelectedListener(this);
+
+        // Reset search button
+        Button reset = (Button) findViewById(R.id.button_reset_markers);
+        reset.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addRestaurantMarker();
+                Toast.makeText(MapsActivity.this, "Search reset", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
 
     @Override
     protected void onStart() {
@@ -180,54 +226,52 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.e(TAG, "onRestart: ");
     }
 
+    private void initSearch() {
+        Log.d(TAG, "init: initiating search");
+
+        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionID, KeyEvent keyEvent) {
+                if(actionID == EditorInfo.IME_ACTION_SEARCH             // Search when clicking on search icon
+                || actionID == EditorInfo.IME_ACTION_DONE               // Search when clicking done
+                || keyEvent.getAction() == keyEvent.ACTION_DOWN         // Search when hiding keyboard
+                || keyEvent.getAction() == keyEvent.KEYCODE_ENTER){     // Search when pressing enter
+
+                    // Search restaurants based on name
+                    searchRestaurants();
+                }
+                return false;
+            }
+        });
+
+        hideKeyboard();
+    }
+
+
     private void addRestaurantMarker() {
 
+        // Clear markers when there are markers in the map
+        if(mClusterManager != null) {
+            mClusterManager.clearItems();
+            mClusterManager.cluster();
+        }
+
+        // Settings for cluster manager
         mClusterManager = new ClusterManager<ClusterMarker>(this, mMap);
         renderer = new CustomClusterRenderer(this, mMap, mClusterManager);
         mClusterManager.setRenderer(renderer);
-
-        // Cluster click listener
-        mClusterManager.setOnClusterClickListener(new ClusterManager.OnClusterClickListener<ClusterMarker>() {
-            @Override
-            public boolean onClusterClick(Cluster<ClusterMarker> cluster) {
-                Toast.makeText(MapsActivity.this, "Cluster item click",
-                        Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
-
-        // Cluster item
-        mClusterManager.setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<ClusterMarker>() {
-            @Override
-            public boolean onClusterItemClick(ClusterMarker item) {
-                Toast.makeText(MapsActivity.this, "Cluster item click",
-                        Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });
-
-
         mClusterManager.getMarkerCollection().setInfoWindowAdapter(new CustomInfoViewAdapter(LayoutInflater.from(this)));
-        mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterMarker>() {
-            @Override
-            public void onClusterItemInfoWindowClick(ClusterMarker item) {
-                Toast.makeText(MapsActivity.this, "Cluster item click",
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
-
         mMap.setOnCameraIdleListener(mClusterManager);
         mMap.setOnMarkerClickListener(mClusterManager);
         mMap.setInfoWindowAdapter(mClusterManager.getMarkerManager());
         mMap.setOnInfoWindowClickListener(mClusterManager);
 
-
         Log.d(TAG, "addRestaurantMarker: getting restaurant info");
 
         // Get restaurant lists
         mRestaurantList = mRestaurantManager.getRestaurants();
+        mClusterMarkersList = new ArrayList<>();
         LatLng currentRestaurantLatLng;
-        MarkerOptions options;
 
         // Add a marker for each restaurant on the list
         for (int i = 0; i < mRestaurantList.size(); i++) {
@@ -260,58 +304,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case LOW:
                         Log.d(TAG, "setting restaurant marker green");
                         // Set marker
-                        /*options = new MarkerOptions()
-                                .position(currentRestaurantLatLng)
-                                .title(restaurantName)
-                                .snippet(snippet)
-                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));*/
-                        //mMarker = mMap.addMarker(options);
-
-                        //mClusterMarkersList.add(new ClusterMarker(options));
-                        //mClusterManager.addItems(mClusterMarkersList);
-                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, 1);
+                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
+                                hazardRating, GREEN, mCurrentRestaurantInspectionList);
                         mClusterManager.addItem(clusterMarker);
+                        mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
                         break;
 
                     case MODERATE:
                         Log.d(TAG, "setting restaurant marker yellow");
                         // Set marker
-                        /*options = new MarkerOptions()
-                                .position(currentRestaurantLatLng)
-                                .title(restaurantName)
-                                .snippet(snippet)
-                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_yellow_24));*/
-                        //mMarker = mMap.addMarker(options);
-
-                        // Cluster the markers
-                        //mClusterMarkersList.add(new ClusterMarker(options));
-                        //mClusterManager.addItems(mClusterMarkersList);
-                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, 2);
+                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
+                                hazardRating, YELLOW, mCurrentRestaurantInspectionList);
                         mClusterManager.addItem(clusterMarker);
+                        mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
                         break;
 
                     case HIGH:
                         Log.d(TAG, "setting restaurant marker red");
                         // Set marker
-                        /*options = new MarkerOptions()
-                                .position(currentRestaurantLatLng)
-                                .title(restaurantName)
-                                .snippet(snippet)
-                                .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_red_24));*/
-                        //mMarker = mMap.addMarker(options);
-
-                        //mClusterMarkersList.add(new ClusterMarker(options));
-                        //mClusterManager.addItems(mClusterMarkersList);
-                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, 3);
+                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
+                                hazardRating, RED, mCurrentRestaurantInspectionList);
                         mClusterManager.addItem(clusterMarker);
+                        mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
                         break;
                 }
-                // Get restaurant full info after clicking the info window
-//                startFullRestaurantInfo(mRestaurantList.indexOf(mCurrentRestaurant));
-
 
             } else {
                 // Current restaurant inspection list is empty
@@ -327,17 +346,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         + "Hazard level: " + hazardRating;
 
                 Log.d(TAG, "setting restaurant marker green");
-                /*options = new MarkerOptions()
-                        .position(currentRestaurantLatLng)
-                        .title(restaurantName)
-                        .snippet(snippet)
-                        .icon(BitmapDescriptorFromVector(getApplicationContext(), R.drawable.ic_map_green_24));*/
-                //mMarker = mMap.addMarker(options);
-
-                //mClusterMarkersList.add(new ClusterMarker(options));
-                //mClusterManager.addItems(mClusterMarkersList);
-                clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, 1);
+                clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
+                        hazardRating, GREEN, mCurrentRestaurantInspectionList);
                 mClusterManager.addItem(clusterMarker);
+                mClusterMarkersList.add(clusterMarker);
                 mClusterManager.cluster();
             }
 
@@ -371,6 +383,186 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+
+
+    private void searchRestaurants() {
+        Log.d(TAG, "searchRestaurants: searching restaurants");
+
+        // Get the name from search
+        String searchString = mSearchText.getText().toString().toLowerCase();
+
+        // Get hazard and Critical issues from drop down list
+        getHazardFromDropDownList();
+        getIssuesFromDropDownList();
+
+        // Date format
+        Date inspectionDate;
+        Date currentDate = new Date();                      // Current date
+        Log.d(TAG, "Current Date: " + currentDate);
+
+        // If there are markers, delete them
+        if(mClusterManager != null) {
+            mClusterManager.clearItems();
+            mClusterManager.cluster();
+        }
+
+        for(int i = 0; i < mClusterMarkersList.size(); i ++) {
+
+            // Get current marker
+            mMarker = mClusterMarkersList.get(i);
+
+            // List of inspections of the restaurant
+            List<Inspection> currentMarkerInspectionsList = mMarker.getInspectionList();    // Initiate marker inspection list
+            int currentMarkerInspectionListSize = currentMarkerInspectionsList.size();      // Inspection list size
+            int numCritical = 0;
+            Log.d(TAG, "Setting critical to ZERO: " + numCritical);
+
+            // Compare search with marker's name
+            if(mMarker.getTitle().toLowerCase().contains(searchString)) {
+
+                // No hazard check search
+                if (hazardRating.equals(HazardRating.NONE)) {
+                    Log.d(TAG, "No hazard check");
+
+                    /*
+                     Loop through all the inspections of the marker to check
+                     the total number of issues
+                     */
+
+                    // Check for empty inspection lists
+                    if(currentMarkerInspectionListSize != 0) {
+                        for(int j = 0; j < currentMarkerInspectionListSize; j++) {
+
+                            // Get current inspection date
+                            mCurrentInspection = currentMarkerInspectionsList.get(j);
+                            Log.d(TAG, "Current inspection: " + mCurrentInspection);
+
+                            inspectionDate = mCurrentInspection.getDate();
+                            Log.d(TAG, "Inspection date: " + inspectionDate);
+
+                            // Calculate the inspection time for less than one year
+                            long diffInMilliSe = Math.abs(currentDate.getTime() - inspectionDate.getTime());
+                            long diff = TimeUnit.DAYS.convert(diffInMilliSe, TimeUnit.MILLISECONDS);
+                            Log.d(TAG, "DAYS: " + diff);
+
+                            // Inspection date is less than 1 year
+                            if(diff < 365) {
+                                numCritical += mCurrentInspection.getNumCritical();
+                                Log.d(TAG, "CRITICAL: " + numCritical);
+                            }
+                        }
+                    }
+
+                    // Add the marker if it's less than the number of critical issues
+                    if(numCritical <= spinnerIssuesNum)  {
+
+                        // Check at least the latest inspection is less than 1 year
+                        Date lastInspectionDate = currentMarkerInspectionsList.get(0).getDate();
+                        if (lastInspectionDate != null) {
+                            long diffInMilliSeLastInspection = Math.abs(currentDate.getTime() - lastInspectionDate.getTime());
+                            long diff = TimeUnit.DAYS.convert(diffInMilliSeLastInspection, TimeUnit.MILLISECONDS);
+                            Log.d(TAG, "DAYS: " + diff);
+
+                            if (diff < 365) {
+                                Log.d(TAG, "NUMBER OF CRITICAL: " + numCritical);
+                                Log.d(TAG, "Adding marker to the map: " + mMarker.getTitle());
+                                mClusterManager.addItem(mMarker);
+                                mClusterManager.cluster();
+                            }
+                        }
+                    }
+
+                }
+
+                // Check hazard search
+                if(hazardRating.equals(mMarker.getHazard())) {
+
+                    Log.d(TAG, "Hazard check");
+                    // Check for empty inspection lists
+                    if(currentMarkerInspectionListSize != 0) {
+                        for(int j = 0; j < currentMarkerInspectionListSize; j++) {
+
+                            // Get current inspection date
+                            mCurrentInspection = currentMarkerInspectionsList.get(j);
+                            Log.d(TAG, "Current inspection: " + mCurrentInspection);
+
+                            inspectionDate = mCurrentInspection.getDate();
+                            Log.d(TAG, "Inspection date: " + inspectionDate);
+
+                            // Calculate the inspection time for less than one year
+                            long diffInMilliSe = Math.abs(currentDate.getTime() - inspectionDate.getTime());
+                            long diff = TimeUnit.DAYS.convert(diffInMilliSe, TimeUnit.MILLISECONDS);
+                            Log.d(TAG, "DAYS: " + diff);
+
+                            // Inspection date is less than 1 year
+                            if(diff < 365) {
+                                numCritical += mCurrentInspection.getNumCritical();
+                                Log.d(TAG, "CRITICAL: " + numCritical);
+                            }
+                        }
+                    }
+
+                    // Add the marker if it's less than the number of critical issues
+                    if(numCritical <= spinnerIssuesNum)  {
+
+                        // Check at least the latest inspection is less than 1 year
+                        Date lastInspectionDate = currentMarkerInspectionsList.get(0).getDate();
+                        if (lastInspectionDate != null) {
+                            long diffInMilliSeLastInspection = Math.abs(currentDate.getTime() - lastInspectionDate.getTime());
+                            long diff = TimeUnit.DAYS.convert(diffInMilliSeLastInspection, TimeUnit.MILLISECONDS);
+                            Log.d(TAG, "DAYS: " + diff);
+
+                            if (diff < 365) {
+                                Log.d(TAG, "NUMBER OF CRITICAL: " + numCritical);
+                                Log.d(TAG, "Adding marker to the map: " + mMarker.getTitle());
+                                mClusterManager.addItem(mMarker);
+                                mClusterManager.cluster();
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
+
+        hideKeyboard();
+
+    }
+
+    private void getIssuesFromDropDownList() {
+
+        // Get user's number
+        spinnerIssuesNum = Integer.parseInt( mSpinnerIssues.getSelectedItem().toString() );
+        Log.d(TAG, "getIssuesFromDropDownList: " + spinnerIssuesNum);
+
+    }
+
+    private void getHazardFromDropDownList() {
+
+        // Get hazard level from drop down list
+        spinnerHazardText = mSpinnerHazard.getSelectedItem().toString().toUpperCase();
+        Log.d(TAG, "LEVEL: " + spinnerHazardText);
+        switch(spinnerHazardText) {
+            case "NONE":
+                hazardRating = HazardRating.NONE;
+                break;
+            case "LOW":
+                hazardRating = HazardRating.LOW;
+                break;
+            case "MODERATE":
+                hazardRating = HazardRating.MODERATE;
+                break;
+            case "HIGH":
+                hazardRating = HazardRating.HIGH;
+                break;
+        }
+        Log.d(TAG, "Hazard rating: " + hazardRating);
+    }
+
+    // Hide keyboard after search
+    private void hideKeyboard() { this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN); }
+
     private void setCallbackToStartFullRestaurantInfo() {
 
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
@@ -398,18 +590,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    public BitmapDescriptor BitmapDescriptorFromVector(Context context, int vectorResID) {
-
-        // source: https://www.youtube.com/watch?v=26bl4r3VtGQ&t=355s
-
-        Drawable vectorDrawable = ContextCompat.getDrawable(context, vectorResID);
-        vectorDrawable.setBounds(0, 0, vectorDrawable.getIntrinsicWidth(), vectorDrawable.getIntrinsicHeight());
-        Bitmap bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
-                vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmap);
-        vectorDrawable.draw(canvas);
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
-    }
 
     private void getLocationPermission() {
         Log.d(TAG, "Getting permission location");
@@ -464,6 +644,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .replace(R.id.map, mapFragment);
         ft.commit();
         mapFragment.getMapAsync(MapsActivity.this);
+
+        mGPS.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "clicked GPS icon");
+                getDeviceLocation();
+            }
+        });
     }
 
     private void getDeviceLocation() {
@@ -502,6 +690,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 + " long " + latLng.longitude);
         // Update map current location
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+        hideKeyboard();
     }
 
     @Override
@@ -1276,4 +1465,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         backFromRestaurantDetail = fromRestaurantDetail;
         return intent;
     }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
+
+        
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
+
 }

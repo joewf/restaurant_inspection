@@ -13,6 +13,75 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.MapsActivity" />
+    
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:elevation="10dp"
+        android:background="@drawable/white_border"
+        android:id="@+id/searchLayout">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:id="@+id/ic_magnify"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/ic_magnify"/>
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@id/ic_magnify"
+            android:layout_centerVertical="true"
+            android:textSize="15dp"
+            android:textColor="#000"
+            android:id="@+id/input_search"
+            android:background="@null"
+            android:hint="Enter Restaurant Name"
+            android:imeOptions="actionSearch"/>
+
+
+    </RelativeLayout>
+    
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_below="@+id/searchLayout"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:scaleType="centerCrop"
+        android:id="@+id/ic_gps"
+        android:src="@drawable/ic_gps"/>
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:background="@drawable/white_border"
+        android:id="@+id/spinner_hazard"
+        android:layout_below="@id/searchLayout"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"/>
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:background="@drawable/white_border"
+        android:id="@+id/spinner_issues"
+        android:layout_below="@id/searchLayout"
+        android:layout_toRightOf="@+id/spinner_hazard"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"/>
+
+
+        
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/floatingActionButton"
@@ -26,6 +95,17 @@
         android:focusable="true"
         android:onClick="myOnClick"
         app:srcCompat="@drawable/ic_baseline_list_24" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/ic_gps"
+        android:text="@string/reset_button"
+        android:id="@+id/button_reset_markers"
+        android:layout_below="@+id/searchLayout"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/white_border"
+        android:layout_marginRight="10dp"/>
 
     <!--<Switch
         android:id="@+id/switch2"
