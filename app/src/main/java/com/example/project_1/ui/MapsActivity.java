@@ -94,6 +94,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 /**
  * MapsActivity class models the information about a MapsActivity activity.
@@ -303,7 +304,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case LOW:
                         Log.d(TAG, "setting restaurant marker green");
                         // Set marker
-                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, hazardRating, GREEN);
+                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
+                                hazardRating, GREEN, mCurrentRestaurantInspectionList);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
@@ -312,7 +314,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case MODERATE:
                         Log.d(TAG, "setting restaurant marker yellow");
                         // Set marker
-                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, hazardRating, YELLOW);
+                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
+                                hazardRating, YELLOW, mCurrentRestaurantInspectionList);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
@@ -321,7 +324,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     case HIGH:
                         Log.d(TAG, "setting restaurant marker red");
                         // Set marker
-                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, hazardRating, RED);
+                        clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
+                                hazardRating, RED, mCurrentRestaurantInspectionList);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
@@ -342,7 +346,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         + "Hazard level: " + hazardRating;
 
                 Log.d(TAG, "setting restaurant marker green");
-                clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng, hazardRating, GREEN);
+                clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
+                        hazardRating, GREEN, mCurrentRestaurantInspectionList);
                 mClusterManager.addItem(clusterMarker);
                 mClusterMarkersList.add(clusterMarker);
                 mClusterManager.cluster();
@@ -384,10 +389,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, "searchRestaurants: searching restaurants");
 
         // Get the name from search
-        String searchString = mSearchText.getText().toString().replaceAll(" ", "").toLowerCase();
+        String searchString = mSearchText.getText().toString().toLowerCase();
 
         // Get hazard from drop down list
         getHazardFromDropDownList();
+        getIssuesFromDropDownList();
+
+        // Date format
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
+        Date inspectionDate;
+        Date currentDate = new Date();                      // Current date
+        simpleDateFormat.format(currentDate);               // Format current date
+        Log.d(TAG, "Current Date: " + currentDate);
 
         // If there are markers, delete them
         if(mClusterManager != null) {
@@ -395,9 +408,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mClusterManager.cluster();
         }
 
-
         for(int i = 0; i < mClusterMarkersList.size(); i ++) {
-            mMarker = mClusterMarkersList.get(i);     // Get current marker
+
+            // Get current marker
+            mMarker = mClusterMarkersList.get(i);
+
+            // List of inspections of the restaurant
+            List<Inspection> currentMarkerInspectionsList = mMarker.getInspectionList();
+            int inspectionListSize = currentMarkerInspectionsList.size();
+            int numCritical = 0;
 
             Log.d(TAG, " title: " + mMarker.getTitle());
             Log.d(TAG, " lowercase title: " + mMarker.getTitle().toLowerCase());
@@ -408,12 +427,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // No hazard check
                 if (hazardRating.equals(HazardRating.NONE)) {
                     Log.d(TAG, "No hazard check");
+
+                    for(int j = 0; j < inspectionListSize; j++) {
+
+                        inspectionDate = currentMarkerInspectionsList.get(j).getDate();
+
+                        // Calculate the inspection time
+                        long diffInMilliSe = Math.abs(currentDate.getTime() - inspectionDate.getTime());
+                        long diff = TimeUnit.DAYS.convert(diffInMilliSe, TimeUnit.MILLISECONDS);
+
+                    }
+
                     mClusterManager.addItem(mMarker);
                     mClusterManager.cluster();
                 }
                 // Check hazard
                 if(hazardRating.equals(mMarker.getHazard())) {
                     Log.d(TAG, "Checking hazard: " + mMarker.getHazard() );
+
+
+
                     mClusterManager.addItem(mMarker);
                     mClusterManager.cluster();
                 }
@@ -423,6 +456,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         hideKeyboard();
+
+    }
+
+    private void getIssuesFromDropDownList() {
+
+        // Get user's number
+        spinnerIssuesInt = Integer.parseInt( mSpinnerIssues.getSelectedItem().toString() );
 
     }
 
@@ -449,9 +489,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     // Hide keyboard after search
-    private void hideKeyboard() {
-        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
-    }
+    private void hideKeyboard() { this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN); }
 
     private void setCallbackToStartFullRestaurantInfo() {
 
@@ -1359,21 +1397,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
 
-        String text = parent.getItemAtPosition(position).toString();
-
-        /*if(text.equals("LOW")) {
-            hazardRating = HazardRating.LOW;
-        }
-        else if(text.equals("MODERATE")) {
-            hazardRating = HazardRating.MODERATE;
-        }
-        else {
-            hazardRating = HazardRating.HIGH;
-        }
-
-        searchRestaurants(hazardRating);*/
-
-        Toast.makeText(parent.getContext(), text, Toast.LENGTH_SHORT).show();
         
     }
 

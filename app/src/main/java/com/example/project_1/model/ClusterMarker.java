@@ -9,6 +9,8 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterItem;
 
+import java.util.List;
+
 /**
  * ClusterMarker class models the information about a ClusterMarker.
  */
@@ -19,6 +21,7 @@ public class ClusterMarker implements ClusterItem {
     private String snippet;
     private int icon;
     private HazardRating hazardRating;
+    private List<Inspection> inspectionList;
 
     public ClusterMarker(String title, String snippet, LatLng position, HazardRating hazardRating) {
 
@@ -28,14 +31,17 @@ public class ClusterMarker implements ClusterItem {
         setHazardRating(hazardRating);
     }
 
-    public ClusterMarker(String title, String snippet, LatLng position, HazardRating hazardRating, int icon) {
+    public ClusterMarker(String title, String snippet, LatLng position, HazardRating hazardRating,
+                         int icon, List<Inspection> inspectionList) {
 
         this.position = position;
         this.title = title;
         this.snippet = snippet;
         this.hazardRating = hazardRating;
         this.icon = icon;
+        this.inspectionList = inspectionList;
     }
+
 
     public ClusterMarker() {
 
@@ -91,5 +97,17 @@ public class ClusterMarker implements ClusterItem {
         }else{
             this.hazardRating = hazardRating.HIGH;
         }
+    }
+
+    public HazardRating getHazardRating() {
+        return hazardRating;
+    }
+
+    public List<Inspection> getInspectionList() {
+        return inspectionList;
+    }
+
+    public void setInspectionList(List<Inspection> inspectionList) {
+        this.inspectionList = inspectionList;
     }
 }
