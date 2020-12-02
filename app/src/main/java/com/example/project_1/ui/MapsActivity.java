@@ -158,12 +158,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        load();
+        //load();
 
         mRestaurantManager = RestaurantManager.getInstance();
         favInspectionNumMap = new HashMap<>(mRestaurantManager.getFavMap());
 
-        createSpinners();
+        createDropDownLists();
         mSearchText = (EditText) findViewById(R.id.input_search);
         mGPS = (ImageView) findViewById(R.id.ic_gps);
 
