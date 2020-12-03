@@ -81,5 +81,6 @@
     <string name="reset_button">重置蒐索</string>
     <string name="no_inspection_found_fav_restaurants">在您最喜愛的飯店中沒有找到新的衛生檢查數據</string>
     <string name="ok">好</string>
+    <string name="search_reset">蒐索重置！</string>
 
 </resources>

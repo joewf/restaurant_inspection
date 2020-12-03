@@ -10,19 +10,18 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -133,6 +132,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private int spinnerIssuesNum;
     private double latitude;
     private double longitude;
+    private boolean favoriteToggled = false;
 
     private EditText mSearchText;
     private ImageView mGPS;
@@ -152,6 +152,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     HashMap<String, ClusterMarker> markerMap = new HashMap<>();
     private CustomClusterRenderer renderer;
     private HashMap<String, Integer> favInspectionNumMap = new HashMap<>();
+    private boolean spinnerInitialized = false;
+    public static String searchStringFromMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,7 +161,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        //load();
+        load();
 
         mRestaurantManager = RestaurantManager.getInstance();
         favInspectionNumMap = new HashMap<>(mRestaurantManager.getFavMap());
@@ -181,7 +183,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 android.R.layout.simple_spinner_item);
         adapterHazard.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerHazard.setAdapter(adapterHazard);
-        mSpinnerHazard.setOnItemSelectedListener(this);
+        mSpinnerHazard.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (spinnerInitialized)
+                    searchRestaurants();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         // Drop down list for issues
         mSpinnerIssues = findViewById(R.id.spinner_issues);
@@ -189,7 +202,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 android.R.layout.simple_spinner_item);
         adapterIssues.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerIssues.setAdapter(adapterIssues);
-        mSpinnerIssues.setOnItemSelectedListener(this);
+        mSpinnerIssues.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (spinnerInitialized)
+                    searchRestaurants();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         // Drop down list for favorite
         mSpinnerFavorite = findViewById(R.id.spinner_favorite);
@@ -197,7 +221,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 android.R.layout.simple_spinner_item);
         adapterFavorite.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerFavorite.setAdapter(adapterFavorite);
-        mSpinnerFavorite.setOnItemSelectedListener(this);
+
+        mSpinnerFavorite.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (spinnerInitialized)
+                    searchRestaurants();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         // Reset search button
         Button reset = (Button) findViewById(R.id.button_reset_markers);
@@ -205,7 +241,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 addRestaurantMarker();
-                Toast.makeText(MapsActivity.this, "Search reset", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity.this, R.string.search_reset, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -222,6 +258,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onResume() {
         super.onResume();
 
+        if (spinnerInitialized) {
+            searchStringFromMap = RestaurantList.searchStringFromList;
+            mSearchText.setText(searchStringFromMap);
+        }
 //        if (backFrom == BackFrom.RestaurantList) {
 //            showNewInspectionOnFav();
 //        }
@@ -244,7 +284,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void initSearch() {
         Log.d(TAG, "init: initiating search");
 
-        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mSearchText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                //addRestaurantMarker();
+                searchRestaurants();
+            }
+        });
+
+        /*mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionID, KeyEvent keyEvent) {
                 if(actionID == EditorInfo.IME_ACTION_SEARCH             // Search when clicking on search icon
@@ -257,7 +315,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 return false;
             }
-        });
+        });*/
 
         hideKeyboard();
     }
@@ -418,11 +476,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, "searchRestaurants: searching restaurants");
 
         // Get the name from search
-        String searchString = mSearchText.getText().toString().toLowerCase();
+        searchStringFromMap = mSearchText.getText().toString().toLowerCase().replaceAll("\n", "");
 
         // Get hazard and Critical issues from drop down list
         getHazardFromDropDownList();
         getIssuesFromDropDownList();
+        getFavoriteFromDropDownList();
 
         // Date format
         Date inspectionDate;
@@ -437,7 +496,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         mRestaurantManager.emptyMarkerRestaurants();        // Remove all restaurants for marker
 
-        for(int i = 0; i < mClusterMarkersList.size(); i ++) {
+
+        for (int i = 0; i < mClusterMarkersList.size(); i++) {
 
             // Get current marker
             mMarker = mClusterMarkersList.get(i);
@@ -448,8 +508,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             int numCritical = 0;
             Log.d(TAG, "Setting critical to ZERO: " + numCritical);
 
+            Restaurant currentRestaurant = mMarker.getRestaurant();
+
+            // Check favorite filter
+            boolean favoriteFilterPassed = true;
+            if (!currentRestaurant.isFavorite() && favoriteToggled) {
+                favoriteFilterPassed = false;
+            }
+
             // Compare search with marker's name
-            if(mMarker.getTitle().toLowerCase().contains(searchString)) {
+            if (mMarker.getTitle().toLowerCase().contains(searchStringFromMap)
+                    && favoriteFilterPassed) {
 
                 // No hazard check search
                 if (hazardRating.equals(HazardRating.NONE)) {
@@ -462,8 +531,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                      */
 
                     // Add issues for non empty inspection lists
-                    if(currentMarkerInspectionListSize != 0) {
-                        for(int j = 0; j < currentMarkerInspectionListSize; j++) {
+                    if (currentMarkerInspectionListSize != 0) {
+                        for (int j = 0; j < currentMarkerInspectionListSize; j++) {
 
                             // Get current inspection date
                             mCurrentInspection = currentMarkerInspectionsList.get(j);
@@ -478,7 +547,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Log.d(TAG, "DAYS: " + diff);
 
                             // Inspection date is less than 1 year
-                            if(diff < 365) {
+                            if (diff < 365) {
                                 numCritical += mCurrentInspection.getNumCritical();
                                 Log.d(TAG, "CRITICAL: " + numCritical);
                             }
@@ -486,10 +555,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
 
                     // Add the marker if it's less than the number of critical issues
-                    if(numCritical <= spinnerIssuesNum)  {
+                    if (spinnerIssuesNum == 888888) {
+                        mClusterManager.addItem(mMarker);
+                        mClusterManager.cluster();
+                        mRestaurantManager.addMarkerRestaurant(currentRestaurant);
+                    } else if (numCritical <= spinnerIssuesNum) {
 
                         // Check at least the latest inspection is less than 1 year
-                        if(currentMarkerInspectionListSize != 0) {
+                        if (currentMarkerInspectionListSize != 0) {
                             Date lastInspectionDate = currentMarkerInspectionsList.get(0).getDate();
                             if (lastInspectionDate != null) {
                                 long diffInMilliSeLastInspection = Math.abs(currentDate.getTime() - lastInspectionDate.getTime());
@@ -501,7 +574,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     Log.d(TAG, "Adding marker to the map: " + mMarker.getTitle());
                                     mClusterManager.addItem(mMarker);
                                     mClusterManager.cluster();
-                                    mRestaurantManager.addMarkerRestaurant(mMarker.getRestaurant());
+                                    mRestaurantManager.addMarkerRestaurant(currentRestaurant);
                                 }
 
                             }
@@ -514,13 +587,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
                 // Check hazard search
-                if(hazardRating.equals(mMarker.getHazard())) {
+                if (hazardRating.equals(mMarker.getHazard())) {
 
                     Log.d(TAG, "Hazard check");
 
                     // Add issues for non empty inspection lists
-                    if(currentMarkerInspectionListSize != 0) {
-                        for(int j = 0; j < currentMarkerInspectionListSize; j++) {
+                    if (currentMarkerInspectionListSize != 0) {
+                        for (int j = 0; j < currentMarkerInspectionListSize; j++) {
 
                             // Get current inspection date
                             mCurrentInspection = currentMarkerInspectionsList.get(j);
@@ -535,7 +608,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             Log.d(TAG, "DAYS: " + diff);
 
                             // Inspection date is less than 1 year
-                            if(diff < 365) {
+                            if (diff < 365) {
                                 numCritical += mCurrentInspection.getNumCritical();
                                 Log.d(TAG, "CRITICAL: " + numCritical);
                             }
@@ -543,10 +616,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
 
                     // Add the marker if it's less than the number of critical issues
-                    if(numCritical <= spinnerIssuesNum)  {
+                    if (spinnerIssuesNum == 888888) {
+                        mClusterManager.addItem(mMarker);
+                        mClusterManager.cluster();
+                        mRestaurantManager.addMarkerRestaurant(currentRestaurant);
+                    } else if (numCritical <= spinnerIssuesNum) {
 
                         // Check at least the latest inspection is less than 1 year
-                        if(currentMarkerInspectionListSize != 0) {
+                        if (currentMarkerInspectionListSize != 0) {
                             Date lastInspectionDate = currentMarkerInspectionsList.get(0).getDate();
 
                             if (lastInspectionDate != null) {
@@ -559,7 +636,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     Log.d(TAG, "Adding marker to the map: " + mMarker.getTitle());
                                     mClusterManager.addItem(mMarker);
                                     mClusterManager.cluster();
-                                    mRestaurantManager.addMarkerRestaurant(mMarker.getRestaurant());
+                                    mRestaurantManager.addMarkerRestaurant(currentRestaurant);
                                 }
 
                             }
@@ -579,10 +656,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     private void getIssuesFromDropDownList() {
+        Log.e(TAG, "getIssuesFromDropDownList: " + mSpinnerIssues.getSelectedItem().toString());
+
 
         // Get user's number
-        spinnerIssuesNum = Integer.parseInt( mSpinnerIssues.getSelectedItem().toString() );
-        Log.d(TAG, "getIssuesFromDropDownList: " + spinnerIssuesNum);
+        if (mSpinnerIssues.getSelectedItem().toString().equals("max CRIT-VIOs w/n last yr")) {
+            spinnerIssuesNum = 888888;
+        } else {
+            spinnerIssuesNum = Integer.parseInt(mSpinnerIssues.getSelectedItem().toString());
+        }
+
+        Log.e(TAG, "getIssuesFromDropDownList: " + spinnerIssuesNum);
+
+    }
+
+    private void getFavoriteFromDropDownList() {
+
+        favoriteToggled = mSpinnerFavorite.getSelectedItem().toString().equals("Fav Only") ?
+                (favoriteToggled = true) : (favoriteToggled = false);
+
+        //Toast.makeText(this, "" + favorite, Toast.LENGTH_SHORT).show();
+        Log.e(TAG, "getIssuesFromDropDownList: " + favoriteToggled);
 
     }
 
@@ -592,7 +686,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         spinnerHazardText = mSpinnerHazard.getSelectedItem().toString().toUpperCase();
         Log.d(TAG, "LEVEL: " + spinnerHazardText);
         switch (spinnerHazardText) {
-            case "NONE":
+            case "HAZARD LVL":
                 hazardRating = HazardRating.NONE;
                 break;
             case "LOW":
@@ -604,12 +698,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             case "HIGH":
                 hazardRating = HazardRating.HIGH;
                 break;
+            default:
+                assert false;
         }
-        Log.d(TAG, "Hazard rating: " + hazardRating);
+        Log.e(TAG, "Hazard rating: " + hazardRating);
     }
 
     // Hide keyboard after search
-    private void hideKeyboard() { this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN); }
+    private void hideKeyboard() {
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
 
     private void setCallbackToStartFullRestaurantInfo() {
 
@@ -760,6 +858,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             mMap.setMyLocationEnabled(true);
             addRestaurantMarker();
+
+            spinnerInitialized = true;
         }
     }
 
@@ -1099,7 +1199,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         ArrayList<Restaurant> favWithNewInspection = mRestaurantManager.getFavRestaurantWithNewInspection(favInspectionNumMap);
 
 //        if (loadedFromSave) {
-            //favWithNewInspection = mRestaurantManager.getFavRestaurants();
+        //favWithNewInspection = mRestaurantManager.getFavRestaurants();
 //        }
 
         Log.e(TAG, "showNewInspectionOnFav: fav " + mRestaurantManager.getFavRestaurants());
@@ -1595,7 +1695,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {
 
-        
+
     }
 
     @Override
