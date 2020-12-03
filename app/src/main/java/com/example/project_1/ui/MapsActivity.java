@@ -317,8 +317,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 hazardRating = mCurrentRestaurantInspectionList.get(0).getHazardRating();
                 Log.d(TAG, "Hazard rating: " + hazardRating);
 
-                snippet = "Address: " + mCurrentRestaurant.getPhysicalAddress() + "\n"
-                        + "Hazard level: " + hazardRating;
+                snippet = getString(R.string.address) + mCurrentRestaurant.getPhysicalAddress() + "\n"
+                        + getString(R.string.hazard_level_) + hazardRating;
 
                 switch (hazardRating) {
                     case LOW:

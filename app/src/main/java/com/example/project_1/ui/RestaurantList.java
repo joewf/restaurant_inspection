@@ -187,10 +187,10 @@ public class RestaurantList extends AppCompatActivity {
                 @Override
                 public void run() {
                     AlertDialog.Builder builder = new AlertDialog.Builder(RestaurantList.this);
-                    builder.setTitle("Last update is 20 hours ago");
-                    builder.setMessage("Do you want to download the update?");
+                    builder.setTitle(R.string.last_update);
+                    builder.setMessage(R.string.last_update);
 
-                    builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton(R.string.no, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();
@@ -214,7 +214,7 @@ public class RestaurantList extends AppCompatActivity {
                         }
                     });
 
-                    builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                    builder.setNegativeButton(R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();
@@ -267,10 +267,10 @@ public class RestaurantList extends AppCompatActivity {
     private void downloadUpdate(String restaurantsURL, String inspectionReportsURL) {
         // cannot save download file to res https://stackoverflow.com/questions/3374061/write-to-res-drawable-on-the-fly/3374149#3374149
         pDialog = new ProgressDialog(this);
-        pDialog.setMessage("Loading...");
+        pDialog.setMessage(getString(R.string.loading));
         //pDialog.setCancelable(false);
         final boolean[] cancelDownloading = {false};
-        pDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+        pDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -915,12 +915,12 @@ public class RestaurantList extends AppCompatActivity {
                 /*for (Inspection inspection : inspectionsForCurrentRestaurant)*/
                 {
                     criticalIssues = inspectionsForCurrentRestaurant.get(0).getNumCritical();
-                    restaurantCriticalIssues.setText("Critical issues: " + criticalIssues);
+                    restaurantCriticalIssues.setText(getString(R.string.crit_iss) + criticalIssues);
 
                     //break;
                 }
             } else {
-                restaurantCriticalIssues.setText("Critical issues: 0");
+                restaurantCriticalIssues.setText(R.string.crit_iss_0);
             }
 
             // Fill hazard icon and text
@@ -941,19 +941,19 @@ public class RestaurantList extends AppCompatActivity {
                     switch (hazard) {
                         case LOW:
                             RestaurantHazard.setImageResource(R.mipmap.green_hazard);
-                            txtRestaurantHazard.setText("" + hazard);
+                            txtRestaurantHazard.setText("" + getString(R.string.hazard_low));
                             txtRestaurantHazard.setTextColor(Color.GREEN);
                             break;
 
                         case MODERATE:
                             RestaurantHazard.setImageResource(R.mipmap.yellow_hazard);
-                            txtRestaurantHazard.setText("" + hazard);
+                            txtRestaurantHazard.setText("" + getString(R.string.hazard_moderate));
                             txtRestaurantHazard.setTextColor(Color.YELLOW);
                             break;
 
                         case HIGH:
                             RestaurantHazard.setImageResource(R.mipmap.red_hazard);
-                            txtRestaurantHazard.setText("" + hazard);
+                            txtRestaurantHazard.setText("" + getString(R.string.hazard_high));
                             txtRestaurantHazard.setTextColor(Color.RED);
                             break;
                     }
@@ -962,7 +962,7 @@ public class RestaurantList extends AppCompatActivity {
                 }
             } else {
                 RestaurantHazard.setImageResource(R.mipmap.green_hazard);
-                txtRestaurantHazard.setText("" + HazardRating.LOW);
+                txtRestaurantHazard.setText("" + getString(R.string.hazard_low));
                 txtRestaurantHazard.setTextColor(Color.GREEN);
             }
 
