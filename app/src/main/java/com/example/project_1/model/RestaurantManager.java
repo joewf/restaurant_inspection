@@ -86,6 +86,7 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
 
     public void removeFavRestaurant(Restaurant restaurant) {
         favRestaurants.remove(restaurant);
+        favTrackingNumList.remove(restaurant.getTrackingNumber().replaceAll("\"", ""));
     }
 
     public void addInspection(Inspection inspection) {
