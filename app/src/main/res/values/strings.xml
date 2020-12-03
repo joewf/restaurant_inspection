@@ -41,19 +41,25 @@
     <string name="restaurant_icon">restaurant icon</string>
     <string name="list_view">List View</string>
     <string name="map_view">Map View</string>
-    <string name="violation_description">Violation Description</string>
-    <string name="food">FOOD</string>
-    <string name="hazard_low">LOW</string>
-    <string name="hazard_moderate">MODERATE</string>
-    <string name="hazard_high">HIGH</string>
-    <string name="last_update">Last update is 20 hours ago</string>
-    <string name="download_update">Do you want to download the update?</string>
-    <string name="no">NO</string>
-    <string name="yes">YES</string>
-    <string name="loading">Loading...</string>
-    <string name="cancel">Cancel</string>
-    <string name="equipment">EQUIPMENT</string>
-    <string name="pest">PEST</string>
-    <string name="employee">EMPLOYEE</string>
-    <string name="permit">PERMIT</string>
+    <string name="reset_button">RESET\nSEARCH</string>
+
+    <string-array name="hazards">
+        <item>NONE</item>
+        <item>LOW</item>
+        <item>MODERATE</item>
+        <item>HIGH</item>
+    </string-array>
+
+    <string-array name="issues">
+        <item>0</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+    </string-array>
+
+    <string-array name="favorite">
+        <item>OFF</item>
+        <item>ON</item>
+    </string-array>
+
 </resources>
