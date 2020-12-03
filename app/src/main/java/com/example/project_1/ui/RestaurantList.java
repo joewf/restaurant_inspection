@@ -830,7 +830,7 @@ public class RestaurantList extends AppCompatActivity {
 
             // Find the restaurant to work with
             Restaurant currentRestaurant = restaurantManager.getRestaurantMarkerIndex(position);
-            List<Inspection> inspectionsForCurrentRestaurant = restaurantManager.getInspectionsForRestaurant(position);
+            List<Inspection> inspectionsForCurrentRestaurant = restaurantManager.getInspectionsForMarkerRestaurant(position);
 
             boolean isFav = restaurantManager.getFavTrackingNumList().contains(currentRestaurant.getTrackingNumber().replaceAll("\"",""));
             // Set Favorite

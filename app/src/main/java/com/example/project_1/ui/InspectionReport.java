@@ -1,10 +1,5 @@
 package com.example.project_1.ui;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -19,6 +14,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.project_1.R;
 import com.example.project_1.model.HazardRating;
 import com.example.project_1.model.Inspection;
 import com.example.project_1.model.InspectionType;
@@ -26,7 +27,6 @@ import com.example.project_1.model.RestaurantManager;
 import com.example.project_1.model.Violation;
 import com.example.project_1.model.ViolationNature;
 import com.example.project_1.model.ViolationSeverity;
-import com.example.project_1.R;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -58,7 +58,7 @@ public class InspectionReport extends AppCompatActivity {
         int inspectionIndex = intent.getIntExtra(INSPECTION_INDEX, -1);
 
         RestaurantManager manager = RestaurantManager.getInstance();
-        inspection = manager.getInspectionsForRestaurant(restaurantIndex).get(inspectionIndex);
+        inspection = manager.getInspectionsForMarkerRestaurant(restaurantIndex).get(inspectionIndex);
         Log.e("inspection", "onCreate: " + inspection);
 
         violationList = inspection.getViolations();

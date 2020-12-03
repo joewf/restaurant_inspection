@@ -122,6 +122,20 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
         return list;
     }
 
+
+    public ArrayList<Inspection> getInspectionsForMarkerRestaurant(int position) {
+        ArrayList<Inspection> list = new ArrayList<>();
+        Restaurant currentRestaurant = markerRestaurants.get(position);
+
+        for (Inspection inspection : inspections) {
+            if (currentRestaurant.getTrackingNumber().equals(inspection.getTrackingNumber())) {
+                list.add(inspection);
+            }
+        }
+
+        return list;
+    }
+
     public void sortRestaurantList() {
         Collections.sort(restaurants, new Comparator<Restaurant>() {
             @Override
