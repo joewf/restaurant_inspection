@@ -129,6 +129,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private String restaurantName;
     private String snippet;
     private String spinnerHazardText;
+    private String trackingNumber;
     private int spinnerIssuesNum;
     private double latitude;
     private double longitude;
@@ -284,6 +285,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             // Get current restaurant
             mCurrentRestaurant = mRestaurantList.get(i);
+            trackingNumber = mCurrentRestaurant.getTrackingNumber();
             // Get a list of inspections for the current restaurant
             mCurrentRestaurantInspectionList = mRestaurantManager.getInspectionsForRestaurant(i);
 
@@ -311,7 +313,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Log.d(TAG, "setting restaurant marker green");
                         // Set marker
                         clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
-                                hazardRating, GREEN, mCurrentRestaurantInspectionList, mCurrentRestaurant);
+                                hazardRating, GREEN, mCurrentRestaurantInspectionList, mCurrentRestaurant,
+                                trackingNumber);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
@@ -322,7 +325,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Log.d(TAG, "setting restaurant marker yellow");
                         // Set marker
                         clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
-                                hazardRating, YELLOW, mCurrentRestaurantInspectionList, mCurrentRestaurant);
+                                hazardRating, YELLOW, mCurrentRestaurantInspectionList, mCurrentRestaurant,
+                                trackingNumber);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
@@ -333,7 +337,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Log.d(TAG, "setting restaurant marker red");
                         // Set marker
                         clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
-                                hazardRating, RED, mCurrentRestaurantInspectionList, mCurrentRestaurant);
+                                hazardRating, RED, mCurrentRestaurantInspectionList, mCurrentRestaurant,
+                                trackingNumber);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
@@ -356,7 +361,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 Log.d(TAG, "setting restaurant marker green");
                 clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
-                        hazardRating, GREEN, mCurrentRestaurantInspectionList, mCurrentRestaurant);
+                        hazardRating, GREEN, mCurrentRestaurantInspectionList, mCurrentRestaurant,
+                        trackingNumber);
                 mClusterManager.addItem(clusterMarker);
                 mClusterMarkersList.add(clusterMarker);
                 mClusterManager.cluster();
@@ -371,9 +377,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<ClusterMarker>() {
             @Override
             public void onClusterItemInfoWindowClick(ClusterMarker item) {
+
+                List<Restaurant> list = mRestaurantManager.getMarkerRestaurants();
                 int index = -1;
-                for (int i = 0; i < mRestaurantList.size(); i++) {
-                    Restaurant current = mRestaurantList.get(i);
+                for (int i = 0; i < list.size(); i++) {
+                    Restaurant current = list.get(i);
                     if (markerMap.get(current.getTrackingNumber()).equals(item)) {
                         index = i;
                         break;
@@ -554,6 +562,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
         hideKeyboard();
+        Log.d(TAG, "MARKER RESTAURANT SIZE:" + mRestaurantManager.getMarkerRestaurants().size());
 
     }
 
@@ -595,9 +604,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
             @Override
             public void onInfoWindowClick(Marker marker) {
+
+                List<Restaurant> list = mRestaurantManager.getMarkerRestaurants();
                 int index = -1;
-                for (int i = 0; i < mRestaurantList.size(); i++) {
-                    Restaurant current = mRestaurantList.get(i);
+                for (int i = 0; i < list.size(); i++) {
+                    Restaurant current = list.get(i);
                     if (markerMap.get(current.getTrackingNumber()).equals(marker)) {
                         index = i;
                         break;
