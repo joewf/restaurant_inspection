@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">餐厅卫生检查</string>
+    <string name="address">地址：</string>
+    <string name="GPS">GPS 坐标：</string>
+    <string name="issues_found">发现的问题</string>
+    <string name="hazard_level">危险等级</string>
+    <string name="inspection_date">检查日期</string>
+    <string name="restaurant_name">餐厅名称</string>
+    <string name="restaurant_address">餐厅地址</string>
+    <string name="gps_coords">GPS 坐标</string>
+    <string name="textview">文字检视</string>
+    <string name="nature">种类：</string>
+    <string name="description_text">内容描述</string>
+    <string name="severity">严重程度：</string>
+    <string name="inspection_type">检查类型</string>
+    <string name="critical_issues_found">发现的危险问题数目</string>
+    <string name="non_critical_issues_found">发现的非危险问题数目</string>
+    <string name="hazard_level_">危险等级：</string>
+    <string name="gps">GPS 坐标：</string>
+    <string name="address_">地址：</string>
+    <string name="days_ago"> 天以前</string>
+    <string name="critical_iss">"危险问题数目： "</string>
+    <string name="non_critical_iss">非危险问题数目：</string>
+    <string name="no_inspection_found">没有找到卫生检查数据</string>
+    <string name="_days_ago"> 天以前</string>
+    <string name="_" />
+    <string name="crit_iss_0">危险问题数目：0</string>
+    <string name="crit_iss">危险问题数目：</string>
+    <string name="comma">， </string>
+    <string name="severity_">严重程度：</string>
+    <string name="crit">很危险</string>
+    <string name="non_crit">有一点危险</string>
+    <string name="nature_">种类：</string>
+    <string name="hazard_level__">严重程度：</string>
+    <string name="num_noncrit">非危险问题数目：</string>
+    <string name="num_crit">危险问题数目：</string>
+    <string name="ins_type">检查类型：</string>
+    <string name="rout">日常检查</string>
+    <string name="fu">跟踪检查</string>
+    <string name="title_activity_maps">地图</string>
+    <string name="restaurant_icon">饭店图标</string>
+    <string name="list_view">列表视图</string>
+    <string name="map_view">地图视图</string>
+    <string name="violation_description">违规细节</string>
+    <string name="food">食物</string>
+    <string name="hazard_low">低</string>
+    <string name="hazard_moderate">中</string>
+    <string name="hazard_high">高</string>
+    <string name="last_update">最后一次更新是在20个小时以前</string>
+    <string name="download_update">您想要下载更新文件吗？</string>
+    <string name="no">不要</string>
+    <string name="yes">要</string>
+    <string name="loading">下载中。。。</string>
+    <string name="cancel">取消</string>
+    <string name="equipment">设备</string>
+    <string name="pest">害虫</string>
+    <string name="employee">员工</string>
+    <string name="permit">许可</string>
+    <string name="enter_restaurant_name">输入餐厅名称</string>
+
+    <string-array name="hazards">
+        <item>无</item>
+        <item>低</item>
+        <item>中</item>
+        <item>高</item>
+    </string-array>
+
+    <string-array name="issues">
+        <item>零</item>
+        <item>五</item>
+        <item>十</item>
+        <item>十五</item>
+    </string-array>
+
+    <string-array name="favorite">
+        <item>关</item>
+        <item>开</item>
+    </string-array>
+
+    <string name="reset_button">重置搜索</string>
+    <string name="no_inspection_found_fav_restaurants">在您最喜爱的饭店中没有找到新的卫生检查数据</string>
+    <string name="ok">好</string>
+
+</resources>
