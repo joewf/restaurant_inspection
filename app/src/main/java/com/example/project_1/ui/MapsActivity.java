@@ -375,8 +375,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 hazardRating = mCurrentRestaurantInspectionList.get(0).getHazardRating();
                 Log.d(TAG, "Hazard rating: " + hazardRating);
 
-                snippet = "Address: " + mCurrentRestaurant.getPhysicalAddress() + "\n"
-                        + "Hazard level: " + hazardRating;
+                snippet = getString(R.string.address) + mCurrentRestaurant.getPhysicalAddress() + "\n"
+                        + getString(R.string.hazard_level_) + hazardRating;
 
                 switch (hazardRating) {
                     case LOW:
@@ -919,10 +919,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 @Override
                 public void run() {
                     AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
-                    builder.setTitle("Last update is 20 hours ago");
-                    builder.setMessage("Do you want to download the update?");
+                    builder.setTitle(R.string.last_update);
+                    builder.setMessage(R.string.download_update);
 
-                    builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
+                    builder.setPositiveButton(R.string.no, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();
@@ -951,7 +951,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
                     });
 
-                    builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                    builder.setNegativeButton(R.string.yes, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();
@@ -1006,10 +1006,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void downloadUpdate(String restaurantsURL, String inspectionReportsURL) {
         // cannot save download file to res https://stackoverflow.com/questions/3374061/write-to-res-drawable-on-the-fly/3374149#3374149
         pDialog = new ProgressDialog(this);
-        pDialog.setMessage("Loading...");
+        pDialog.setMessage(getString(R.string.loading));
         //pDialog.setCancelable(false);
         final boolean[] cancelDownloading = {false};
-        pDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
+        pDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
@@ -1231,8 +1231,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         ArrayList<Restaurant> finalFavWithNewInspection = favWithNewInspection;
         if (finalFavWithNewInspection.isEmpty()) {
-            builder.setMessage("No new inspection found for your favourite restaurants!")
-                    .setPositiveButton("OK", null);
+            builder.setMessage(R.string.no_inspection_found_fav_restaurants)
+                    .setPositiveButton(R.string.ok, null);
         } else {
             builder.setTitle("New inspections found for your favourite restaurants:");
         }

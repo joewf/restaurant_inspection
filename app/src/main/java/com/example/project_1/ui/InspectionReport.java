@@ -102,19 +102,19 @@ public class InspectionReport extends AppCompatActivity {
         switch (hazard) {
             case LOW:
                 ivHazard.setImageResource(R.mipmap.green_hazard);
-                tvHazard.setText(getString(R.string.hazard_level__) + hazard);
+                tvHazard.setText(getString(R.string.hazard_level__) + getString(R.string.hazard_low));
                 tvHazard.setTextColor(Color.GREEN);
                 break;
 
             case MODERATE:
                 ivHazard.setImageResource(R.mipmap.yellow_hazard);
-                tvHazard.setText(getString(R.string.hazard_level__) + hazard);
+                tvHazard.setText(getString(R.string.hazard_level__) + getString(R.string.hazard_moderate));
                 tvHazard.setTextColor(Color.YELLOW);
                 break;
 
             case HIGH:
                 ivHazard.setImageResource(R.mipmap.red_hazard);
-                tvHazard.setText(getString(R.string.hazard_level__) + hazard);
+                tvHazard.setText(getString(R.string.hazard_level__) + getString(R.string.hazard_high));
                 tvHazard.setTextColor(Color.RED);
                 break;
         }
@@ -132,7 +132,7 @@ public class InspectionReport extends AppCompatActivity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     Violation violation = violationList.get(position);
                     new AlertDialog.Builder(InspectionReport.this).setMessage(violation.getDescription())
-                            .setTitle("Violation Description")
+                            .setTitle(R.string.violation_description)
                             .show();
                 }
             });
@@ -203,7 +203,26 @@ public class InspectionReport extends AppCompatActivity {
 
                 // Fill nature text
                 TextView tvNature = itemView.findViewById(R.id.InspectionReport_listItem_text_nature);
-                tvNature.setText(getString(R.string.nature_) + violation.getNature());
+                // FOOD, EQUIPMENT, PEST, EMPLOYEE, PERMIT
+                String violation_nature = null;
+                switch (violation.getNature()) {
+                    case FOOD:
+                        violation_nature = getString(R.string.food);
+                        break;
+                    case EQUIPMENT:
+                        violation_nature = getString(R.string.equipment);
+                        break;
+                    case PEST:
+                        violation_nature = getString(R.string.pest);
+                        break;
+                    case EMPLOYEE:
+                        violation_nature = getString(R.string.employee);
+                        break;
+                    case PERMIT:
+                        violation_nature = getString(R.string.permit);
+                        break;
+                }
+                tvNature.setText(getString(R.string.nature_) + violation_nature);
 
                 // Fill severity text
                 TextView tvSeverity = itemView.findViewById(R.id.InspectionReport_listItem_text_severity);

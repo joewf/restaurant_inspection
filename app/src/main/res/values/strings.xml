@@ -62,5 +62,23 @@
         <item>All</item>
         <item>Fav Only</item>
     </string-array>
+    <string name="hazard_low">LOW</string>
+    <string name="violation_description">violation description</string>
+    <string name="food">FOOD</string>
+    <string name="hazard_moderate">MODERATE</string>
+    <string name="hazard_high">HIGH</string>
+    <string name="last_update">The last update is 20 hours ago</string>
+    <string name="download_update">Do you want to download the update?</string>
+    <string name="no">NO</string>
+    <string name="yes">YES</string>
+    <string name="loading">Loading...</string>
+    <string name="cancel">Cancel</string>
+    <string name="equipment">EQUIPMENT</string>
+    <string name="pest">PEST</string>
+    <string name="employee">EMPLOYEE</string>
+    <string name="permit">PERMIT</string>
+    <string name="enter_restaurant_name">Enter Restaurant Name</string>
+    <string name="no_inspection_found_fav_restaurants">No new inspections found for your favourite restaurants!</string>
+    <string name="ok">OK</string>
 
 </resources>
