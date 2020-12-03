@@ -57,4 +57,29 @@
     <string name="pest">害蟲</string>
     <string name="employee">員工</string>
     <string name="permit">許可</string>
+    <string name="enter_restaurant_name">輸入餐廳名稱</string>
+
+    <string-array name="hazards">
+        <item>無</item>
+        <item>低</item>
+        <item>中</item>
+        <item>高</item>
+    </string-array>
+
+    <string-array name="issues">
+        <item>零</item>
+        <item>五</item>
+        <item>十</item>
+        <item>十五</item>
+    </string-array>
+
+    <string-array name="favorite">
+        <item>關</item>
+        <item>開</item>
+    </string-array>
+
+    <string name="reset_button">重置蒐索</string>
+    <string name="no_inspection_found_fav_restaurants">在您最喜愛的飯店中沒有找到新的衛生檢查數據</string>
+    <string name="ok">好</string>
+
 </resources>

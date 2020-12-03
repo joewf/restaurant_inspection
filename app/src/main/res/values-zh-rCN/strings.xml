@@ -57,4 +57,29 @@
     <string name="pest">害虫</string>
     <string name="employee">员工</string>
     <string name="permit">许可</string>
+    <string name="enter_restaurant_name">输入餐厅名称</string>
+
+    <string-array name="hazards">
+        <item>无</item>
+        <item>低</item>
+        <item>中</item>
+        <item>高</item>
+    </string-array>
+
+    <string-array name="issues">
+        <item>零</item>
+        <item>五</item>
+        <item>十</item>
+        <item>十五</item>
+    </string-array>
+
+    <string-array name="favorite">
+        <item>关</item>
+        <item>开</item>
+    </string-array>
+
+    <string name="reset_button">重置搜索</string>
+    <string name="no_inspection_found_fav_restaurants">在您最喜爱的饭店中没有找到新的卫生检查数据</string>
+    <string name="ok">好</string>
+
 </resources>

@@ -188,7 +188,7 @@ public class RestaurantList extends AppCompatActivity {
                 public void run() {
                     AlertDialog.Builder builder = new AlertDialog.Builder(RestaurantList.this);
                     builder.setTitle(R.string.last_update);
-                    builder.setMessage(R.string.last_update);
+                    builder.setMessage(R.string.download_update);
 
                     builder.setPositiveButton(R.string.no, new DialogInterface.OnClickListener() {
                         @Override
@@ -1001,7 +1001,7 @@ public class RestaurantList extends AppCompatActivity {
                     //break;
                 }
             } else {
-                restaurantDate.setText("No inspections found");
+                restaurantDate.setText(R.string.no_inspection_found);
             }
 
             return itemView;

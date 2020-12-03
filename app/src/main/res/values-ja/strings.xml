@@ -47,7 +47,7 @@
     <string name="hazard_low">低い</string>
     <string name="hazard_moderate">にある</string>
     <string name="hazard_high">高さ</string>
-    <string name="last_update">最終更新は20時間前です。</string>
+    <string name="last_update">最終更新は20時間前です</string>
     <string name="download_update">更新ファイルをダウンロードしますか？</string>
     <string name="no">いいえ</string>
     <string name="yes">はい</string>
@@ -57,4 +57,29 @@
     <string name="pest">害虫</string>
     <string name="employee">従業員</string>
     <string name="permit">許可</string>
+    <string name="enter_restaurant_name">レストランの名前を入力してください</string>
+
+    <string-array name="hazards">
+        <item>無</item>
+        <item>低い</item>
+        <item>にある</item>
+        <item>高さ</item>
+    </string-array>
+
+    <string-array name="issues">
+        <item>零</item>
+        <item>五</item>
+        <item>十</item>
+        <item>十五</item>
+    </string-array>
+
+    <string-array name="favorite">
+        <item>オフ</item>
+        <item>開く</item>
+    </string-array>
+
+    <string name="reset_button">検索をリセット</string>
+    <string name="no_inspection_found_fav_restaurants">お気に入りのホテルでは、新しい衛生検査のデータが見つかりませんでした。</string>
+    <string name="ok">はい</string>
+
 </resources>
