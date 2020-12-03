@@ -80,6 +80,17 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"/>
 
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:background="@drawable/white_border"
+        android:id="@+id/spinner_favorite"
+        android:layout_below="@id/searchLayout"
+        android:layout_toRightOf="@+id/spinner_issues"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"/>
+
 
         
 
