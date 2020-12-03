@@ -138,6 +138,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private ImageView mGPS;
     private Spinner mSpinnerHazard;
     private Spinner mSpinnerIssues;
+    private Spinner mSpinnerFavorite;
 
     ProgressDialog pDialog;
     private static boolean loadedFromSave = false;
@@ -189,6 +190,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         adapterIssues.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpinnerIssues.setAdapter(adapterIssues);
         mSpinnerIssues.setOnItemSelectedListener(this);
+
+        // Drop down list for favorite
+        mSpinnerFavorite = findViewById(R.id.spinner_favorite);
+        ArrayAdapter<CharSequence> adapterFavorite = ArrayAdapter.createFromResource(this, R.array.favorite,
+                android.R.layout.simple_spinner_item);
+        adapterFavorite.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpinnerFavorite.setAdapter(adapterFavorite);
+        mSpinnerFavorite.setOnItemSelectedListener(this);
 
         // Reset search button
         Button reset = (Button) findViewById(R.id.button_reset_markers);
