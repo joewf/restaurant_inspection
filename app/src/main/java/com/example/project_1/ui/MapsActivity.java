@@ -241,7 +241,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public void onClick(View view) {
                 addRestaurantMarker();
-                Toast.makeText(MapsActivity.this, "Search reset", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MapsActivity.this, R.string.search_reset, Toast.LENGTH_SHORT).show();
             }
         });
 

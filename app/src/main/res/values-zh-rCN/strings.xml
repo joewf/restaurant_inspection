@@ -81,5 +81,6 @@
     <string name="reset_button">重置搜索</string>
     <string name="no_inspection_found_fav_restaurants">在您最喜爱的饭店中没有找到新的卫生检查数据</string>
     <string name="ok">好</string>
+    <string name="search_reset">搜索重置!</string>
 
 </resources>
