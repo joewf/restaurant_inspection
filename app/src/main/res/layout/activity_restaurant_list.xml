@@ -9,15 +9,15 @@
     android:orientation="vertical">
 
     <EditText
+        android:id="@+id/input_search_restaurant_list"
         android:layout_width="match_parent"
         android:layout_height="58dp"
-        android:textSize="15sp"
-        android:textColor="#000"
-        android:id="@+id/input_search_restaurant_list"
         android:background="@null"
-        android:hint="Enter Restaurant Name"
+        android:hint="@string/enter_restaurant_name"
         android:imeOptions="actionSearch"
-        android:padding="8dp"/>
+        android:padding="8dp"
+        android:textColor="#000"
+        android:textSize="15sp" />
 
     <ListView
         android:id="@+id/restaurantListView"

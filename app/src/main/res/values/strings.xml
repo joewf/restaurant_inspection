@@ -80,5 +80,6 @@
     <string name="enter_restaurant_name">Enter Restaurant Name</string>
     <string name="no_inspection_found_fav_restaurants">No new inspections found for your favourite restaurants!</string>
     <string name="ok">OK</string>
+    <string name="search_reset">Search Reset!</string>
 
 </resources>

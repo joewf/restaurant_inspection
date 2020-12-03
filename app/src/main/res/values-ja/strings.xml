@@ -81,5 +81,6 @@
     <string name="reset_button">検索をリセット</string>
     <string name="no_inspection_found_fav_restaurants">お気に入りのホテルでは、新しい衛生検査のデータが見つかりませんでした。</string>
     <string name="ok">はい</string>
+    <string name="search_reset">検索リセット！</string>
 
 </resources>
