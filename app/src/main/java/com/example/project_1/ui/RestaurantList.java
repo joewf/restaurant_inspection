@@ -1122,15 +1122,19 @@ public class RestaurantList extends AppCompatActivity {
         Log.d(TAG, "searchRestaurants: searching restaurants");
 
         // Get the name from search
-        searchStringFromList = mSearchText.getText().toString().toLowerCase().replaceAll("\n", "");
+        searchStringFromList = mSearchText.getText().toString().toLowerCase().replaceAll("\n", "").trim();
 
         List<Restaurant> allRestaurants = restaurantManager.getRestaurants();
 
         restaurantManager.emptyMarkerRestaurants();        // Remove all restaurants for marker
 
-        for (Restaurant current: allRestaurants) {
-            if (current.getName().toLowerCase().contains(searchStringFromList)) {
-                restaurantManager.addMarkerRestaurant(current);
+        /*if (searchStringFromList.isEmpty()) {
+            restaurantManager.setMarkerRestaurants(allRestaurants);
+        } else */{
+            for (Restaurant current : allRestaurants) {
+                if (current.getName().toLowerCase().contains(searchStringFromList)) {
+                    restaurantManager.addMarkerRestaurant(current);
+                }
             }
         }
 

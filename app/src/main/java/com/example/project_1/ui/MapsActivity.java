@@ -13,15 +13,18 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -154,6 +157,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private HashMap<String, Integer> favInspectionNumMap = new HashMap<>();
     private boolean spinnerInitialized = false;
     public static String searchStringFromMap;
+    private Button clearButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -236,11 +240,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         // Reset search button
-        Button reset = (Button) findViewById(R.id.button_reset_markers);
-        reset.setOnClickListener(new View.OnClickListener() {
+        clearButton = (Button) findViewById(R.id.button_reset_markers);
+        clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addRestaurantMarker();
+                mSearchText.setText("");
+                mSpinnerFavorite.setSelection(0);
+                mSpinnerHazard.setSelection(0);
+                mSpinnerIssues.setSelection(0);
                 Toast.makeText(MapsActivity.this, "Search reset", Toast.LENGTH_SHORT).show();
             }
         });
@@ -284,7 +292,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void initSearch() {
         Log.d(TAG, "init: initiating search");
 
-        mSearchText.addTextChangedListener(new TextWatcher() {
+        /*mSearchText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -300,9 +308,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //addRestaurantMarker();
                 searchRestaurants();
             }
-        });
+        });*/
 
-        /*mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionID, KeyEvent keyEvent) {
                 if(actionID == EditorInfo.IME_ACTION_SEARCH             // Search when clicking on search icon
@@ -315,7 +323,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
                 return false;
             }
-        });*/
+        });
 
         hideKeyboard();
     }
@@ -476,7 +484,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.d(TAG, "searchRestaurants: searching restaurants");
 
         // Get the name from search
-        searchStringFromMap = mSearchText.getText().toString().toLowerCase().replaceAll("\n", "");
+        searchStringFromMap = mSearchText.getText().toString().toLowerCase().replaceAll("\n", "").trim();
 
         // Get hazard and Critical issues from drop down list
         getHazardFromDropDownList();
@@ -512,12 +520,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
             // Check favorite filter
             boolean favoriteFilterPassed = true;
-            if (!currentRestaurant.isFavorite() && favoriteToggled) {
+            if (!mRestaurantManager.getFavRestaurants().contains(currentRestaurant) && favoriteToggled) {
                 favoriteFilterPassed = false;
             }
 
             // Compare search with marker's name
-            if (mMarker.getTitle().toLowerCase().contains(searchStringFromMap)
+            if (mMarker.getTitle().toLowerCase().trim().contains(searchStringFromMap)
                     && favoriteFilterPassed) {
 
                 // No hazard check search
