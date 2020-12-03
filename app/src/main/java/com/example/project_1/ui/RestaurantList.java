@@ -8,11 +8,15 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -103,6 +107,8 @@ public class RestaurantList extends AppCompatActivity {
 
     //RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
     int count;
+    public static String searchStringFromList;
+    private EditText mSearchText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +121,8 @@ public class RestaurantList extends AppCompatActivity {
         Log.e(TAG, "onCreate: " + lastUpdatedTimeInMilliseconds);
         ;
         restaurantManager = RestaurantManager.getInstance();
+
+        initSearch();
 
 //        load();
 //        checkUpdateOfFraserHealthRestaurantInspectionReports();
@@ -832,7 +840,7 @@ public class RestaurantList extends AppCompatActivity {
             Restaurant currentRestaurant = restaurantManager.getRestaurantMarkerIndex(position);
             List<Inspection> inspectionsForCurrentRestaurant = restaurantManager.getInspectionsForMarkerRestaurant(position);
 
-            boolean isFav = restaurantManager.getFavTrackingNumList().contains(currentRestaurant.getTrackingNumber().replaceAll("\"",""));
+            boolean isFav = restaurantManager.getFavTrackingNumList().contains(currentRestaurant.getTrackingNumber().replaceAll("\"", ""));
             // Set Favorite
             if (isFav) {
                 itemView.setBackgroundColor(Color.parseColor("#ffffcc"));
@@ -1063,5 +1071,76 @@ public class RestaurantList extends AppCompatActivity {
         super.onRestart();
 
         populateListView();
+    }
+
+    private void initSearch() {
+        Log.d(TAG, "init: initiating search");
+
+        searchStringFromList = MapsActivity.searchStringFromMap;
+
+        mSearchText = (EditText) findViewById(R.id.input_search_restaurant_list);
+
+        mSearchText.setText(searchStringFromList);
+
+        mSearchText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                //addRestaurantMarker();
+                searchRestaurants();
+            }
+        });
+
+        /*mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionID, KeyEvent keyEvent) {
+                if(actionID == EditorInfo.IME_ACTION_SEARCH             // Search when clicking on search icon
+                || actionID == EditorInfo.IME_ACTION_DONE               // Search when clicking done
+                || keyEvent.getAction() == keyEvent.ACTION_DOWN         // Search when hiding keyboard
+                || keyEvent.getAction() == keyEvent.KEYCODE_ENTER){     // Search when pressing enter
+
+                    // Search restaurants based on name
+                    searchRestaurants();
+                }
+                return false;
+            }
+        });*/
+
+        hideKeyboard();
+    }
+
+    private void searchRestaurants() {
+        Log.d(TAG, "searchRestaurants: searching restaurants");
+
+        // Get the name from search
+        searchStringFromList = mSearchText.getText().toString().toLowerCase().replaceAll("\n", "");
+
+        List<Restaurant> allRestaurants = restaurantManager.getRestaurants();
+
+        restaurantManager.emptyMarkerRestaurants();        // Remove all restaurants for marker
+
+        for (Restaurant current: allRestaurants) {
+            if (current.getName().toLowerCase().contains(searchStringFromList)) {
+                restaurantManager.addMarkerRestaurant(current);
+            }
+        }
+
+        populateListView();
+
+        hideKeyboard();
+    }
+
+    // Hide keyboard after search
+    private void hideKeyboard() {
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 }

@@ -44,13 +44,14 @@
     <string name="reset_button">RESET\nSEARCH</string>
 
     <string-array name="hazards">
-        <item>NONE</item>
+        <item>Hazard Lvl</item>
         <item>LOW</item>
         <item>MODERATE</item>
         <item>HIGH</item>
     </string-array>
 
     <string-array name="issues">
+        <item>max CRIT-VIOs w/n last yr</item>
         <item>0</item>
         <item>5</item>
         <item>10</item>
@@ -58,8 +59,8 @@
     </string-array>
 
     <string-array name="favorite">
-        <item>OFF</item>
-        <item>ON</item>
+        <item>All</item>
+        <item>Fav Only</item>
     </string-array>
 
 </resources>

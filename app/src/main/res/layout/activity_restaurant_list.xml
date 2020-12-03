@@ -5,14 +5,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="1dp"
-    tools:context=".ui.RestaurantList">
+    tools:context=".ui.RestaurantList"
+    android:orientation="vertical">
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:textSize="15sp"
+        android:textColor="#000"
+        android:id="@+id/input_search_restaurant_list"
+        android:background="@null"
+        android:hint="Enter Restaurant Name"
+        android:imeOptions="actionSearch"
+        android:padding="8dp"/>
 
     <ListView
         android:id="@+id/restaurantListView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
+        android:layout_height="wrap_content"
+
+        android:layout_below="@+id/input_search_restaurant_list"
         android:scrollbars="vertical" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
