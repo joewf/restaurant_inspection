@@ -262,6 +262,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mClusterManager.cluster();
         }
 
+        // Clear marker restaurants list
+        mRestaurantManager.emptyMarkerRestaurants();
+
 
         // Settings for cluster manager
         mClusterManager = new ClusterManager<ClusterMarker>(this, mMap);
