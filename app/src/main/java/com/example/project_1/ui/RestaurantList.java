@@ -1,18 +1,13 @@
 package com.example.project_1.ui;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.*;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +17,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -29,6 +30,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.project_1.R;
 import com.example.project_1.model.HazardRating;
 import com.example.project_1.model.InputStreamVolleyRequest;
 import com.example.project_1.model.Inspection;
@@ -37,7 +39,6 @@ import com.example.project_1.model.Restaurant;
 import com.example.project_1.model.RestaurantManager;
 import com.example.project_1.model.Violation;
 import com.example.project_1.model.ViolationSeverity;
-import com.example.project_1.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -53,7 +54,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.charset.Charset;
 import java.text.ParseException;
@@ -816,7 +816,7 @@ public class RestaurantList extends AppCompatActivity {
 
     private class MyListAdapter extends ArrayAdapter<Restaurant> {
         public MyListAdapter() {
-            super(RestaurantList.this, R.layout.restaurant_view, restaurantManager.getRestaurants());
+            super(RestaurantList.this, R.layout.restaurant_view, restaurantManager.getMarkerRestaurants());
         }
 
         @NonNull
@@ -829,7 +829,7 @@ public class RestaurantList extends AppCompatActivity {
             }
 
             // Find the restaurant to work with
-            Restaurant currentRestaurant = restaurantManager.get(position);
+            Restaurant currentRestaurant = restaurantManager.getRestaurantMarkerIndex(position);
             List<Inspection> inspectionsForCurrentRestaurant = restaurantManager.getInspectionsForRestaurant(position);
 
             boolean isFav = restaurantManager.getFavTrackingNumList().contains(currentRestaurant.getTrackingNumber().replaceAll("\"",""));

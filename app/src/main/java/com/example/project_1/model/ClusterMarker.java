@@ -3,10 +3,7 @@ package com.example.project_1.model;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.maps.android.clustering.ClusterItem;
 
 import java.util.List;
@@ -22,6 +19,8 @@ public class ClusterMarker implements ClusterItem {
     private int icon;
     private HazardRating hazardRating;
     private List<Inspection> inspectionList;
+    private Restaurant restaurant;
+
 
     public ClusterMarker(String title, String snippet, LatLng position, HazardRating hazardRating) {
 
@@ -40,6 +39,18 @@ public class ClusterMarker implements ClusterItem {
         this.hazardRating = hazardRating;
         this.icon = icon;
         this.inspectionList = inspectionList;
+    }
+
+    public ClusterMarker(String title, String snippet, LatLng position, HazardRating hazardRating,
+                         int icon, List<Inspection> inspectionList, Restaurant restaurant) {
+
+        this.position = position;
+        this.title = title;
+        this.snippet = snippet;
+        this.hazardRating = hazardRating;
+        this.icon = icon;
+        this.inspectionList = inspectionList;
+        this.restaurant = restaurant;
     }
 
 
@@ -83,6 +94,14 @@ public class ClusterMarker implements ClusterItem {
 
     public int getIcon() {
         return icon;
+    }
+
+    public Restaurant getRestaurant() {
+        return restaurant;
+    }
+
+    public void setRestaurant(Restaurant restaurant) {
+        this.restaurant = restaurant;
     }
 
     public HazardRating getHazard(){

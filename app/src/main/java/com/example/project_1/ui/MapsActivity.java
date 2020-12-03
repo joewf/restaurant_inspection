@@ -1,13 +1,5 @@
 package com.example.project_1.ui;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
-
 import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -20,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
@@ -30,8 +23,15 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.view.LayoutInflater;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -65,8 +65,6 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.maps.android.clustering.ClusterManager;
 
-import java.util.ArrayList;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -90,6 +88,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -262,6 +261,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mClusterManager.cluster();
         }
 
+
         // Settings for cluster manager
         mClusterManager = new ClusterManager<ClusterMarker>(this, mMap);
         renderer = new CustomClusterRenderer(this, mMap, mClusterManager);
@@ -311,30 +311,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         Log.d(TAG, "setting restaurant marker green");
                         // Set marker
                         clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
-                                hazardRating, GREEN, mCurrentRestaurantInspectionList);
+                                hazardRating, GREEN, mCurrentRestaurantInspectionList, mCurrentRestaurant);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
+                        mRestaurantManager.addMarkerRestaurant(mCurrentRestaurant);
                         break;
 
                     case MODERATE:
                         Log.d(TAG, "setting restaurant marker yellow");
                         // Set marker
                         clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
-                                hazardRating, YELLOW, mCurrentRestaurantInspectionList);
+                                hazardRating, YELLOW, mCurrentRestaurantInspectionList, mCurrentRestaurant);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
+                        mRestaurantManager.addMarkerRestaurant(mCurrentRestaurant);
                         break;
 
                     case HIGH:
                         Log.d(TAG, "setting restaurant marker red");
                         // Set marker
                         clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
-                                hazardRating, RED, mCurrentRestaurantInspectionList);
+                                hazardRating, RED, mCurrentRestaurantInspectionList, mCurrentRestaurant);
                         mClusterManager.addItem(clusterMarker);
                         mClusterMarkersList.add(clusterMarker);
                         mClusterManager.cluster();
+                        mRestaurantManager.addMarkerRestaurant(mCurrentRestaurant);
                         break;
                 }
 
@@ -353,10 +356,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 Log.d(TAG, "setting restaurant marker green");
                 clusterMarker = new ClusterMarker(restaurantName, snippet, currentRestaurantLatLng,
-                        hazardRating, GREEN, mCurrentRestaurantInspectionList);
+                        hazardRating, GREEN, mCurrentRestaurantInspectionList, mCurrentRestaurant);
                 mClusterManager.addItem(clusterMarker);
                 mClusterMarkersList.add(clusterMarker);
                 mClusterManager.cluster();
+                mRestaurantManager.addMarkerRestaurant(mCurrentRestaurant);
             }
 
             markerMap.put(mCurrentRestaurant.getTrackingNumber(), clusterMarker);
@@ -410,6 +414,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mClusterManager.clearItems();
             mClusterManager.cluster();
         }
+
+        mRestaurantManager.emptyMarkerRestaurants();        // Remove all restaurants for marker
 
         for(int i = 0; i < mClusterMarkersList.size(); i ++) {
 
@@ -475,6 +481,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     Log.d(TAG, "Adding marker to the map: " + mMarker.getTitle());
                                     mClusterManager.addItem(mMarker);
                                     mClusterManager.cluster();
+                                    mRestaurantManager.addMarkerRestaurant(mMarker.getRestaurant());
                                 }
 
                             }
@@ -532,6 +539,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     Log.d(TAG, "Adding marker to the map: " + mMarker.getTitle());
                                     mClusterManager.addItem(mMarker);
                                     mClusterManager.cluster();
+                                    mRestaurantManager.addMarkerRestaurant(mMarker.getRestaurant());
                                 }
 
                             }

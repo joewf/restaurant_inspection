@@ -21,6 +21,7 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
     private List<Restaurant> restaurants = new ArrayList<>();
     private List<Inspection> inspections = new ArrayList<>();
     private List<Restaurant> favRestaurants = new ArrayList<>();
+    private List<Restaurant> markerRestaurants = new ArrayList<>();
     private List<String> favTrackingNumList = new ArrayList<>();
     private static RestaurantManager instance;
     private HashMap<String, Integer> favMap = new HashMap<>();
@@ -33,6 +34,10 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
 
     public List<Inspection> getInspections() {
         return inspections;
+    }
+
+    public List<Restaurant> getMarkerRestaurants() {
+        return markerRestaurants;
     }
 
     private RestaurantManager() {
@@ -54,6 +59,10 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
         return instance;
     }
 
+    public void setMarkerRestaurants(List<Restaurant> markerRestaurants) {
+        this.markerRestaurants = markerRestaurants;
+    }
+
     public void setRestaurants(List<Restaurant> restaurants) {
         this.restaurants = restaurants;
     }
@@ -71,6 +80,10 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
         favTrackingNumList.add(restaurant.getTrackingNumber().replaceAll("\"", ""));
     }
 
+    public void addMarkerRestaurant(Restaurant restaurant) {
+        markerRestaurants.add(restaurant);
+    }
+
     public void removeFavRestaurant(Restaurant restaurant) {
         favRestaurants.remove(restaurant);
     }
@@ -81,6 +94,10 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
 
     public Restaurant get(int index) {
         return restaurants.get(index);
+    }
+
+    public Restaurant getRestaurantMarkerIndex(int index) {
+        return markerRestaurants.get(index);
     }
 
     public List<Violation> getViolations(int restaurantIndex, int inspectionIndex) {
@@ -186,6 +203,8 @@ public class RestaurantManager implements Iterable<Restaurant>, Serializable {
     public void emptyInspections() {
         inspections.clear();
     }
+
+    public void emptyMarkerRestaurants() {markerRestaurants.clear(); }
 
     public void emptyFav() {
         favRestaurants.clear();
