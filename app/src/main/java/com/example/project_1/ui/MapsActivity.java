@@ -240,7 +240,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
 
         // Reset search button
-        clearButton = (Button) findViewById(R.id.button_reset_markers);
+        /*clearButton = (Button) findViewById(R.id.button_reset_markers);
         clearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -251,7 +251,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mSpinnerIssues.setSelection(0);
                 Toast.makeText(MapsActivity.this, "Search reset", Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
 
     }
 
