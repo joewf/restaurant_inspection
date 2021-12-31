@@ -56,11 +56,6 @@ public class ClusterMarker implements ClusterItem {
         this.trackingNumber = trackingNumber;
     }
 
-
-    public ClusterMarker() {
-
-    }
-
     @NonNull
     @Override
     public LatLng getPosition() {

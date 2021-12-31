@@ -105,11 +105,6 @@ public class Restaurant implements Serializable {
         return "\nRestaurant{" +
                 "trackingNumber='" + trackingNumber + '\'' +
                 "name='" + name + '\'' +
-//                ", physicalAddress='" + physicalAddress + '\'' +
-//                ", physicalCity='" + physicalCity + '\'' +
-//                ", factType='" + factType + '\'' +
-//                ", latitude=" + latitude +
-//                ", altitude=" + longitude +
                 '}';
     }
 }

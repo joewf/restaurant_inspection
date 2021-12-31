@@ -42,19 +42,4 @@ public class CustomClusterRenderer extends DefaultClusterRenderer<ClusterMarker>
             markerOptions.icon(markerDescriptor);
         }
     }
-
-    /*@Override
-    protected void onBeforeClusterRendered(@NonNull Cluster<ClusterMarker> cluster, @NonNull MarkerOptions markerOptions) {
-        if(cluster.getSize() > 6) {
-            mClusterIconGenerator.setBackground(ContextCompat.getDrawable(mContext, R.drawable.ic_baseline_zoom_in_black_24));
-        }else {
-            mClusterIconGenerator.setBackground(ContextCompat.getDrawable(mContext, R.drawable.ic_baseline_zoom_in_24));
-        }
-
-        mClusterIconGenerator.setTextAppearance(R.style.AppTheme_WhiteTextAppearance);
-        String clusterTitle = String.valueOf(cluster.getSize());
-        Bitmap icon = mClusterIconGenerator.makeIcon(clusterTitle);
-        markerOptions.icon(BitmapDescriptorFactory.fromBitmap(icon));
-
-    }*/
 }

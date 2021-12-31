@@ -270,10 +270,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             searchStringFromMap = RestaurantList.searchStringFromList;
             mSearchText.setText(searchStringFromMap);
         }
-//        if (backFrom == BackFrom.RestaurantList) {
-//            showNewInspectionOnFav();
-//        }
-
         Log.e(TAG, "onResume: ");
     }
 
@@ -291,24 +287,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void initSearch() {
         Log.d(TAG, "init: initiating search");
-
-        /*mSearchText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                //addRestaurantMarker();
-                searchRestaurants();
-            }
-        });*/
 
         mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -493,7 +471,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Date format
         Date inspectionDate;
-        Date currentDate = new Date();                      // Current date
+        Date currentDate = new Date();                      //Current date
         Log.d(TAG, "Current Date: " + currentDate);
 
         // If there are markers, delete them
@@ -502,7 +480,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mClusterManager.cluster();
         }
 
-        mRestaurantManager.emptyMarkerRestaurants();        // Remove all restaurants for marker
+        mRestaurantManager.emptyMarkerRestaurants();        //Remove all restaurants for marker
 
 
         for (int i = 0; i < mClusterMarkersList.size(); i++) {
@@ -511,8 +489,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMarker = mClusterMarkersList.get(i);
 
             // List of inspections of the restaurant
-            List<Inspection> currentMarkerInspectionsList = mMarker.getInspectionList();    // Initiate marker inspection list
-            int currentMarkerInspectionListSize = currentMarkerInspectionsList.size();      // Inspection list size
+            List<Inspection> currentMarkerInspectionsList = mMarker.getInspectionList();    //Initiate marker inspection list
+            int currentMarkerInspectionListSize = currentMarkerInspectionsList.size();      //Inspection list size
             int numCritical = 0;
             Log.d(TAG, "Setting critical to ZERO: " + numCritical);
 
@@ -940,22 +918,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             setRestaurantData(updateAvailable, oldRestaurants);
                             File oldInspectionReports = new File(getFilesDir(), "oldRestaurants");
                             setInspectionData(updateAvailable, oldInspectionReports);
-                            /*mRestaurantManager.sortRestaurantList();
-                            mRestaurantManager.sortInspectionDate();
-                            populateListView();
-                            populateIcon();*/
-                            //Intent home = new Intent(getApplicationContext(), OfficeActivity.class);
-                            //startActivity(home);
-                            //finish();
                             mRestaurantManager.sortRestaurantList();
                             mRestaurantManager.sortInspectionDate();
 
                             if (!loadedFromSave) {
                                 save();
                             }
-
                             getLocationPermission();
-                            //Log.e(TAG, "onClick: " + mRestaurantManager);
                         }
                     });
 
@@ -990,13 +959,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             });
 
                             // Add the request to the RequestQueue.
-                            //RequestQueue requestQueue = Volley.newRequestQueue(this);
                             Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
-                            //requestQueue.add(stringRequest);
-
-                            //Intent home = new Intent(getApplicationContext(), SchoolActivity.class);
-                            //startActivity(home);
-                            //finish();
                         }
                     });
                     AlertDialog alertdialog = builder.create();
@@ -1023,15 +986,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                 pDialog.dismiss();//dismiss dialog
                 cancelDownloading[0] = true;
-                //Volley.newRequestQueue(getApplicationContext(), new HurlStack()).stop();
-                //requestQueue.stop();
                 Boolean updateAvailable = false;
                 File oldRestaurants = new File(getFilesDir(), "oldRestaurants");
                 setRestaurantData(updateAvailable, oldRestaurants);
                 File oldInspectionReports = new File(getFilesDir(), "oldRestaurants");
                 setInspectionData(updateAvailable, oldInspectionReports);
-                /*mRestaurantManager.sortRestaurantList();
-                mRestaurantManager.sortInspectionDate();*/
                 mRestaurantManager.sortRestaurantList();
                 mRestaurantManager.sortInspectionDate();
                 save();
@@ -1057,7 +1016,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             //covert reponse to input stream
                             InputStream input = new ByteArrayInputStream(response);
-                            //File path = Environment.getExternalStorageDirectory();
                             File newRestaurants = new File(getFilesDir(), filename);
                             map.put("resume_path", newRestaurants.toString());
                             BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(newRestaurants));
@@ -1094,14 +1052,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }, null);
         request.setTag("tag");
         Request<byte[]> requestQueueByte = Volley.newRequestQueue(getApplicationContext(), new HurlStack()).add(request);
-        //RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
-        //requestQueue = requestQueue.add(request);
         if (cancelDownloading[0]) {
-            //Volley.newRequestQueue(getApplicationContext(), new HurlStack()).stop();
-            //Log.i("myStop", "stop");
             requestQueueByte.cancel();
         }
-        //requestQueue.add(request);
     }
 
 
@@ -1157,12 +1110,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                             lastUpdatedTimeInMilliseconds = Instant.now().toEpochMilli();
                             lastModifiedTimeInMilliseconds = currentLastModifiedTimeInMilliseconds;
-
-                            //change here to adapt large data
-                            //sortRestaurantList();
-                            //sortInspectionDate();
-                            //populateListView();
-                            //populateIcon();
                             mRestaurantManager.sortRestaurantList();
                             mRestaurantManager.sortInspectionDate();
 
@@ -1191,11 +1138,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //Volley.newRequestQueue(getApplicationContext(), new HurlStack()).add(request);
         Request<byte[]> requestQueueByte = Volley.newRequestQueue(getApplicationContext(), new HurlStack()).add(request);
         if (cancelDownloading[0]) {
-            //Volley.newRequestQueue(getApplicationContext(), new HurlStack()).stop();
-            //Log.i("myStop", "stop");
             requestQueueByte.cancel();
         }
-        //requestQueue.add(request);
     }
 
     private void showNewInspectionOnFav() {
@@ -1205,11 +1149,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.e(TAG, "showNewInspectionOnFav: FavMap " + mRestaurantManager.getFavMap());
 
         ArrayList<Restaurant> favWithNewInspection = mRestaurantManager.getFavRestaurantWithNewInspection(favInspectionNumMap);
-
-//        if (loadedFromSave) {
-        //favWithNewInspection = mRestaurantManager.getFavRestaurants();
-//        }
-
         Log.e(TAG, "showNewInspectionOnFav: fav " + mRestaurantManager.getFavRestaurants());
         Log.e(TAG, "showNewInspectionOnFav: fav with update " + favWithNewInspection);
 
@@ -1337,10 +1276,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         }
 
                         List<Violation> violationList = getViolationsFromString(violationsString.toString());
-                        //List<Violation> violationList = new ArrayList<>();
                         sampleInspection.setViolations(violationList);
 
-                        //Log.i("myViolations", "setInspectionData: " + violationList);
                     }
 
                     mRestaurantManager.addInspection(sampleInspection);
@@ -1425,7 +1362,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     // Violations
                     if (tokens.length > 6) {
-                        //Log.e("violations length ", "setInspectionData: " + (tokens.length - 6));
 
                         // Get violations String "..."
                         StringBuilder violationsString = new StringBuilder();
@@ -1484,7 +1420,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 description = tokens[2];
 
                 Violation violation = new Violation(description, severity, code);
-                //Log.e("Violation OBJECT", "getViolationsFromString: " + violation);
 
                 list.add((violation));
 
@@ -1508,20 +1443,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     newRestaurant.setTrackingNumber(tokens[0]);
                     Log.i("myRestaurantName", tokens[1]);
 
-                    /*sampleRestaurant.setName(tokens[1]);
-                    sampleRestaurant.setPhysicalAddress(tokens[2]);
-                    sampleRestaurant.setPhysicalCity(tokens[3]);
-                    sampleRestaurant.setFactType(tokens[4]);
-                    if (tokens[5].length() > 0) {
-                    sampleRestaurant.setLatitude(tokens[5]);
-                    } else {
-                        sampleRestaurant.setLatitude("0");
-                    }
-                    if (tokens[6].length() > 0) {
-                        sampleRestaurant.setAltitude(tokens[6]);
-                    } else {
-                        sampleRestaurant.setAltitude("0");
-                    }*/
                     if (tokens.length == 7) {
                         newRestaurant.setName(tokens[1]);
                         newRestaurant.setPhysicalAddress(tokens[2]);
@@ -1542,16 +1463,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     mRestaurantManager.addRestaurant(newRestaurant);
 
-                    //Log.d("RestaurantList", "Just created: " + sampleRestaurant);
-
                 }
                 Log.i("myRestaurantLength", ": " + mRestaurantManager.getRestaurants().size());
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } /*else if (LOAD) {
-            //load();
-        }*/ else if (!loadedFromSave) {
+        }
+            else if (!loadedFromSave) {
             InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(is, Charset.forName("UTF-8"))
@@ -1667,12 +1585,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         System.exit(0);
                     }
                 })
-                /*.setNeutralButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        startActivity(new Intent(MapsActivity.this, RestaurantList.class));
-                    }
-                })*/
                 .setNegativeButton("Cancel", null)
                 .show();
 

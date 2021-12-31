@@ -91,21 +91,6 @@ public class RestaurantList extends AppCompatActivity {
     private long lastUpdatedTimeInMilliseconds;
     private long lastModifiedTimeInMilliseconds;
 
-
-    // Add the request to the RequestQueue.
-
-
-    // Instantiate the cache
-    //Cache cache = new DiskBasedCache(getCacheDir(), 1024 * 1024); // 1MB cap
-
-    // Set up the network to use HttpURLConnection as the HTTP client.
-    //Network network = new BasicNetwork(new HurlStack());
-
-    // Instantiate the RequestQueue with the cache and network.
-    //RequestQueue requestQueue = new RequestQueue(this);
-    //RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-    //RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
     int count;
     public static String searchStringFromList;
     private EditText mSearchText;
@@ -123,9 +108,6 @@ public class RestaurantList extends AppCompatActivity {
         restaurantManager = RestaurantManager.getInstance();
 
         initSearch();
-
-//        load();
-//        checkUpdateOfFraserHealthRestaurantInspectionReports();
         populateListView();
 
     }
@@ -145,8 +127,6 @@ public class RestaurantList extends AppCompatActivity {
     private void checkUpdateOfFraserHealthRestaurantInspectionReports() {
 
         String urlFraserHealthRestaurantInspectionReports = "https://data.surrey.ca/api/3/action/package_show?id=fraser-health-restaurant-inspection-reports";
-
-        //final JSONObject[] restaurantRequest = new JSONObject[1];
         StringRequest stringRequest = new StringRequest(Request.Method.GET, urlFraserHealthRestaurantInspectionReports,
                 new Response.Listener<String>() {
                     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -208,13 +188,6 @@ public class RestaurantList extends AppCompatActivity {
                             setRestaurantData(updateAvailable, oldRestaurants);
                             File oldInspectionReports = new File(getFilesDir(), "oldRestaurants");
                             setInspectionData(updateAvailable, oldInspectionReports);
-                            /*restaurantManager.sortRestaurantList();
-                            restaurantManager.sortInspectionDate();
-                            populateListView();
-                            populateIcon();*/
-                            //Intent home = new Intent(getApplicationContext(), OfficeActivity.class);
-                            //startActivity(home);
-                            //finish();
                             restaurantManager.sortRestaurantList();
                             restaurantManager.sortInspectionDate();
                             populateListView();
@@ -253,13 +226,8 @@ public class RestaurantList extends AppCompatActivity {
                             });
 
                             // Add the request to the RequestQueue.
-                            //RequestQueue requestQueue = Volley.newRequestQueue(this);
                             Volley.newRequestQueue(getApplicationContext()).add(stringRequest);
-                            //requestQueue.add(stringRequest);
 
-                            //Intent home = new Intent(getApplicationContext(), SchoolActivity.class);
-                            //startActivity(home);
-                            //finish();
                         }
                     });
                     AlertDialog alertdialog = builder.create();
@@ -284,15 +252,11 @@ public class RestaurantList extends AppCompatActivity {
 
                 pDialog.dismiss();//dismiss dialog
                 cancelDownloading[0] = true;
-                //Volley.newRequestQueue(getApplicationContext(), new HurlStack()).stop();
-                //requestQueue.stop();
                 Boolean updateAvailable = false;
                 File oldRestaurants = new File(getFilesDir(), "oldRestaurants");
                 setRestaurantData(updateAvailable, oldRestaurants);
                 File oldInspectionReports = new File(getFilesDir(), "oldRestaurants");
                 setInspectionData(updateAvailable, oldInspectionReports);
-                /*restaurantManager.sortRestaurantList();
-                restaurantManager.sortInspectionDate();*/
                 restaurantManager.sortRestaurantList();
                 restaurantManager.sortInspectionDate();
                 populateListView();
@@ -310,15 +274,13 @@ public class RestaurantList extends AppCompatActivity {
                     if (response != null) {
 
                         String filename = "newRestaurants";
-                        //filename = filename.replace(":", ".");
                         Log.d("myRESUME FILE NAME", filename);
 
                         try {
-                            long lenghtOfFile = response.length;
+                            long lengthOfFile = response.length;
 
-                            //covert reponse to input stream
+                            //covert response to input stream
                             InputStream input = new ByteArrayInputStream(response);
-                            //File path = Environment.getExternalStorageDirectory();
                             File newRestaurants = new File(getFilesDir(), filename);
                             map.put("resume_path", newRestaurants.toString());
                             BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(newRestaurants));
@@ -355,14 +317,9 @@ public class RestaurantList extends AppCompatActivity {
         }, null);
         request.setTag("tag");
         Request<byte[]> requestQueueByte = Volley.newRequestQueue(getApplicationContext(), new HurlStack()).add(request);
-        //RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext(), new HurlStack());
-        //requestQueue = requestQueue.add(request);
         if (cancelDownloading[0]) {
-            //Volley.newRequestQueue(getApplicationContext(), new HurlStack()).stop();
-            //Log.i("myStop", "stop");
             requestQueueByte.cancel();
         }
-        //requestQueue.add(request);
     }
 
 
@@ -376,15 +333,13 @@ public class RestaurantList extends AppCompatActivity {
                     if (response != null) {
 
                         String filename = "newInspectionReports";
-                        //filename = filename.replace(":", ".");
                         Log.d("myRESUME FILE NAME", filename);
 
                         try {
-                            long lenghtOfFile = response.length;
+                            long lengthOfFile = response.length;
 
-                            //covert reponse to input stream
+                            //covert response to input stream
                             InputStream input = new ByteArrayInputStream(response);
-                            //File path = Environment.getExternalStorageDirectory();
                             File newInspectionReports = new File(getFilesDir(), filename);
                             map.put("resume_path", newInspectionReports.toString());
                             BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(newInspectionReports));
@@ -415,11 +370,6 @@ public class RestaurantList extends AppCompatActivity {
                             setRestaurantData(updateAvailable, newRestaurants);
                             setInspectionData(updateAvailable, newInspectionReports);
 
-                            //change here to adapt large data
-                            //sortRestaurantList();
-                            //sortInspectionDate();
-                            //populateListView();
-                            //populateIcon();
                             restaurantManager.sortRestaurantList();
                             restaurantManager.sortInspectionDate();
                             populateListView();
@@ -440,14 +390,10 @@ public class RestaurantList extends AppCompatActivity {
                 Log.d("KEY_ERROR", "UNABLE TO DOWNLOAD FILE. ERROR:: " + error.getMessage());
             }
         }, null);
-        //Volley.newRequestQueue(getApplicationContext(), new HurlStack()).add(request);
         Request<byte[]> requestQueueByte = Volley.newRequestQueue(getApplicationContext(), new HurlStack()).add(request);
         if (cancelDownloading[0]) {
-            //Volley.newRequestQueue(getApplicationContext(), new HurlStack()).stop();
-            //Log.i("myStop", "stop");
             requestQueueByte.cancel();
         }
-        //requestQueue.add(request);
     }
 
 
@@ -521,7 +467,6 @@ public class RestaurantList extends AppCompatActivity {
                         // Get violations String "..."
                         StringBuilder violationsString = new StringBuilder();
                         for (int i = 5; i < tokens.length - 1; i++) {
-                            //Log.e("token[i]", "loop: " + tokens[i]);
                             if (i == 5) {
                                 violationsString.append(tokens[i]);
                             } else {
@@ -530,10 +475,7 @@ public class RestaurantList extends AppCompatActivity {
                         }
 
                         List<Violation> violationList = getViolationsFromString(violationsString.toString());
-                        //List<Violation> violationList = new ArrayList<>();
                         sampleInspection.setViolations(violationList);
-
-                        //Log.i("myViolations", "setInspectionData: " + violationList);
                     }
 
                     restaurantManager.addInspection(sampleInspection);
@@ -547,12 +489,9 @@ public class RestaurantList extends AppCompatActivity {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+        }
 
-
-        } /*else if (LOAD) {
-            load();
-            Log.e("TAG", "setInspectionData: " + restaurantManager);
-        }*/ else if (!loadedFromSave) {
+            else if (!loadedFromSave) {
             InputStream is = getResources().openRawResource(R.raw.inspectionreports_itr1);
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(is, Charset.forName("UTF-8"))
@@ -618,13 +557,10 @@ public class RestaurantList extends AppCompatActivity {
 
                     // Violations
                     if (tokens.length > 6) {
-                        //Log.e("violations length ", "setInspectionData: " + (tokens.length - 6));
 
                         // Get violations String "..."
                         StringBuilder violationsString = new StringBuilder();
                         for (int i = 6; i < tokens.length; i++) {
-                            //Log.e("token[i]", "loop: " + tokens[i]);
-
                             if (i == 6) {
                                 violationsString.append(tokens[i].substring(1));
                             } else {
@@ -633,10 +569,7 @@ public class RestaurantList extends AppCompatActivity {
                         }
 
                         List<Violation> violationList = getViolationsFromString(violationsString.toString());
-
                         sampleInspection.setViolations(violationList);
-
-                        //Log.e("violations", "setInspectionData: " + violationList);
                     }
 
                     restaurantManager.addInspection(sampleInspection);
@@ -648,8 +581,6 @@ public class RestaurantList extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-
-
     }
 
     private List<Violation> getViolationsFromString(String violationsString) {
@@ -677,8 +608,6 @@ public class RestaurantList extends AppCompatActivity {
                 description = tokens[2];
 
                 Violation violation = new Violation(description, severity, code);
-                //Log.e("Violation OBJECT", "getViolationsFromString: " + violation);
-
                 list.add((violation));
 
             }
@@ -701,20 +630,6 @@ public class RestaurantList extends AppCompatActivity {
                     newRestaurant.setTrackingNumber(tokens[0]);
                     Log.i("myRestaurantName", tokens[1]);
 
-                    /*sampleRestaurant.setName(tokens[1]);
-                    sampleRestaurant.setPhysicalAddress(tokens[2]);
-                    sampleRestaurant.setPhysicalCity(tokens[3]);
-                    sampleRestaurant.setFactType(tokens[4]);
-                    if (tokens[5].length() > 0) {
-                    sampleRestaurant.setLatitude(tokens[5]);
-                    } else {
-                        sampleRestaurant.setLatitude("0");
-                    }
-                    if (tokens[6].length() > 0) {
-                        sampleRestaurant.setAltitude(tokens[6]);
-                    } else {
-                        sampleRestaurant.setAltitude("0");
-                    }*/
                     if (tokens.length == 7) {
                         newRestaurant.setName(tokens[1]);
                         newRestaurant.setPhysicalAddress(tokens[2]);
@@ -732,19 +647,16 @@ public class RestaurantList extends AppCompatActivity {
                         newRestaurant.setLongitude(Double.parseDouble(tokens[7]));
                     }
 
-
                     restaurantManager.addRestaurant(newRestaurant);
-
-                    //Log.d("RestaurantList", "Just created: " + sampleRestaurant);
 
                 }
                 Log.i("myRestaurantLength", ": " + restaurantManager.getRestaurants().size());
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } /*else if (LOAD) {
-            //load();
-        }*/ else if (!loadedFromSave) {
+        }
+
+            else if (!loadedFromSave) {
             InputStream is = getResources().openRawResource(R.raw.restaurants_itr1);
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(is, Charset.forName("UTF-8"))
@@ -919,13 +831,10 @@ public class RestaurantList extends AppCompatActivity {
             TextView restaurantCriticalIssues = (TextView) itemView.findViewById(R.id.text_issues_found);
             int criticalIssues;
             if (!inspectionsForCurrentRestaurant.isEmpty()) {
-
-                /*for (Inspection inspection : inspectionsForCurrentRestaurant)*/
                 {
                     criticalIssues = inspectionsForCurrentRestaurant.get(0).getNumCritical();
                     restaurantCriticalIssues.setText(getString(R.string.crit_iss) + criticalIssues);
 
-                    //break;
                 }
             } else {
                 restaurantCriticalIssues.setText(R.string.crit_iss_0);
@@ -942,8 +851,6 @@ public class RestaurantList extends AppCompatActivity {
                     txtRestaurantHazard.setBackgroundColor(Color.TRANSPARENT);
                 }
 
-                //Log.e("hazard loop", "getView: " + inspectionsForCurrentRestaurant.toString());
-                /*for (Inspection inspection : inspectionsForCurrentRestaurant)*/
                 {
                     HazardRating hazard = inspectionsForCurrentRestaurant.get(0).getHazardRating();
                     switch (hazard) {
@@ -965,8 +872,6 @@ public class RestaurantList extends AppCompatActivity {
                             txtRestaurantHazard.setTextColor(Color.RED);
                             break;
                     }
-
-//                    break;
                 }
             } else {
                 RestaurantHazard.setImageResource(R.mipmap.green_hazard);
@@ -1005,8 +910,6 @@ public class RestaurantList extends AppCompatActivity {
                         String strDate = simpleDateFormat.format(inspectionDate);
                         restaurantDate.setText(strDate);
                     }
-
-                    //break;
                 }
             } else {
                 restaurantDate.setText(R.string.no_inspection_found);
@@ -1034,12 +937,7 @@ public class RestaurantList extends AppCompatActivity {
                         System.exit(0);
                     }
                 })
-                /*.setNeutralButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        startActivity(new Intent(RestaurantList.this, MapsActivity.class));
-                    }
-                })*/
+
                 .setNegativeButton("Cancel", null)
                 .show();
 
@@ -1100,21 +998,6 @@ public class RestaurantList extends AppCompatActivity {
             }
         });
 
-        /*mSearchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionID, KeyEvent keyEvent) {
-                if(actionID == EditorInfo.IME_ACTION_SEARCH             // Search when clicking on search icon
-                || actionID == EditorInfo.IME_ACTION_DONE               // Search when clicking done
-                || keyEvent.getAction() == keyEvent.ACTION_DOWN         // Search when hiding keyboard
-                || keyEvent.getAction() == keyEvent.KEYCODE_ENTER){     // Search when pressing enter
-
-                    // Search restaurants based on name
-                    searchRestaurants();
-                }
-                return false;
-            }
-        });*/
-
         hideKeyboard();
     }
 
@@ -1128,9 +1011,7 @@ public class RestaurantList extends AppCompatActivity {
 
         restaurantManager.emptyMarkerRestaurants();        // Remove all restaurants for marker
 
-        /*if (searchStringFromList.isEmpty()) {
-            restaurantManager.setMarkerRestaurants(allRestaurants);
-        } else */{
+        {
             for (Restaurant current : allRestaurants) {
                 if (current.getName().toLowerCase().contains(searchStringFromList)) {
                     restaurantManager.addMarkerRestaurant(current);
